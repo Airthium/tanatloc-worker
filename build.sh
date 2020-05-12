@@ -33,7 +33,9 @@ downloadArchive() {
   # Download target if not already present
   if [ ! -f $archive ]; then
     echo "File $archive not found. Downloading..."
-    wget ARCHIVES[$archive];
+    # TODO wget is not working for private repository releases
+    # Use? curl -vLJO -H 'Authorization: token my_access_token' 'https://api.github.com/repos/:owner/:repo/releases/assets/:id'
+    wget ${ARCHIVES[$archive]};
   fi
 }
 
@@ -41,7 +43,7 @@ buildDockerfile() {
   target="$1"
   echo -e "Building Dockerfile..."
   echo -e "> ${DOCKERFILE_PATH}"
-  
+
   declare -A fragments
   fragments="${TARGETS[$target]}"
 
