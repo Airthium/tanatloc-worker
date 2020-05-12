@@ -15,3 +15,6 @@ RUN cd gmsh \
   && cmake .. \
   && make -j "$(nproc)" \
   && make install
+
+# Fix shared library missing using
+# export LD_LIBRARY_PATH=/usr/local/lib
