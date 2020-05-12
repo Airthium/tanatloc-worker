@@ -3,7 +3,7 @@ FROM ubuntu:18.04
 
 WORKDIR /usr/bin
 
-COPY . .
+COPY ./converters .
 
 RUN cmake .
 
