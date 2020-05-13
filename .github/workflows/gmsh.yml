@@ -1,0 +1,16 @@
+name: Gmsh Docker image build
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Gmsh test
+        run: ./build.sh gmsh:test
