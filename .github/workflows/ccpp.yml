@@ -35,7 +35,6 @@ jobs:
         cd converters
         make
         make clean
-        make distclean
     - name: Sonar scan
       run: |
         cd converters
