@@ -21,16 +21,16 @@ private:
 
   TopoDS_Shape shape;
 
-  virtual void processCodeValuePair(unsigned int, const std::string&);
-  virtual void addLine(const DL_LineData&);
+  virtual void processCodeValuePair(unsigned int, const std::string&) override;
+  virtual void addLine(const DL_LineData&) override;
 
-  virtual void addArc(const DL_ArcData&);
-  virtual void addCircle(const DL_CircleData&);
+  virtual void addArc(const DL_ArcData&) override;
+  virtual void addCircle(const DL_CircleData&) override;
 
-  virtual void addPolyline(const DL_PolylineData&);
-  virtual void addVertex(const DL_VertexData&);
+  virtual void addPolyline(const DL_PolylineData&) override;
+  virtual void addVertex(const DL_VertexData&) override;
 
-  virtual void endEntity();
+  virtual void endEntity() override;
 
   void buildWire();
   void buildFace();

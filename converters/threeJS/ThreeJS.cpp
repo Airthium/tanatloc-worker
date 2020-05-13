@@ -23,8 +23,28 @@ ThreeJS::ThreeJS () :
   colors(nullptr) {}
 
 /**
+ * Copy Constructor
+ */
+ThreeJS::ThreeJS (const ThreeJS&) :
+  dimension(3),
+  numberOfVertices(0),
+  numberOfNormals(0),
+  numberOfIndices(0),
+  numberOfColors(0),
+  minBb(0.),
+  maxBb(0.),
+  label(0),
+  vertices(nullptr),
+  normals(nullptr),
+  indices(nullptr),
+  colors(nullptr) {
+    std::cerr << "Copy constructore not defined" << std::endl;
+    throw std::string("Copy constructore not defined");
+  }
+
+/**
  * Constructor
- * @param vertices Vertices
+ * @param vertices Vertices (float)
  * @param numberOfVertices Number of vertices
  */
 ThreeJS::ThreeJS (float *vertices, const uint numberOfVertices) :
@@ -43,6 +63,11 @@ ThreeJS::ThreeJS (float *vertices, const uint numberOfVertices) :
   std::copy(vertices, vertices+numberOfVertices, this->vertices);
 }
 
+/**
+ * Constructor
+ * @param vertices Vertices (double)
+ * @param numberOfVertices Number of vertices
+ */
 ThreeJS::ThreeJS (double *vertices, const uint numberOfVertices) :
   dimension(3),
   numberOfVertices(numberOfVertices),
@@ -409,6 +434,27 @@ bool ThreeJS::writePartFile (const std::string &fileName, const std::string &typ
   file << "}" << std::endl;
 
   return true;
+}
+
+/**
+ * Operator
+ */
+ThreeJS &ThreeJS::operator= (const ThreeJS&) {
+  this->dimension = 3;
+  this->numberOfVertices = 0;
+  this->numberOfNormals = 0;
+  this->numberOfIndices = 0;
+  this->numberOfColors = 0;
+  this->minBb = 0.;
+  this->maxBb = 0.;
+  this->label = 0;
+  this->vertices = nullptr;
+  this->normals = nullptr;
+  this->indices = nullptr;
+  this->colors = nullptr;
+  std::cerr << "Copy constructore not defined" << std::endl;
+  throw std::string("Equality operator not defined");
+  return *this;
 }
 
 /**
