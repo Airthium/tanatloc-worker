@@ -1,0 +1,20 @@
+- name: Configure
+  run: |
+    cd converters
+    cmake .
+- name: Build
+  run: |
+    cd converters
+    make
+    make clean
+- name: Sonar scan
+  run: |
+    cd converters
+    ../build-wrapper-linux-x86/build-wrapper-linux-x86 --out-dir sonar-output make
+    ../sonar-scanner-cli-4.2.0.1873-linux/sonar-scanner-4.2.0.1873-linux/bin/sonar-scanner \
+      -Dsonar.organization=airthium \
+      -Dsonar.projectKey=Airthium_tanatloc-dockers \
+      -Dsonar.sources=. \
+      -Dsonar.host.url=https://sonarcloud.io \
+      -Dsonar.cfamily.build-wrapper-output=bw-output \
+      -Dsonar.login=${{ secrets.SONARCLOUD_LOGIN }}
