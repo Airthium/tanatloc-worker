@@ -1,1 +1,21 @@
+# Archives
 **/*.tar.gz
+
+# CMake
+converters/CMakeFiles
+converters/cmake_install.cmake
+converters/CMakeCache.txt
+converters/Makefile
+
+# Build
+converters/**/*.o
+
+# Executables
+converters/BRepToThreeJS
+converters/DXFToBRep
+converters/GmshToThreeJS
+converters/StepToThreeJS
+converters/StepUnion
+
+# Sonar
+converters/sonar-output
