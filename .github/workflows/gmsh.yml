@@ -13,4 +13,6 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Gmsh test
-        run: ./build.sh gmsh:test
+        run: |
+          export GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}" \
+          && ./build.sh gmsh:test
