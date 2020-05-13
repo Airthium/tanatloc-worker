@@ -15,7 +15,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install
-      run: sudo apt install -y cmake cppcheck libopencascade-dev unzip wget
+      run: |
+        sudo apt update
+        sudo apt install -y cmake cppcheck libopencascade-dev unzip wget
     - name: Install Sonar
       run: |
         wget https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
