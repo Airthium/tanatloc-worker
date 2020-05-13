@@ -2,8 +2,10 @@
 
 declare -A ARCHIVES
 
-ARCHIVES["opencascade-7.4.0.tar.gz"]="https://github.com/Airthium/tanatloc-dockers/releases/download/opencascade-7.4.0/opencascade-7.4.0.tar.gz"
-ARCHIVES["gmsh.tar.gz"]="https://github.com/Airthium/tanatloc-dockers/releases/download/gmsh-4.5.6/gmsh.tar.gz"
+# Get the list of releases and associated assets:
+#> curl -u $GITHUB_TOKEN:x-oauth-basic "https://api.github.com/repos/Airthium/tanatloc-dockers/releases"
+ARCHIVES["opencascade-7.4.0.tar.gz"]="https://api.github.com/repos/Airthium/tanatloc-dockers/releases/assets/20660980"
+ARCHIVES["gmsh.tar.gz"]="https://api.github.com/repos/Airthium/tanatloc-dockers/releases/assets/20664165"
 
 declare -A TARGETS
 
@@ -33,9 +35,7 @@ downloadArchive() {
   # Download target if not already present
   if [ ! -f $archive ]; then
     echo "File $archive not found. Downloading..."
-    # TODO wget is not working for private repository releases
-    # Use? curl -vLJO -H 'Authorization: token my_access_token' 'https://api.github.com/repos/:owner/:repo/releases/assets/:id'
-    wget ${ARCHIVES[$archive]};
+    curl -LJO -u $GITHUB_TOKEN:x-oauth-basic -H 'Accept: application/octet-stream' ${ARCHIVES[$archive]}
   fi
 }
 
@@ -59,7 +59,8 @@ buildDockerfile() {
 
 build() {
   echo -e "Building Docker image..."
-  docker build "$@" -f $DOCKERFILE_PATH .
+  echo -e "> docker build $ARGS -f $DOCKERFILE_PATH ."
+  docker build $ARGS -f $DOCKERFILE_PATH .
 }
 
 target=$1
@@ -71,8 +72,9 @@ if [ "${TARGETS[$target]}" == "" ]; then
   exit 1;
 fi
 
+ARGS="$@";
 echo "TARGET=\"$target\""
-echo "ARGS=\"$@\""
+echo "ARGS=\"$ARGS\""
 
 checkArchives
 buildDockerfile "$target"

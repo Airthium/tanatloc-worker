@@ -6,15 +6,14 @@ WORKDIR $GMSHPATH
 
 # Copy gmsh directory
 COPY gmsh.tar.gz .
-RUN tar xf gmsh.tar.gz
+RUN tar -zxvf gmsh.tar.gz
 
 # Configure and build Gmsh
 RUN cd gmsh \
   && mkdir build \
   && cd build \
-  && cmake .. \
+  && cmake .. -DENABLE_FLTK=OFF \
   && make -j "$(nproc)" \
   && make install
 
-# Fix shared library missing using
-# export LD_LIBRARY_PATH=/usr/local/lib
+RUN export LD_LIBRARY_PATH=/usr/local/lib
