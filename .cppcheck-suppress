@@ -1,1 +1,2 @@
 *:converters/dxflib/*
+*:converters/CMakeFiles/*

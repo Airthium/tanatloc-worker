@@ -44,6 +44,7 @@ private:
 public:
   // Constructor
   ThreeJS();
+  ThreeJS(const ThreeJS&);
   ThreeJS(float*, const uint);
   ThreeJS(double*, const uint);
   ThreeJS(float*, const uint, float*, const uint);
@@ -69,6 +70,9 @@ public:
 
   // Write part file
   bool writePartFile(const std::string&, const std::string&, const uint, const uint, const uint numberOfEdges=0) const;
+
+  // Operator
+  ThreeJS &operator= (const ThreeJS&);
 };
 
 #endif

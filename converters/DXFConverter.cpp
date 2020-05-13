@@ -23,15 +23,15 @@
 
 // PUBLIC
 
-DXFConverter::DXFConverter () {
-  this->input = "";
-  this->output = "";
+DXFConverter::DXFConverter () :
+  input(""),
+  output("") {
   this->vertices.clear();
 }
 
-DXFConverter::~DXFConverter () {
-  this->input = "";
-  this->output = "";
+DXFConverter::~DXFConverter () :
+  input(""),
+  output("") {
   this->vertices.clear();
 }
 
