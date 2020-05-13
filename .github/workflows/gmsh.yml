@@ -12,6 +12,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
+
+      - uses: actions/cache@v1
+        id: cache-opencascade
+        with:
+          path: opencascade-7.4.0.tar.gz
+          key: ${{ runner.os }}-opencascade-7.4.0.tar.gz
+
+      - uses: actions/cache@v1
+          id: cache-gmsh
+          with:
+            path: gmsh.tar.gz
+            key: ${{ runner.os }}-gmsh.tar.gz
+
       - name: Gmsh test
         run: |
           export GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}" \
