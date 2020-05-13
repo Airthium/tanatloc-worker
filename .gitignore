@@ -11,8 +11,11 @@ converters/Makefile
 converters/**/*.o
 
 # Executables
-converters/BrepToThreeJS
-converters/DXFToBrep
+converters/BRepToThreeJS
+converters/DXFToBRep
 converters/GmshToThreeJS
 converters/StepToThreeJS
 converters/StepUnion
+
+# Sonar
+converters/sonar-output
