@@ -3,8 +3,8 @@ name: Gmsh Docker image build
 on:
   push:
     branches: [master]
-  pull_request:
-    branches: [master]
+  # pull_request:
+  #   branches: [master]
 
 jobs:
   ci:
@@ -20,12 +20,13 @@ jobs:
           key: ${{ runner.os }}-opencascade-7.4.0.tar.gz
 
       - uses: actions/cache@v1
-          id: cache-gmsh
-          with:
-            path: gmsh.tar.gz
-            key: ${{ runner.os }}-gmsh.tar.gz
+        id: cache-gmsh
+        with:
+          path: gmsh.tar.gz
+          key: ${{ runner.os }}-gmsh.tar.gz
 
       - name: Gmsh test
+        env:
+          BUILD_TOKEN: ${{ secrets.ActionsAuthForTanatloc }}
         run: |
-          export GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}" \
-          && ./build.sh gmsh:test
+          ./build.sh gmsh:test
