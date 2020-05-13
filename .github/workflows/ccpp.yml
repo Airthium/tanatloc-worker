@@ -17,7 +17,7 @@ jobs:
     - name: Install
       run: |
         sudo apt update
-        sudo apt install -y cmake cppcheck liboce-foundation-dev unzip wget
+        sudo apt install -y cmake cppcheck liboce-foundation-dev liboce-modeling-dev liboce-ocaf-dev liboce-visualization-dev unzip wget
     - name: Install Sonar
       run: |
         wget https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
