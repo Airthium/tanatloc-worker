@@ -2,6 +2,18 @@
 
 Dockers for the Tanatloc project.
 
+## Requirements
+
+You need a valid `GITHUB_TOKEN` defined in your environment
+variables to retrieve the archives OpenCascade and Gmsh from
+this repository.
+
+```shell
+export GITHUB_TOKEN=xxx
+```
+
+> https://github.com/settings/tokens
+
 ## Usage
 
 ```shell
