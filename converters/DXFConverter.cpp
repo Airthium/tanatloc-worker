@@ -29,9 +29,9 @@ DXFConverter::DXFConverter () :
   this->vertices.clear();
 }
 
-DXFConverter::~DXFConverter () :
-  input(""),
-  output("") {
+DXFConverter::~DXFConverter () {
+  this->input = "";
+  this->output = "";
   this->vertices.clear();
 }
 
