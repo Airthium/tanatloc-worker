@@ -17,12 +17,6 @@ jobs:
     - name: Install
       run: |
         sudo apt update
-        sudo apt install -y cmake cppcheck unzip wget
-    - name: Install Sonar
-      run: |
-        wget https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
-        unzip build-wrapper-linux-x86.zip
-        wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.2.0.1873-linux.zip
-        unzip sonar-scanner-cli-4.2.0.1873-linux.zip
+        sudo apt install -y cppcheck
     - name: cppcheck
       run: cppcheck --enable=warning,style,performance,portability,information,missingInclude --suppressions-list=.cppcheck-suppress converters/
