@@ -15,7 +15,13 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install
-      run: sudo apt install -y cmake cppcheck
+      run: sudo apt install -y cmake cppcheck libopencascade-dev unzip wget
+    - name: Install Sonar
+      run: |
+        wget https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
+        unzip build-wrapper-linux-x86.zip
+        wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.2.0.1873-linux.zip
+        unzip sonar-scanner-cli-4.2.0.1873-linux.zip
     - name: cppcheck
       run: cppcheck --enable=warning,style,performance,portability,information,missingInclude converters/
     - name: Configure
