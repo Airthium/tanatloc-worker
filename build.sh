@@ -16,6 +16,9 @@ TARGETS["converters"]="pre opencascade.build gmsh.build converters.build"
 
 DOCKERFILE_PATH="/tmp/Dockerfile";
 
+# Read Github Token from 2 different env variables for CI:
+GITHUB_TOKEN=${BUILD_TOKEN:-${GITHUB_TOKEN}}
+
 usage() {
   echo "Usage: ./build.sh [target]";
   echo "target=[opencascade, gmsh or converters]"
@@ -73,16 +76,10 @@ if [ "${TARGETS[$target]}" == "" ]; then
 fi
 
 ARGS="$@";
+echo "Building started..."
 echo "TARGET=\"$target\""
 echo "ARGS=\"$ARGS\""
 
 checkArchives
 buildDockerfile "$target"
 build
-
-# echo "Building docker image..."
-# cat ./pre.Dockerfile > /tmp/Dockerfile
-# cat ./opencascade.build.Dockerfile | sed s/FROM.*// >> /tmp/Dockerfile
-# cat ./gmsh.build.Dockerfile | sed s/FROM.*// >> /tmp/Dockerfile
-
-# docker build "$@" -f /tmp/Dockerfile .

@@ -16,4 +16,4 @@ RUN cd gmsh \
   && make -j "$(nproc)" \
   && make install
 
-RUN export LD_LIBRARY_PATH=/usr/local/lib
+ENV LD_LIBRARY_PATH /usr/local/lib
