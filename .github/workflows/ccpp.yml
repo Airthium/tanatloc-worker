@@ -17,7 +17,7 @@ jobs:
     - name: Install
       run: |
         sudo apt update
-        sudo apt install -y cmake cppcheck liboce-foundation-dev liboce-modeling-dev liboce-ocaf-dev liboce-visualization-dev unzip wget
+        sudo apt install -y cmake cppcheck unzip wget
     - name: Install Sonar
       run: |
         wget https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
@@ -25,7 +25,7 @@ jobs:
         wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.2.0.1873-linux.zip
         unzip sonar-scanner-cli-4.2.0.1873-linux.zip
     - name: cppcheck
-      run: cppcheck --enable=warning,style,performance,portability,information,missingInclude converters/
+      run: cppcheck --enable=warning,style,performance,portability,information,missingInclude --suppressions-list=.cppcheck-suppress converters/
     - name: Configure
       run: |
         cd converters

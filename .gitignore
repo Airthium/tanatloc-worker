@@ -1,1 +1,18 @@
+# Archives
 **/*.tar.gz
+
+# CMake
+converters/CMakeFiles
+converters/cmake_install.cmake
+converters/CMakeCache.txt
+converters/Makefile
+
+# Build
+converters/**/*.o
+
+# Executables
+converters/BrepToThreeJS
+converters/DXFToBrep
+converters/GmshToThreeJS
+converters/StepToThreeJS
+converters/StepUnion
