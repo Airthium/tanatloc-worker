@@ -15,7 +15,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install
-      run: apt install -y cmake cppcheck
+      run: sudo apt install -y cmake cppcheck
     - name: cppcheck
       run: cppcheck --enable=warning,style,performance,portability,information,missingInclude converters/
     - name: Configure
