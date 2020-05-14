@@ -18,8 +18,8 @@ RUN cd opencascade-7.4.0 \
   && cd build \
   && cmake ..
 
-RUN cd opencascade-7.4.0/build \
-  && make -j "$(nproc)"
+# RUN cd opencascade-7.4.0/build \
+#   && make -j "$(nproc)"
 
-RUN cd opencascade-7.4.0/build \
-  && make install
+# RUN cd opencascade-7.4.0/build \
+#   && make install

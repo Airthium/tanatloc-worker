@@ -3,8 +3,8 @@ name: Gmsh Docker image build
 on:
   push:
     branches: [master]
-  # pull_request:
-  #   branches: [master]
+  pull_request:
+    branches: [master]
 
 jobs:
   ci:
@@ -26,13 +26,17 @@ jobs:
           key: ${{ runner.os }}-gmsh.tar.gz
 
       - name: Gmsh test
-        uses: whoan/docker-build-with-cache-action@v5
+        env:
+          BUILD_TOKEN: ${{ secrets.ActionsAuthForTanatloc }}
+          SKIP_BUILD: "true"
+          DOCKERFILE_PATH: "Dockerfile"
+        run: |
+          ./build.sh gmsh:test
+
+      - uses: whoan/docker-build-with-cache-action@v5
         with:
           username: "${{ secrets.DOCKER_HUB_USERNAME }}"
           password: "${{ secrets.DOCKER_HUB_PASSWORD }}"
           image_name: tanatloc/gmsh
           image_tag: test
-        env:
-          BUILD_TOKEN: ${{ secrets.ActionsAuthForTanatloc }}
-        run: |
-          ./build.sh gmsh:test
+          dockerfile: Dockerfile

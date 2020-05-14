@@ -14,10 +14,11 @@ TARGETS["gmsh"]="pre opencascade.build gmsh.build"
 TARGETS["gmsh:test"]="pre opencascade.build gmsh.build gmsh.test"
 TARGETS["converters"]="pre opencascade.build gmsh.build converters.build"
 
-DOCKERFILE_PATH="/tmp/Dockerfile";
-
 # Read Github Token from 2 different env variables for CI:
 GITHUB_TOKEN=${BUILD_TOKEN:-${GITHUB_TOKEN}}
+
+# Dockerfile generation:
+DOCKERFILE_PATH=${DOCKERFILE_PATH:-'/tmp/Dockerfile'}
 
 usage() {
   echo "Usage: ./build.sh [target]";
@@ -82,4 +83,6 @@ echo "ARGS=\"$ARGS\""
 
 checkArchives
 buildDockerfile "$target"
-build
+if [ "$SKIP_BUILD" == "" ]; then
+  build
+fi
