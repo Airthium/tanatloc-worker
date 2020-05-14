@@ -16,15 +16,16 @@ public:
   // Constructor
   Union();
   // Constructor
-  Union(std::vector<TopoDS_Shape>& objects, std::vector<TopoDS_Shape>& tools, double tolerance);
+  Union(std::vector<TopoDS_Shape> &objects, std::vector<TopoDS_Shape> &tools,
+        double tolerance);
   // Destructor
   ~Union();
 
   // Set objects
-  void setObjects (std::vector<TopoDS_Shape>& objects);
+  void setObjects(std::vector<TopoDS_Shape> &objects);
 
   // Set tools
-  void setTools (std::vector<TopoDS_Shape>& tools);
+  void setTools(std::vector<TopoDS_Shape> &tools);
 
   // Set tolerance
   void setTolerance(double tolerance);

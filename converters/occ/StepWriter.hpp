@@ -12,7 +12,7 @@ public:
   // Constructor
   StepWriter();
   // Constructor
-  StepWriter(std::string&, TopoDS_Shape);
+  StepWriter(std::string &, TopoDS_Shape);
   // Destructor
   ~StepWriter();
 

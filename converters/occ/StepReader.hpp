@@ -3,8 +3,8 @@
 
 #include <vector>
 
-#include <TopoDS_Shape.hxx>
 #include <TDocStd_Document.hxx>
+#include <TopoDS_Shape.hxx>
 
 class StepReader {
 private:
@@ -16,7 +16,7 @@ public:
   // Constructor
   StepReader();
   // Constructor
-  explicit StepReader(std::string&);
+  explicit StepReader(std::string &);
   // Destructor
   ~StepReader();
 

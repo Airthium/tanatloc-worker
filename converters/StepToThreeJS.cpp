@@ -1,9 +1,9 @@
 #include <iostream>
-#include <string>
 #include <sstream>
+#include <string>
 
-#include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 
 #include "occ/StepReader.hpp"
 #include "occ/Triangulation.hpp"
@@ -20,7 +20,7 @@
 /**
  * Main function
  */
-int main (int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   bool res;
   uint i;
   std::string stepFile;
@@ -80,30 +80,33 @@ int main (int argc, char *argv[]) {
     std::vector<float> normals = triangulation.getNormals();
     std::vector<uint> indices = triangulation.getIndices();
 
-    float **colors = new float*[0];
+    float **colors = new float *[0];
     colors[0] = new float[3];
-    colors[0][0] = std::get<0>(solidColors[i]) ? std::get<1>(solidColors[i]).Red() : DEFAULT_SOLID_COLOR_R;
-    colors[0][1] = std::get<0>(solidColors[i]) ? std::get<1>(solidColors[i]).Green() : DEFAULT_SOLID_COLOR_G;
-    colors[0][2] = std::get<0>(solidColors[i]) ? std::get<1>(solidColors[i]).Blue() : DEFAULT_SOLID_COLOR_B;
+    colors[0][0] = std::get<0>(solidColors[i])
+                       ? std::get<1>(solidColors[i]).Red()
+                       : DEFAULT_SOLID_COLOR_R;
+    colors[0][1] = std::get<0>(solidColors[i])
+                       ? std::get<1>(solidColors[i]).Green()
+                       : DEFAULT_SOLID_COLOR_G;
+    colors[0][2] = std::get<0>(solidColors[i])
+                       ? std::get<1>(solidColors[i]).Blue()
+                       : DEFAULT_SOLID_COLOR_B;
 
-    ThreeJS solid(
-      &vertices[0], vertices.size(),
-      &normals[0], normals.size(),
-      &indices[0], indices.size()
-    );
+    ThreeJS solid(&vertices[0], vertices.size(), &normals[0], normals.size(),
+                  &indices[0], indices.size());
     solid.setColors(colors, 1);
-    solid.setLabel(i+1);
+    solid.setLabel(i + 1);
     double min, max;
     triangulation.getBb(&min, &max);
     solid.setMinMax(min, max);
     std::ostringstream oss;
-		oss << threeJSPath << "/" << SOLID << i << ".json";
-		res = solid.save(oss.str());
-		if (!res) {
-			std::cerr << "Unable to write ThreeJS file " << oss.str() << std::endl;
-			return EXIT_FAILURE;
-		}
-    std::cout << 0.5*(i/(solids.size())) << std::endl;
+    oss << threeJSPath << "/" << SOLID << i << ".json";
+    res = solid.save(oss.str());
+    if (!res) {
+      std::cerr << "Unable to write ThreeJS file " << oss.str() << std::endl;
+      return EXIT_FAILURE;
+    }
+    std::cout << 0.5 * (i / (solids.size())) << std::endl;
   }
 
   for (i = 0; i < faces.size(); ++i) {
@@ -113,27 +116,29 @@ int main (int argc, char *argv[]) {
     std::vector<float> normals = triangulation.getNormals();
     std::vector<uint> indices = triangulation.getIndices();
 
-    float **colors = new float*[0];
+    float **colors = new float *[0];
     colors[0] = new float[3];
-    colors[0][0] = std::get<0>(faceColors[i]) ? std::get<1>(faceColors[i]).Red() : DEFAULT_FACE_COLOR_R;
-    colors[0][1] = std::get<0>(faceColors[i]) ? std::get<1>(faceColors[i]).Green() : DEFAULT_FACE_COLOR_G;
-    colors[0][2] = std::get<0>(faceColors[i]) ? std::get<1>(faceColors[i]).Blue() : DEFAULT_FACE_COLOR_B;
+    colors[0][0] = std::get<0>(faceColors[i]) ? std::get<1>(faceColors[i]).Red()
+                                              : DEFAULT_FACE_COLOR_R;
+    colors[0][1] = std::get<0>(faceColors[i])
+                       ? std::get<1>(faceColors[i]).Green()
+                       : DEFAULT_FACE_COLOR_G;
+    colors[0][2] = std::get<0>(faceColors[i])
+                       ? std::get<1>(faceColors[i]).Blue()
+                       : DEFAULT_FACE_COLOR_B;
 
-    ThreeJS face(
-      &vertices[0], vertices.size(),
-      &normals[0], normals.size(),
-      &indices[0], indices.size()
-    );
+    ThreeJS face(&vertices[0], vertices.size(), &normals[0], normals.size(),
+                 &indices[0], indices.size());
     face.setColors(colors, 1);
-    face.setLabel(i+1);
+    face.setLabel(i + 1);
     std::ostringstream oss;
     oss << threeJSPath << "/" << FACE << i << ".json";
-		res = face.save(oss.str());
-		if (!res) {
-			std::cerr << "Unable to write ThreeJS file " << oss.str() << std::endl;
-			return EXIT_FAILURE;
-		}
-    std::cout << 0.5 + 0.5*(i/(faces.size()-1.)) << std::endl;
+    res = face.save(oss.str());
+    if (!res) {
+      std::cerr << "Unable to write ThreeJS file " << oss.str() << std::endl;
+      return EXIT_FAILURE;
+    }
+    std::cout << 0.5 + 0.5 * (i / (faces.size() - 1.)) << std::endl;
   }
 
   // Write part file
@@ -143,7 +148,7 @@ int main (int argc, char *argv[]) {
   res = part.writePartFile(oss.str(), "geometry", solids.size(), faces.size());
   if (!res) {
     std::cerr << "Unable to write ThreeJS part file " << oss.str() << std::endl;
-		return EXIT_FAILURE;
+    return EXIT_FAILURE;
   }
 
   return EXIT_SUCCESS;

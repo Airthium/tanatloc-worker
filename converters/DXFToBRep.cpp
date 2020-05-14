@@ -2,7 +2,7 @@
 
 #include "DXFConverter.hpp"
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
   bool res;
   std::string dxfFile, brepFile;
 

@@ -2,10 +2,10 @@
 
 #include "occ/StepReader.hpp"
 #include "occ/StepWriter.hpp"
-#include "occ/getElements.hpp"
 #include "occ/Union.hpp"
+#include "occ/getElements.hpp"
 
-int main (int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   bool res;
   std::string input;
   std::string output;

@@ -1,9 +1,9 @@
 #include <iostream>
-#include <string>
 #include <sstream>
+#include <string>
 
-#include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 
 #include <BRepTools.hxx>
 #include <BRep_Builder.hxx>
@@ -15,7 +15,7 @@
 /**
  * Main function
  */
-int main (int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   bool res;
   uint i;
   std::string brepFile;
@@ -83,26 +83,23 @@ int main (int argc, char *argv[]) {
     std::vector<float> normals = triangulation.getNormals();
     std::vector<uint> indices = triangulation.getIndices();
 
-    ThreeJS solid(
-      &vertices[0], vertices.size(),
-      &normals[0], normals.size(),
-      &indices[0], indices.size()
-    );
+    ThreeJS solid(&vertices[0], vertices.size(), &normals[0], normals.size(),
+                  &indices[0], indices.size());
 
-    solid.setLabel(i+1);
+    solid.setLabel(i + 1);
 
     double min, max;
     triangulation.getBb(&min, &max);
     solid.setMinMax(min, max);
 
     std::ostringstream oss;
-		oss << threeJSPath << "/" << SOLID << i << ".json";
-		res = solid.save(oss.str());
-		if (!res) {
-			std::cerr << "Unable to write ThreeJS file " << oss.str() << std::endl;
-			return EXIT_FAILURE;
-		}
-    std::cout << 0.5*(i/(solids.size())) << std::endl;
+    oss << threeJSPath << "/" << SOLID << i << ".json";
+    res = solid.save(oss.str());
+    if (!res) {
+      std::cerr << "Unable to write ThreeJS file " << oss.str() << std::endl;
+      return EXIT_FAILURE;
+    }
+    std::cout << 0.5 * (i / (solids.size())) << std::endl;
   }
 
   for (i = 0; i < faces.size(); ++i) {
@@ -112,22 +109,19 @@ int main (int argc, char *argv[]) {
     std::vector<float> normals = triangulation.getNormals();
     std::vector<uint> indices = triangulation.getIndices();
 
-    ThreeJS face(
-      &vertices[0], vertices.size(),
-      &normals[0], normals.size(),
-      &indices[0], indices.size()
-    );
+    ThreeJS face(&vertices[0], vertices.size(), &normals[0], normals.size(),
+                 &indices[0], indices.size());
 
-    face.setLabel(i+1);
+    face.setLabel(i + 1);
 
     std::ostringstream oss;
     oss << threeJSPath << "/" << FACE << i << ".json";
-		res = face.save(oss.str());
-		if (!res) {
-			std::cerr << "Unable to write ThreeJS file " << oss.str() << std::endl;
-			return EXIT_FAILURE;
-		}
-    std::cout << 0.5 + 0.5*(i/(faces.size()-1.)) << std::endl;
+    res = face.save(oss.str());
+    if (!res) {
+      std::cerr << "Unable to write ThreeJS file " << oss.str() << std::endl;
+      return EXIT_FAILURE;
+    }
+    std::cout << 0.5 + 0.5 * (i / (faces.size() - 1.)) << std::endl;
   }
 
   for (i = 0; i < edges.size(); ++i) {
@@ -135,30 +129,29 @@ int main (int argc, char *argv[]) {
     triangulation.triangulate();
     std::vector<float> vertices = triangulation.getVertices();
 
-    ThreeJS edge(
-      &vertices[0], vertices.size()
-    );
+    ThreeJS edge(&vertices[0], vertices.size());
 
-    edge.setLabel(i+1);
+    edge.setLabel(i + 1);
 
     std::ostringstream oss;
     oss << threeJSPath << "/" << EDGE << i << ".json";
-		res = edge.save(oss.str());
-		if (!res) {
-			std::cerr << "Unable to write ThreeJS file " << oss.str() << std::endl;
-			return EXIT_FAILURE;
-		}
-    std::cout << 0.5 + 0.5*(i/(edges.size()-1.)) << std::endl;
+    res = edge.save(oss.str());
+    if (!res) {
+      std::cerr << "Unable to write ThreeJS file " << oss.str() << std::endl;
+      return EXIT_FAILURE;
+    }
+    std::cout << 0.5 + 0.5 * (i / (edges.size() - 1.)) << std::endl;
   }
 
   // Write part file
   ThreeJS part;
   std::ostringstream oss;
   oss << threeJSPath << "/part.json";
-  res = part.writePartFile(oss.str(), "geometry", solids.size(), faces.size(), edges.size());
+  res = part.writePartFile(oss.str(), "geometry", solids.size(), faces.size(),
+                           edges.size());
   if (!res) {
     std::cerr << "Unable to write ThreeJS part file " << oss.str() << std::endl;
-		return EXIT_FAILURE;
+    return EXIT_FAILURE;
   }
 
   return EXIT_SUCCESS;

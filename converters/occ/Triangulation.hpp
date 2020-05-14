@@ -3,8 +3,8 @@
 
 #include <vector>
 
-#include <TopoDS_Shape.hxx>
 #include <TopoDS_Face.hxx>
+#include <TopoDS_Shape.hxx>
 
 #define meshQuality 1.0
 
@@ -26,9 +26,10 @@ private:
   // Triangulate edge
   void triangulateEdge(TopoDS_Shape &shape);
   // Triangulate loop (solid & face)
-  void triangulateLoop(TopoDS_Face &face, const uint iDelta=0);
+  void triangulateLoop(TopoDS_Face &face, const uint iDelta = 0);
   // Is valid
-  bool isValid(const gp_Pnt&, const gp_Pnt&, const gp_Pnt&) const;
+  bool isValid(const gp_Pnt &, const gp_Pnt &, const gp_Pnt &) const;
+
 public:
   // Constructor
   Triangulation();
