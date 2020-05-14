@@ -3,8 +3,8 @@
 /**
  * Constructor
  */
-Tetrahedron::Tetrahedron () :
-  index1(0), index2(0), index3(0), index4(0), label(0) {}
+Tetrahedron::Tetrahedron()
+    : index1(0), index2(0), index3(0), index4(0), label(0) {}
 
 /**
  * Constructor
@@ -14,13 +14,15 @@ Tetrahedron::Tetrahedron () :
  * @param index4 Index 4
  * @param label Label
  */
-Tetrahedron::Tetrahedron(const uint index1, const uint index2, const uint index3, const uint index4, const uint label) :
-  index1(index1), index2(index2), index3(index3), index4(index4), label(label) {}
+Tetrahedron::Tetrahedron(const uint index1, const uint index2,
+                         const uint index3, const uint index4, const uint label)
+    : index1(index1), index2(index2), index3(index3), index4(index4),
+      label(label) {}
 
 /**
  * Destructor
  */
-Tetrahedron::~Tetrahedron () {
+Tetrahedron::~Tetrahedron() {
   this->index1 = 0;
   this->index2 = 0;
   this->index3 = 0;
@@ -35,7 +37,8 @@ Tetrahedron::~Tetrahedron () {
  * @param index3 Index 3
  * @param index4 Index 4
  */
-void Tetrahedron::setIndices (const uint index1, const uint index2, const uint index3, const uint index4) {
+void Tetrahedron::setIndices(const uint index1, const uint index2,
+                             const uint index3, const uint index4) {
   this->index1 = index1;
   this->index2 = index2;
   this->index3 = index3;
@@ -46,16 +49,14 @@ void Tetrahedron::setIndices (const uint index1, const uint index2, const uint i
  * Set label
  * @param label Label
  */
-void Tetrahedron::setLabel (const uint label) {
-  this->label = label;
-}
+void Tetrahedron::setLabel(const uint label) { this->label = label; }
 
 /**
  * Get index
  * @param i index
  * @returns Index i
  */
-uint Tetrahedron::getIndex (const uint i) const {
+uint Tetrahedron::getIndex(const uint i) const {
   if (i == 0)
     return this->index1;
   else if (i == 1)
@@ -72,7 +73,7 @@ uint Tetrahedron::getIndex (const uint i) const {
  * Get indices
  * @returns Indices
  */
-uint *Tetrahedron::getIndices () const {
+uint *Tetrahedron::getIndices() const {
   uint *indices = new uint[4];
   indices[0] = index1;
   indices[1] = index2;
@@ -85,6 +86,4 @@ uint *Tetrahedron::getIndices () const {
  * Get label
  * @returns Label
  */
-uint Tetrahedron::getLabel () const {
-  return this->label;
-}
+uint Tetrahedron::getLabel() const { return this->label; }

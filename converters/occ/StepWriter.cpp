@@ -1,17 +1,16 @@
 #include "StepWriter.hpp"
 
-#include <STEPControl_Writer.hxx>
 #include <STEPControl_StepModelType.hxx>
+#include <STEPControl_Writer.hxx>
 
-StepWriter::StepWriter (): fileName(""), shape() {}
+StepWriter::StepWriter() : fileName(""), shape() {}
 
-StepWriter::StepWriter (std::string& fileName, TopoDS_Shape shape) : fileName(fileName), shape(shape) {}
+StepWriter::StepWriter(std::string &fileName, TopoDS_Shape shape)
+    : fileName(fileName), shape(shape) {}
 
-StepWriter::~StepWriter () {
-  this->fileName = "";
-}
+StepWriter::~StepWriter() { this->fileName = ""; }
 
-bool StepWriter::write () {
+bool StepWriter::write() {
   int res;
   STEPControl_Writer writer = STEPControl_Writer();
   STEPControl_StepModelType type = STEPControl_AsIs;

@@ -28,7 +28,7 @@ private:
   double minBb;
   // Max Bb
   double maxBb;
-  //Label
+  // Label
   uint label;
   // Vertices
   float *vertices;
@@ -41,14 +41,15 @@ private:
 
   // Generate UUID
   std::string generateUUID() const;
+
 public:
   // Constructor
   ThreeJS();
-  ThreeJS(const ThreeJS&);
-  ThreeJS(float*, const uint);
-  ThreeJS(double*, const uint);
-  ThreeJS(float*, const uint, float*, const uint);
-  ThreeJS(float*, const uint, float*, const uint, uint*, const uint);
+  ThreeJS(const ThreeJS &);
+  ThreeJS(float *, const uint);
+  ThreeJS(double *, const uint);
+  ThreeJS(float *, const uint, float *, const uint);
+  ThreeJS(float *, const uint, float *, const uint, uint *, const uint);
   // Destructor
   ~ThreeJS();
 
@@ -66,13 +67,14 @@ public:
   void setColors(float **, const uint);
 
   // Saver
-  bool save(const std::string&) const;
+  bool save(const std::string &) const;
 
   // Write part file
-  bool writePartFile(const std::string&, const std::string&, const uint, const uint, const uint numberOfEdges=0) const;
+  bool writePartFile(const std::string &, const std::string &, const uint,
+                     const uint, const uint numberOfEdges = 0) const;
 
   // Operator
-  ThreeJS &operator= (const ThreeJS&);
+  ThreeJS &operator=(const ThreeJS &);
 };
 
 #endif

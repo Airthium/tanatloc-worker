@@ -4,9 +4,9 @@
 #include <string>
 #include <vector>
 
-#include "Vertex.hpp"
-#include "Triangle.hpp"
 #include "Tetrahedron.hpp"
+#include "Triangle.hpp"
+#include "Vertex.hpp"
 
 typedef unsigned int uint;
 
@@ -44,7 +44,7 @@ public:
   ~Gmsh();
 
   // Loader
-  bool load(const std::string&);
+  bool load(const std::string &);
 
   // Compute number of different labels
   void computeLabels();
@@ -66,9 +66,9 @@ public:
   uint getTriangleLabel(const uint) const;
 
   // Get volume vertices
-  std::vector<double>* getVolumesVertices() const;
+  std::vector<double> *getVolumesVertices() const;
   // Get surface vertices
-  std::vector<double>* getSurfacesVertices() const;
+  std::vector<double> *getSurfacesVertices() const;
 };
 
 #endif

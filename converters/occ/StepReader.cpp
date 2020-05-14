@@ -2,36 +2,34 @@
 
 #include <fstream>
 
-#include <XCAFApp_Application.hxx>
-#include <STEPCAFControl_Reader.hxx>
 #include <IFSelect_ReturnStatus.hxx>
+#include <STEPCAFControl_Reader.hxx>
+#include <XCAFApp_Application.hxx>
+#include <XCAFDoc_ColorTool.hxx>
 #include <XCAFDoc_DocumentTool.hxx>
 #include <XCAFDoc_ShapeTool.hxx>
-#include <XCAFDoc_ColorTool.hxx>
 
 /**
  * Constructor
  */
-StepReader::StepReader () : fileName(""), shape() {}
+StepReader::StepReader() : fileName(""), shape() {}
 
 /**
  * Constructor
  * @parem fileName File name
  */
-StepReader::StepReader (std::string &fileName) : fileName(fileName), shape() {}
+StepReader::StepReader(std::string &fileName) : fileName(fileName), shape() {}
 
 /**
  * Destructor
  */
-StepReader::~StepReader () {
-  this->fileName = "";
-}
+StepReader::~StepReader() { this->fileName = ""; }
 
 /**
  * Read
  * @returns Status
  */
-bool StepReader::read () {
+bool StepReader::read() {
   Handle(XCAFApp_Application) app = XCAFApp_Application::GetApplication();
   // Handle(TDocStd_Document) doc;
 
@@ -55,7 +53,8 @@ bool StepReader::read () {
     return false;
   }
 
-  Handle(XCAFDoc_ShapeTool) shapeContent = XCAFDoc_DocumentTool::ShapeTool(this->document->Main());
+  Handle(XCAFDoc_ShapeTool) shapeContent =
+      XCAFDoc_DocumentTool::ShapeTool(this->document->Main());
   TDF_LabelSequence shapes;
   shapeContent->GetShapes(shapes);
 
@@ -68,14 +67,12 @@ bool StepReader::read () {
  * Get shape
  * @returns Shape
  */
-TopoDS_Shape StepReader::getShape () const {
-  return this->shape;
-}
+TopoDS_Shape StepReader::getShape() const { return this->shape; }
 
 /**
  * Get document
  * @returns Document
  */
-Handle(TDocStd_Document) StepReader::getDocument () const {
+Handle(TDocStd_Document) StepReader::getDocument() const {
   return this->document;
 }
