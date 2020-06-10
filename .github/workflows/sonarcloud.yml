@@ -20,15 +20,14 @@ jobs:
           sudo apt install -y cppcheck
           wget https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
           unzip build-wrapper-linux-x86.zip
-          export PATH=$(pwd)/build-wrapper-linux-x86:$PATH
           wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.2.0.1873-linux.zip
           unzip sonar-scanner-cli-4.2.0.1873-linux.zip
-          export PATH=$(pwd)/sonar-scanner-4.2.0.1873-linux/bin:$PATH
       - name: sonar
         env:
           SONAR_LOGIN: ${{ secrets.SONARCLOUD_LOGIN }}
         run: |
           cd converters
+          build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir bw-output make clean all
           sonar-scanner \
             -Dsonar.organization=airthium \
             -Dsonar.projectKey=Airthium_tanatloc-dockers \
