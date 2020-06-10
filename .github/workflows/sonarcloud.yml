@@ -27,8 +27,8 @@ jobs:
           SONAR_LOGIN: ${{ secrets.SONARCLOUD_LOGIN }}
         run: |
           cd converters
-          build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir bw-output make clean all
-          sonar-scanner \
+          ../build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir bw-output make clean all
+          ../sonar-scanner \
             -Dsonar.organization=airthium \
             -Dsonar.projectKey=Airthium_tanatloc-dockers \
             -Dsonar.sources=. \
