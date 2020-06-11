@@ -18,4 +18,5 @@ converters/StepToThreeJS
 converters/StepUnion
 
 # Sonar
-converters/sonar-output
+.scannerwork
+converters/bw-output
