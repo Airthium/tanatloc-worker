@@ -6,7 +6,7 @@
 #include <TopoDS_Face.hxx>
 #include <TopoDS_Shape.hxx>
 
-#define meshQuality 1.0
+#define meshQuality 0.01
 
 class Triangulation {
 private:
