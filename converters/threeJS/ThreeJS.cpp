@@ -351,9 +351,9 @@ bool ThreeJS::writePartFile(const std::string &fileName,
 
   for (i = 0; i < numberOfVolumes; ++i) {
     file << "\t\t{" << std::endl;
-    file << "\t\t\t\"name\": \"" << SOLID << i << "\"," << std::endl;
-    file << "\t\t\t\"path\": \"" << SOLID << i << ".json\"," << std::endl;
-    file << "\t\t\t\"number\": \"" << i << "\"" << std::endl;
+    file << "\t\t\t\"name\": \"" << SOLID << (i+1) << "\"," << std::endl;
+    file << "\t\t\t\"path\": \"" << SOLID << (i+1) << ".json\"," << std::endl;
+    file << "\t\t\t\"number\": \"" << (i+1) << "\"" << std::endl;
     if (i < numberOfVolumes - 1)
       file << "\t\t}," << std::endl;
     else
@@ -365,9 +365,9 @@ bool ThreeJS::writePartFile(const std::string &fileName,
 
   for (i = 0; i < numberOfSurfaces; ++i) {
     file << "\t\t{" << std::endl;
-    file << "\t\t\t\"name\": \"" << FACE << i << "\"," << std::endl;
-    file << "\t\t\t\"path\": \"" << FACE << i << ".json\"," << std::endl;
-    file << "\t\t\t\"number\": \"" << i << "\"" << std::endl;
+    file << "\t\t\t\"name\": \"" << FACE << (i+1) << "\"," << std::endl;
+    file << "\t\t\t\"path\": \"" << FACE << (i+1) << ".json\"," << std::endl;
+    file << "\t\t\t\"number\": \"" << (i+1) << "\"" << std::endl;
     if (i < numberOfSurfaces - 1)
       file << "\t\t}," << std::endl;
     else
@@ -382,9 +382,9 @@ bool ThreeJS::writePartFile(const std::string &fileName,
 
     for (i = 0; i < numberOfEdges; ++i) {
       file << "\t\t{" << std::endl;
-      file << "\t\t\t\"name\": \"" << EDGE << i << "\"," << std::endl;
-      file << "\t\t\t\"path\": \"" << EDGE << i << ".json\"," << std::endl;
-      file << "\t\t\t\"number\": \"" << i << "\"" << std::endl;
+      file << "\t\t\t\"name\": \"" << EDGE << (i+1) << "\"," << std::endl;
+      file << "\t\t\t\"path\": \"" << EDGE << (i+1) << ".json\"," << std::endl;
+      file << "\t\t\t\"number\": \"" << (i+1) << "\"" << std::endl;
       if (i < numberOfEdges - 1)
         file << "\t\t}," << std::endl;
       else
