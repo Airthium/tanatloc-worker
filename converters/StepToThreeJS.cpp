@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
     triangulation.getBb(&min, &max);
     solid.setMinMax(min, max);
     std::ostringstream oss;
-    oss << threeJSPath << "/" << SOLID << i << ".json";
+    oss << threeJSPath << "/" << SOLID << (i+1) << ".json";
     res = solid.save(oss.str());
     if (!res) {
       std::cerr << "Unable to write ThreeJS file " << oss.str() << std::endl;
@@ -132,7 +132,7 @@ int main(int argc, char *argv[]) {
     face.setColors(colors, 1);
     face.setLabel(i + 1);
     std::ostringstream oss;
-    oss << threeJSPath << "/" << FACE << i << ".json";
+    oss << threeJSPath << "/" << FACE << (i+1) << ".json";
     res = face.save(oss.str());
     if (!res) {
       std::cerr << "Unable to write ThreeJS file " << oss.str() << std::endl;

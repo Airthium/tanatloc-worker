@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
     volume.setLabel(mesh->getTetrahedronLabel(i));
 
     std::ostringstream oss;
-    oss << threeJSPath << "/" << SOLID << i << ".json";
+    oss << threeJSPath << "/" << SOLID << (i+1) << ".json";
     res = volume.save(oss.str());
     if (!res) {
       std::cerr << "Unable to write ThreeJS file " << oss.str() << std::endl;
@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
     surface.setColors(colors, 1);
     surface.setLabel(mesh->getTriangleLabel(i));
     std::ostringstream oss;
-    oss << threeJSPath << "/" << FACE << i << ".json";
+    oss << threeJSPath << "/" << FACE << (i+1) << ".json";
     res = surface.save(oss.str());
     if (!res) {
       std::cerr << "Unable to write ThreeJS file " << oss.str() << std::endl;
