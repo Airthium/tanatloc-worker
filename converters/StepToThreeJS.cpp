@@ -63,6 +63,7 @@ int main(int argc, char *argv[]) {
   // Get solids and faces
   std::vector<std::pair<bool, Quantity_Color>> solidColors;
   std::vector<TopoDS_Shape> solids = getSolids(shape, document, &solidColors);
+  // cout << solids.size() << std::endl;
   std::vector<std::pair<bool, Quantity_Color>> faceColors;
   std::vector<TopoDS_Shape> faces = std::vector<TopoDS_Shape>();
   for (i = 0; i < solids.size(); ++i) {
@@ -100,7 +101,7 @@ int main(int argc, char *argv[]) {
     triangulation.getBb(&min, &max);
     solid.setMinMax(min, max);
     std::ostringstream oss;
-    oss << threeJSPath << "/" << SOLID << (i+1) << ".json";
+    oss << threeJSPath << "/" << SOLID << (i + 1) << ".json";
     res = solid.save(oss.str());
     if (!res) {
       std::cerr << "Unable to write ThreeJS file " << oss.str() << std::endl;
@@ -132,7 +133,7 @@ int main(int argc, char *argv[]) {
     face.setColors(colors, 1);
     face.setLabel(i + 1);
     std::ostringstream oss;
-    oss << threeJSPath << "/" << FACE << (i+1) << ".json";
+    oss << threeJSPath << "/" << FACE << (i + 1) << ".json";
     res = face.save(oss.str());
     if (!res) {
       std::cerr << "Unable to write ThreeJS file " << oss.str() << std::endl;
