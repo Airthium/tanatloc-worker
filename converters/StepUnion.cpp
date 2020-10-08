@@ -7,6 +7,7 @@
 
 int main(int argc, char *argv[]) {
   bool res;
+  uint i;
   std::string input;
   std::string output;
 
@@ -24,10 +25,14 @@ int main(int argc, char *argv[]) {
     std::cerr << "Unable to load step file " << input << std::endl;
     return EXIT_FAILURE;
   }
-  TopoDS_Shape inputShape = reader.getShape();
+  std::vector<TopoDS_Shape> inputShapes = reader.getShapes();
 
   // Get solids
-  std::vector<TopoDS_Shape> solids = getSolids(inputShape);
+  std::vector<TopoDS_Shape> solids = std::vector<TopoDS_Shape>();
+  for (i = 0; i < inputShapes.size(); ++i) {
+    std::vector<TopoDS_Shape> solidTemp = getSolids(inputShapes[i]);
+    std::copy(solidTemp.begin(), solidTemp.end(), back_inserter(solids));
+  }
 
   // Union
   Union fuse = Union();

@@ -22,7 +22,7 @@
  */
 int main(int argc, char *argv[]) {
   bool res;
-  uint i;
+  uint i, j;
   std::string stepFile;
   std::string threeJSPath;
 
@@ -57,20 +57,27 @@ int main(int argc, char *argv[]) {
     std::cerr << "Unable to load step file " << stepFile << std::endl;
     return EXIT_FAILURE;
   }
-  TopoDS_Shape shape = reader.getShape();
+  std::vector<TopoDS_Shape> shapes = reader.getShapes();
   Handle(TDocStd_Document) document = reader.getDocument();
 
   // Get solids and faces
   std::vector<std::pair<bool, Quantity_Color>> solidColors;
-  std::vector<TopoDS_Shape> solids = getSolids(shape, document, &solidColors);
-  // cout << solids.size() << std::endl;
+  std::vector<TopoDS_Shape> solids = std::vector<TopoDS_Shape>();
   std::vector<std::pair<bool, Quantity_Color>> faceColors;
   std::vector<TopoDS_Shape> faces = std::vector<TopoDS_Shape>();
-  for (i = 0; i < solids.size(); ++i) {
-    std::vector<std::pair<bool, Quantity_Color>> tempColors;
-    std::vector<TopoDS_Shape> temp = getFaces(solids[i], document, &tempColors);
-    std::copy(temp.begin(), temp.end(), back_inserter(faces));
-    std::copy(tempColors.begin(), tempColors.end(), back_inserter(faceColors));
+
+  for (i = 0; i < shapes.size(); ++i) {
+    std::vector<TopoDS_Shape> solidTemp =
+        getSolids(shapes[i], document, &solidColors);
+    std::copy(solidTemp.begin(), solidTemp.end(), back_inserter(solids));
+    for (j = 0; j < solids.size(); ++j) {
+      std::vector<std::pair<bool, Quantity_Color>> tempColors;
+      std::vector<TopoDS_Shape> faceTemp =
+          getFaces(solids[j], document, &tempColors);
+      std::copy(faceTemp.begin(), faceTemp.end(), back_inserter(faces));
+      std::copy(tempColors.begin(), tempColors.end(),
+                back_inserter(faceColors));
+    }
   }
 
   // Save ThreeJS files
@@ -107,7 +114,7 @@ int main(int argc, char *argv[]) {
       std::cerr << "Unable to write ThreeJS file " << oss.str() << std::endl;
       return EXIT_FAILURE;
     }
-    std::cout << 0.5 * (i / (solids.size())) << std::endl;
+    // std::cout << 0.5 * (i / (solids.size())) << std::endl;
   }
 
   for (i = 0; i < faces.size(); ++i) {
@@ -139,7 +146,7 @@ int main(int argc, char *argv[]) {
       std::cerr << "Unable to write ThreeJS file " << oss.str() << std::endl;
       return EXIT_FAILURE;
     }
-    std::cout << 0.5 + 0.5 * (i / (faces.size() - 1.)) << std::endl;
+    // std::cout << 0.5 + 0.5 * (i / (faces.size() - 1.)) << std::endl;
   }
 
   // Write part file

@@ -9,7 +9,7 @@
 class StepReader {
 private:
   std::string fileName;
-  TopoDS_Shape shape;
+  std::vector<TopoDS_Shape> shapes;
   Handle(TDocStd_Document) document;
 
 public:
@@ -24,7 +24,7 @@ public:
   bool read();
 
   // Get shape
-  TopoDS_Shape getShape() const;
+  std::vector<TopoDS_Shape> getShapes() const;
 
   // Get document
   Handle(TDocStd_Document) getDocument() const;

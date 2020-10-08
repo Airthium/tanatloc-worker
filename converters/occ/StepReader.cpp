@@ -12,18 +12,21 @@
 /**
  * Constructor
  */
-StepReader::StepReader() : fileName(""), shape() {}
+StepReader::StepReader() : fileName(""), shapes() {}
 
 /**
  * Constructor
  * @parem fileName File name
  */
-StepReader::StepReader(std::string &fileName) : fileName(fileName), shape() {}
+StepReader::StepReader(std::string &fileName) : fileName(fileName), shapes() {}
 
 /**
  * Destructor
  */
-StepReader::~StepReader() { this->fileName = ""; }
+StepReader::~StepReader() {
+  this->fileName = "";
+  this->shapes.clear();
+}
 
 /**
  * Read
@@ -48,8 +51,6 @@ bool StepReader::read() {
     return false;
   }
 
-  caf_reader.NbRootsForTransfer();
-
   if (!caf_reader.Transfer(this->document)) {
     std::cerr << "Unable to transfert root" << std::endl;
     return false;
@@ -60,10 +61,9 @@ bool StepReader::read() {
   TDF_LabelSequence shapes;
   shapeContent->GetShapes(shapes);
 
-  if (shapes.Size() > 1)
-    std::cout << "do not works if there are more than one shape" << std::endl;
-
-  this->shape = shapeContent->GetShape(shapes.Value(1));
+  for (int i = 1; i <= shapes.Size(); ++i) {
+    this->shapes.push_back(shapeContent->GetShape(shapes.Value(i)));
+  }
 
   return true;
 }
@@ -72,7 +72,7 @@ bool StepReader::read() {
  * Get shape
  * @returns Shape
  */
-TopoDS_Shape StepReader::getShape() const { return this->shape; }
+std::vector<TopoDS_Shape> StepReader::getShapes() const { return this->shapes; }
 
 /**
  * Get document
