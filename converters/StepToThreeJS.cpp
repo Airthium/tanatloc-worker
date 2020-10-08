@@ -70,10 +70,10 @@ int main(int argc, char *argv[]) {
     std::vector<TopoDS_Shape> solidTemp =
         getSolids(shapes[i], document, &solidColors);
     std::copy(solidTemp.begin(), solidTemp.end(), back_inserter(solids));
-    for (j = 0; j < solids.size(); ++j) {
+    for (j = 0; j < solidTemp.size(); ++j) {
       std::vector<std::pair<bool, Quantity_Color>> tempColors;
       std::vector<TopoDS_Shape> faceTemp =
-          getFaces(solids[j], document, &tempColors);
+          getFaces(solidTemp[j], document, &tempColors);
       std::copy(faceTemp.begin(), faceTemp.end(), back_inserter(faces));
       std::copy(tempColors.begin(), tempColors.end(),
                 back_inserter(faceColors));
