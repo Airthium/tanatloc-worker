@@ -30,8 +30,9 @@ StepReader::~StepReader() { this->fileName = ""; }
  * @returns Status
  */
 bool StepReader::read() {
+  IFSelect_ReturnStatus status;
+
   Handle(XCAFApp_Application) app = XCAFApp_Application::GetApplication();
-  // Handle(TDocStd_Document) doc;
 
   if (app->NbDocuments() > 0) {
     app->GetDocument(1, this->document);
@@ -40,13 +41,6 @@ bool StepReader::read() {
 
   app->NewDocument("STEP-XCAF", this->document);
 
-  STEPControl_Reader reader = STEPControl_Reader();
-  IFSelect_ReturnStatus status = reader.ReadFile(fileName.c_str());
-  if (status != IFSelect_RetDone) {
-    std::cerr << "Unable to read " << fileName << std::endl;
-    return false;
-  }
-
   STEPCAFControl_Reader caf_reader = STEPCAFControl_Reader();
   status = caf_reader.ReadFile(fileName.c_str());
   if (status != IFSelect_RetDone) {
@@ -54,26 +48,22 @@ bool StepReader::read() {
     return false;
   }
 
+  caf_reader.NbRootsForTransfer();
+
   if (!caf_reader.Transfer(this->document)) {
     std::cerr << "Unable to transfert root" << std::endl;
     return false;
   }
 
-  reader.NbRootsForTransfer();
-  reader.TransferRoots();
+  Handle(XCAFDoc_ShapeTool) shapeContent =
+      XCAFDoc_DocumentTool::ShapeTool(this->document->Main());
+  TDF_LabelSequence shapes;
+  shapeContent->GetShapes(shapes);
 
-  this->shape = reader.OneShape();
+  if (shapes.Size() > 1)
+    std::cout << "do not works if there are more than one shape" << std::endl;
 
-  // Handle(XCAFDoc_ShapeTool) shapeContent =
-  //     XCAFDoc_DocumentTool::ShapeTool(this->document->Main());
-  // TDF_LabelSequence shapes;
-  // shapeContent->GetShapes(shapes);
-
-  // if (shapes.Size() > 1)
-  //   std::cout << "do not works if there are more than one shape" <<
-  //   std::endl;
-
-  // this->shape = shapeContent->GetShape(shapes.Value(1));
+  this->shape = shapeContent->GetShape(shapes.Value(1));
 
   return true;
 }
