@@ -7,11 +7,7 @@
 /**
  * Constructor
  */
-Gmsh::Gmsh()
-    : numberOfVertices(0), numberOfTriangles(0), numberOfTriangleLabels(0),
-      numberOfTetrahedra(0), numberOfTetrahedronLabels(0), vertices(nullptr),
-      triangles(nullptr), triangleLabels(nullptr), tetrahedra(nullptr),
-      tetrahedronLabels(nullptr) {}
+Gmsh::Gmsh() {}
 
 /**
  * Destructor
@@ -51,12 +47,14 @@ Gmsh::~Gmsh() {
  * @returns {boolean} Loading status
  */
 bool Gmsh::load(const std::string &fileName) {
-  uint i, j;
+  uint i;
+  uint j;
   uint numberOfElements;
   std::string buffer;
   std::vector<Triangle> triangles;
   std::vector<Tetrahedron> tetrahedra;
 
+  // Read file
   std::ifstream file(fileName, std::ios::in);
   if (!file) {
     std::cerr << "Unable to open " << fileName << std::endl;
@@ -77,7 +75,9 @@ bool Gmsh::load(const std::string &fileName) {
   this->vertices = new Vertex[this->numberOfVertices];
 
   for (i = 0; i < this->numberOfVertices; ++i) {
-    double x, y, z;
+    double x;
+    double y;
+    double z;
     file >> buffer >> x >> y >> z;
     this->vertices[i].setCoordinates(x, y, z);
   }
@@ -94,7 +94,8 @@ bool Gmsh::load(const std::string &fileName) {
   }
 
   for (i = 0; i < numberOfElements; ++i) {
-    uint type, numberOfLabels;
+    uint type;
+    uint numberOfLabels;
     uint label;
     file >> buffer >> type >> numberOfLabels;
 
@@ -103,12 +104,17 @@ bool Gmsh::load(const std::string &fileName) {
       file >> buffer;
 
     if (type == 2) { // 3-nodes triangle
-      uint index1, index2, index3;
+      uint index1;
+      uint index2;
+      uint index3;
       file >> index1 >> index2 >> index3;
       Triangle triangle = Triangle(--index1, --index2, --index3, label);
       triangles.push_back(triangle);
     } else if (type == 4) { // 4-nodes tetrahedron
-      uint index1, index2, index3, index4;
+      uint index1;
+      uint index2;
+      uint index3;
+      uint index4;
       file >> index1 >> index2 >> index3 >> index4;
       Tetrahedron tetrahedron =
           Tetrahedron(--index1, --index2, --index3, --index4, label);
@@ -117,7 +123,8 @@ bool Gmsh::load(const std::string &fileName) {
       uint index1;
       file >> index1;
     } else if (type == 1) { // 2-node line
-      uint index1, index2;
+      uint index1;
+      uint index2;
       file >> index1 >> index2;
     } else {
       std::cerr << "Unsupported type: " << type << std::endl;
@@ -135,10 +142,6 @@ bool Gmsh::load(const std::string &fileName) {
   triangles.clear();
 
   this->numberOfTetrahedra = tetrahedra.size();
-  // if (!this->numberOfTetrahedra) {
-  //   std::cerr << "No tetrahedra" << std::endl;
-  //   return false;
-  // } // NEEDED for 2D
   this->tetrahedra = new Tetrahedron[this->numberOfTetrahedra];
   std::copy(tetrahedra.begin(), tetrahedra.end(), this->tetrahedra);
   tetrahedra.clear();

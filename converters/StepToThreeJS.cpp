@@ -10,12 +10,14 @@
 #include "occ/getElements.hpp"
 #include "threeJS/ThreeJS.hpp"
 
-#define DEFAULT_SOLID_COLOR_R 0.75
-#define DEFAULT_SOLID_COLOR_G 0.75
-#define DEFAULT_SOLID_COLOR_B 0.75
-#define DEFAULT_FACE_COLOR_R 0.75
-#define DEFAULT_FACE_COLOR_G 0.75
-#define DEFAULT_FACE_COLOR_B 0.75
+// Default solid color (R G B)
+constexpr float DEFAULT_SOLID_COLOR_R = 0.75;
+constexpr float DEFAULT_SOLID_COLOR_G = 0.75;
+constexpr float DEFAULT_SOLID_COLOR_B = 0.75;
+// Default face color (R G B)
+constexpr float DEFAULT_FACE_COLOR_R = 0.75;
+constexpr float DEFAULT_FACE_COLOR_G = 0.75;
+constexpr float DEFAULT_FACE_COLOR_B = 0.75;
 
 /**
  * Main function
@@ -104,7 +106,8 @@ int main(int argc, char *argv[]) {
                   &indices[0], indices.size());
     solid.setColors(colors, 1);
     solid.setLabel(i + 1);
-    double min, max;
+    double min;
+    double max;
     triangulation.getBb(&min, &max);
     solid.setMinMax(min, max);
     std::ostringstream oss;

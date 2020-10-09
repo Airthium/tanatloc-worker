@@ -16,26 +16,26 @@ typedef unsigned int uint;
 class Gmsh {
 private:
   // Number of nodes
-  uint numberOfVertices;
+  uint numberOfVertices = 0;
   // Number of triangles
-  uint numberOfTriangles;
+  uint numberOfTriangles = 0;
   // Number of triangle labels
-  uint numberOfTriangleLabels;
+  uint numberOfTriangleLabels = 0;
   // Number of tetrahedra
-  uint numberOfTetrahedra;
+  uint numberOfTetrahedra = 0;
   // Number of tetrahedron labels
-  uint numberOfTetrahedronLabels;
+  uint numberOfTetrahedronLabels = 0;
 
   // Vertices
-  Vertex *vertices;
+  Vertex *vertices = nullptr;
   // Triangles
-  Triangle *triangles;
+  Triangle *triangles = nullptr;
   // Triangle labels
-  uint *triangleLabels;
+  uint *triangleLabels = nullptr;
   // Tetrahedra
-  Tetrahedron *tetrahedra;
+  Tetrahedron *tetrahedra = nullptr;
   // Tetrahedron labels
-  uint *tetrahedronLabels;
+  uint *tetrahedronLabels = nullptr;
 
 public:
   // Constructor
