@@ -2,26 +2,26 @@
 
 #include <iostream>
 
-static void LOG(std::string message) {
+void Logger::LOG(const std::string &message) {
   try {
     std::cout << message << std::endl;
-  } catch (...) {
-    //
+  } catch (const std::exception &e) {
+    std::cerr << e.what() << std::endl;
   }
 }
 
-static void WARN(std::string message) {
+void Logger::WARNING(const std::string &message) {
   try {
     std::cout << message << std::endl;
-  } catch (...) {
-    //
+  } catch (const std::exception &e) {
+    std::cerr << e.what() << std::endl;
   }
 }
 
-static void ERROR(std::string message) {
+void Logger::ERROR(const std::string &message) {
   try {
     std::cout << message << std::endl;
-  } catch (...) {
-    //
+  } catch (const std::exception &e) {
+    std::cerr << e.what() << std::endl;
   }
 }

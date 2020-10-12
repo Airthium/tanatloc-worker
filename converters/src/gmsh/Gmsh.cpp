@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <fstream>
-#include <iostream>
 
 #include "../logger/Logger.hpp"
 
@@ -69,7 +68,7 @@ bool Gmsh::load(const std::string &fileName) {
 
   file >> this->m_numberOfVertices;
   if (!this->m_numberOfVertices) {
-    std::cerr << "No vertices" << std::endl;
+    Logger::ERROR("No vertices");
     return false;
   }
 
@@ -90,19 +89,18 @@ bool Gmsh::load(const std::string &fileName) {
 
   file >> numberOfElements;
   if (!numberOfElements) {
-    std::cerr << "No elements" << std::endl;
+    Logger::ERROR("No elements");
     return false;
   }
 
   for (i = 0; i < numberOfElements; ++i) {
-    uint j;
     uint type;
     uint numberOfLabels;
     uint label;
     file >> buffer >> type >> numberOfLabels;
 
     file >> buffer >> label;
-    for (j = 2; j < numberOfLabels; ++j)
+    for (uint j = 2; j < numberOfLabels; ++j)
       file >> buffer;
 
     if (type == 2) { // 3-nodes triangle
@@ -129,14 +127,14 @@ bool Gmsh::load(const std::string &fileName) {
       uint index2;
       file >> index1 >> index2;
     } else {
-      std::cerr << "Unsupported type: " << type << std::endl;
+      Logger::ERROR("Unsupported type: " + type);
       return false;
     }
   }
 
   this->m_numberOfTriangles = triangles.size();
   if (!this->m_numberOfTriangles) {
-    std::cerr << "No triangles" << std::endl;
+    Logger::ERROR("No triangles");
     return false;
   }
   this->m_triangles = new Triangle[this->m_numberOfTriangles];
@@ -244,20 +242,18 @@ uint Gmsh::getTriangleLabel(const uint i) const {
  * @returns Vertices
  */
 std::vector<double> *Gmsh::getVolumesVertices() const {
-  uint i, j, k, l;
-
   if (!this->m_numberOfTetrahedronLabels)
     return nullptr;
 
   std::vector<double> *vertices =
       new std::vector<double>[this->m_numberOfTetrahedronLabels];
-  for (i = 0; i < this->m_numberOfTetrahedronLabels; ++i) {
-    for (j = 0; j < this->m_numberOfTetrahedra; ++j) {
+  for (uint i = 0; i < this->m_numberOfTetrahedronLabels; ++i) {
+    for (uint j = 0; j < this->m_numberOfTetrahedra; ++j) {
       if (this->m_tetrahedra[j].getLabel() == this->m_tetrahedronLabels[i]) {
         uint *indices = this->m_tetrahedra[j].getIndices();
-        for (k = 0; k < 4; ++k) {
+        for (uint k = 0; k < 4; ++k) {
           double *coordinates = this->m_vertices[indices[k]].getCoordinates();
-          for (l = 0; l < 3; ++l) {
+          for (uint l = 0; l < 3; ++l) {
             vertices[i].push_back(coordinates[l]);
           }
           delete[] coordinates;
@@ -275,20 +271,18 @@ std::vector<double> *Gmsh::getVolumesVertices() const {
  * @returns Vertices
  */
 std::vector<double> *Gmsh::getSurfacesVertices() const {
-  uint i, j, k, l;
-
   if (!this->m_numberOfTriangleLabels)
     return nullptr;
 
   std::vector<double> *vertices =
       new std::vector<double>[this->m_numberOfTriangleLabels];
-  for (i = 0; i < this->m_numberOfTriangleLabels; ++i) {
-    for (j = 0; j < this->m_numberOfTriangles; ++j) {
+  for (uint i = 0; i < this->m_numberOfTriangleLabels; ++i) {
+    for (uint j = 0; j < this->m_numberOfTriangles; ++j) {
       if (this->m_triangles[j].getLabel() == this->m_triangleLabels[i]) {
         uint *indices = this->m_triangles[j].getIndices();
-        for (k = 0; k < 3; ++k) {
+        for (uint k = 0; k < 3; ++k) {
           double *coordinates = this->m_vertices[indices[k]].getCoordinates();
-          for (l = 0; l < 3; ++l) {
+          for (uint l = 0; l < 3; ++l) {
             vertices[i].push_back(coordinates[l]);
           }
           delete[] coordinates;

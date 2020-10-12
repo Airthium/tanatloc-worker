@@ -1,5 +1,8 @@
 #!/bin/sh
 
+set -x
+set -e
+
 echo "Build"
 cd converters
 cmake -DCOVERAGE=ON .

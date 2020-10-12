@@ -14,6 +14,9 @@ if (OpenCASCADE_FOUND)
   set(OCC_LIBS ${OpenCASCADE_LIBRARIES})
 endif (OpenCASCADE_FOUND)
 
+# Logger library
+AUX_SOURCE_DIRECTORY(src/logger LOGGER_SOURCE)
+
 # DXF library
 AUX_SOURCE_DIRECTORY(src/dxflib DXF_SOURCE)
 
@@ -32,6 +35,7 @@ set(DXFToBRepSOURCE
   src/DXFToBRep.cpp
   src/DXFConverter.cpp
   ${DXF_SOURCE}
+  ${LOGGER_SOURCE}
 )
 
 # BRepToThreeJS
@@ -39,6 +43,7 @@ set(BRepToThreeJSSOURCE
   src/BRepToThreeJS.cpp
   ${OCC_SOURCE}
   ${THREEJS_SOURCE}
+  ${LOGGER_SOURCE}
 )
 
 # GmshToThreeJS
@@ -46,6 +51,7 @@ set(GmshToThreeJSSOURCE
   src/GmshToThreeJS.cpp
   ${GMSH_SOURCE}
   ${THREEJS_SOURCE}
+  ${LOGGER_SOURCE}
 )
 
 # StepToThreeJS (TODO to remove)
@@ -53,12 +59,14 @@ set(StepToThreeJSSOURCE
   src/StepToThreeJS.cpp
   ${OCC_SOURCE}
   ${THREEJS_SOURCE}
+  ${LOGGER_SOURCE}
 )
 
 # StepUnion (TODO to replace by BRepUnion)
 set(StepUnionSOURCE
   src/StepUnion.cpp
   ${OCC_SOURCE}
+  ${LOGGER_SOURCE}
 )
 
 ## Executables
@@ -85,12 +93,18 @@ target_link_libraries(StepUnion ${OCC_LIBS})
 include(CTest)
 include(ParseAndAddCatchTests)
 
+set(LOGGER_TESTS
+  test/logger/Logger.test.cpp
+)
+
 set(GMSH_TESTS
   test/gmsh/Gmsh.test.cpp
 )
 
 set(SOURCE_TESTS
   test/main.cpp
+  ${LOGGER_TESTS}
+  ${LOGGER_SOURCE}
   ${GMSH_TESTS}
   ${GMSH_SOURCE}
 )
