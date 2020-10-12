@@ -5,10 +5,10 @@
 
 typedef unsigned int uint;
 
-#define FACE "face_"
-#define SOLID "solid_"
-#define EDGE "edge_"
-#define UUID_LENGHT (uint)16
+const std::string FACE = "face_";
+const std::string SOLID = "solid_";
+const std::string EDGE = "edge_";
+const uint UUID_LENGHT = 16;
 
 class ThreeJS {
 private:
@@ -24,10 +24,6 @@ private:
   // Number of colors
   uint m_numberOfColors = 0;
 
-  // Min Bb
-  double m_minBb = 0;
-  // Max Bb
-  double m_maxBb = 0;
   // Label
   uint m_label = 0;
   // Vertices
@@ -46,14 +42,12 @@ public:
   // Constructor
   ThreeJS();
   ThreeJS(float *, const uint);
-  ThreeJS(double *, const uint);
+  ThreeJS(const double *, const uint);
   ThreeJS(float *, const uint, float *, const uint);
   ThreeJS(float *, const uint, float *, const uint, uint *, const uint);
   // Destructor
   ~ThreeJS();
 
-  // Set min & max
-  void setMinMax(double, double);
   // Set label
   void setLabel(uint);
   // Set vertices

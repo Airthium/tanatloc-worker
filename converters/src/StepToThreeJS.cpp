@@ -92,7 +92,7 @@ int main(int argc, char *argv[]) {
     std::vector<float> normals = triangulation.getNormals();
     std::vector<uint> indices = triangulation.getIndices();
 
-    float **colors = new float *[0];
+    float **colors = new float *[1];
     colors[0] = new float[3];
     colors[0][0] = std::get<0>(solidColors[i])
                        ? std::get<1>(solidColors[i]).Red()
@@ -111,7 +111,6 @@ int main(int argc, char *argv[]) {
     double min;
     double max;
     triangulation.getBb(&min, &max);
-    solid.setMinMax(min, max);
     std::ostringstream oss;
     oss << threeJSPath << "/" << SOLID << (i + 1) << ".json";
     res = solid.save(oss.str());
@@ -129,7 +128,7 @@ int main(int argc, char *argv[]) {
     std::vector<float> normals = triangulation.getNormals();
     std::vector<uint> indices = triangulation.getIndices();
 
-    float **colors = new float *[0];
+    float **colors = new float *[1];
     colors[0] = new float[3];
     colors[0][0] = std::get<0>(faceColors[i]) ? std::get<1>(faceColors[i]).Red()
                                               : DEFAULT_FACE_COLOR_R;

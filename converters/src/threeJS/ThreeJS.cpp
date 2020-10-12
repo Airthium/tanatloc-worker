@@ -18,8 +18,8 @@ ThreeJS::ThreeJS() {}
  * @param numberOfVertices Number of vertices
  */
 ThreeJS::ThreeJS(float *vertices, const uint numberOfVertices)
-    : m_numberOfVertices(numberOfVertices) {
-  this->m_vertices = new float[numberOfVertices];
+    : m_numberOfVertices(numberOfVertices),
+      m_vertices(new float[numberOfVertices]) {
   std::copy(vertices, vertices + numberOfVertices, this->m_vertices);
 }
 
@@ -28,11 +28,10 @@ ThreeJS::ThreeJS(float *vertices, const uint numberOfVertices)
  * @param vertices Vertices (double)
  * @param numberOfVertices Number of vertices
  */
-ThreeJS::ThreeJS(double *vertices, const uint numberOfVertices)
-    : m_numberOfVertices(numberOfVertices) {
-  uint i;
-  this->m_vertices = new float[numberOfVertices];
-  for (i = 0; i < numberOfVertices; ++i) {
+ThreeJS::ThreeJS(const double *vertices, const uint numberOfVertices)
+    : m_numberOfVertices(numberOfVertices),
+      m_vertices(new float[numberOfVertices]) {
+  for (uint i = 0; i < numberOfVertices; ++i) {
     this->m_vertices[i] = (float)vertices[i];
   }
 }
@@ -108,14 +107,6 @@ ThreeJS::~ThreeJS() {
 }
 
 /**
- * Set min & max
- */
-void ThreeJS::setMinMax(double min, double max) {
-  this->m_minBb = min;
-  this->m_maxBb = max;
-}
-
-/**
  * Set label
  * @param number Label
  */
@@ -168,7 +159,7 @@ void ThreeJS::setIndices(uint *indices, const uint size) {
 
 void ThreeJS::setColors(float **colors, const uint size) {
   uint i;
-  if (!this->m_colors) {
+  if (this->m_colors) {
     for (i = 0; i < this->m_numberOfColors; ++i) {
       if (this->m_colors[i]) {
         delete[] this->m_colors[i];

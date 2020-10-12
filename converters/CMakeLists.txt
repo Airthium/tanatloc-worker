@@ -108,6 +108,10 @@ set(OCC_TESTS
   test/occ/getElements.test.cpp
 )
 
+set(THREEJS_TESTS
+  test/threeJS/ThreeJS.test.cpp
+)
+
 set(SOURCE_TESTS
   test/main.cpp
   ${LOGGER_TESTS}
@@ -116,6 +120,8 @@ set(SOURCE_TESTS
   ${GMSH_SOURCE}
   ${OCC_TESTS}
   ${OCC_SOURCE}
+  ${THREEJS_TESTS}
+  ${THREEJS_SOURCE}
 )
 
 add_executable(tests ${SOURCE_TESTS})
