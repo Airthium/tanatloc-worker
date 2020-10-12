@@ -5,6 +5,8 @@ WORKDIR /usr/bin
 
 COPY ./converters .
 
-RUN cmake .
+RUN mkdir build
+
+RUN cmake ..
 
 RUN make
