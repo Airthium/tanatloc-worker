@@ -2,11 +2,12 @@
 **/*.tar.gz
 
 # CMake
-converters/build
+converters
+!converters/src
+!converters/test
+!converters/CMakeFile
 
 # Coverage
+coverage
 converters/coverage
 
-# Sonar
-.scannerwork
-converters/bw-output
