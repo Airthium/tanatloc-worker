@@ -3,6 +3,9 @@ cmake_minimum_required(VERSION 3.0)
 project(Tanatloc)
 
 ## LIBRARIES
+# Catch2
+find_package(Catch2 REQUIRED)
+
 # OpenCASCADE
 find_package(OpenCASCADE)
 if (OpenCASCADE_FOUND)
@@ -12,49 +15,49 @@ if (OpenCASCADE_FOUND)
 endif (OpenCASCADE_FOUND)
 
 # DXF library
-AUX_SOURCE_DIRECTORY(dxflib DXF_SOURCE)
+AUX_SOURCE_DIRECTORY(src/dxflib DXF_SOURCE)
 
 # Gmsh library
-AUX_SOURCE_DIRECTORY(gmsh GMSH_SOURCE)
+AUX_SOURCE_DIRECTORY(src/gmsh GMSH_SOURCE)
 
 # OCC library
-AUX_SOURCE_DIRECTORY(occ OCC_SOURCE)
+AUX_SOURCE_DIRECTORY(src/occ OCC_SOURCE)
 
 # ThreeJS library
-AUX_SOURCE_DIRECTORY(threeJS THREEJS_SOURCE)
+AUX_SOURCE_DIRECTORY(src/threeJS THREEJS_SOURCE)
 
 ## SOURCES
 # DXFToBRep
 set(DXFToBRepSOURCE
-  DXFToBRep.cpp
-  DXFConverter.cpp
+  src/DXFToBRep.cpp
+  src/DXFConverter.cpp
   ${DXF_SOURCE}
 )
 
 # BRepToThreeJS
 set(BRepToThreeJSSOURCE
-  BRepToThreeJS.cpp
+  src/BRepToThreeJS.cpp
   ${OCC_SOURCE}
   ${THREEJS_SOURCE}
 )
 
 # GmshToThreeJS
 set(GmshToThreeJSSOURCE
-  GmshToThreeJS.cpp
+  src/GmshToThreeJS.cpp
   ${GMSH_SOURCE}
   ${THREEJS_SOURCE}
 )
 
 # StepToThreeJS (TODO to remove)
 set(StepToThreeJSSOURCE
-  StepToThreeJS.cpp
+  src/StepToThreeJS.cpp
   ${OCC_SOURCE}
   ${THREEJS_SOURCE}
 )
 
 # StepUnion (TODO to replace by BRepUnion)
 set(StepUnionSOURCE
-  StepUnion.cpp
+  src/StepUnion.cpp
   ${OCC_SOURCE}
 )
 
@@ -77,3 +80,36 @@ target_link_libraries(StepToThreeJS ${OCC_LIBS})
 # StepUnion
 add_executable(StepUnion ${StepUnionSOURCE})
 target_link_libraries(StepUnion ${OCC_LIBS})
+
+## Tests
+include(CTest)
+include(ParseAndAddCatchTests)
+
+set(GMSH_TESTS
+  test/gmsh/Gmsh.test.cpp
+)
+
+set(SOURCE_TESTS
+  test/main.cpp
+  ${GMSH_TESTS}
+  ${GMSH_SOURCE}
+)
+
+add_executable(tests ${SOURCE_TESTS})
+
+target_link_libraries(tests Catch2::Catch2)
+ParseAndAddCatchTests(tests)
+
+## Coverage
+option(COVERAGE "Enable coverage flags" OFF)
+if (COVERAGE)
+  SET(CMAKE_CXX_FLAGS "-O0 --coverage")
+endif()
+
+add_custom_target(coverage
+  COMMAND make clean
+  COMMAND make
+  COMMAND make test
+  COMMAND lcov --directory . -c -o report.info
+  COMMAND genhtml -o ../coverage -t "Converters coverage" report.info
+)
