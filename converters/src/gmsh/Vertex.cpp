@@ -3,16 +3,7 @@
 /**
  * Constructor
  */
-Vertex::Vertex() : x(0.), y(0.), z(0.) {}
-
-/**
- * Destructor
- */
-Vertex::~Vertex() {
-  this->x = 0.;
-  this->y = 0.;
-  this->z = 0.;
-}
+Vertex::Vertex() {}
 
 /**
  * Set coordinates
@@ -21,9 +12,9 @@ Vertex::~Vertex() {
  * @param z Coordinate z
  */
 void Vertex::setCoordinates(const double x, const double y, const double z) {
-  this->x = x;
-  this->y = y;
-  this->z = z;
+  this->m_x = x;
+  this->m_y = y;
+  this->m_z = z;
 }
 
 /**
@@ -33,11 +24,11 @@ void Vertex::setCoordinates(const double x, const double y, const double z) {
  */
 double Vertex::getCoordinate(const uint i) const {
   if (i == 0)
-    return this->x;
+    return this->m_x;
   else if (i == 1)
-    return this->y;
+    return this->m_y;
   else if (i == 2)
-    return this->z;
+    return this->m_z;
   else
     return 0.;
 }
@@ -47,9 +38,9 @@ double Vertex::getCoordinate(const uint i) const {
  * @returns Coordinates
  */
 double *Vertex::getCoordinates() const {
-  double *coordinates = new double[3];
-  coordinates[0] = this->x;
-  coordinates[1] = this->y;
-  coordinates[2] = this->z;
+  auto *coordinates = new double[3];
+  coordinates[0] = this->m_x;
+  coordinates[1] = this->m_y;
+  coordinates[2] = this->m_z;
   return coordinates;
 }

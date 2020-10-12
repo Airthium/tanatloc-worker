@@ -9,23 +9,21 @@ typedef unsigned int uint;
 class Tetrahedron {
 private:
   // Index 1
-  uint index1;
+  uint m_index1 = 0;
   // Index 2
-  uint index2;
+  uint m_index2 = 0;
   // Index 3
-  uint index3;
+  uint m_index3 = 0;
   // Index 4
-  uint index4;
+  uint m_index4 = 0;
   // Label
-  uint label;
+  uint m_label = 0;
 
 public:
   // Constructor
   Tetrahedron();
   // Constructor
   Tetrahedron(const uint, const uint, const uint, const uint, const uint);
-  // Destructor
-  ~Tetrahedron();
 
   // Set indices
   void setIndices(const uint, const uint, const uint, const uint);

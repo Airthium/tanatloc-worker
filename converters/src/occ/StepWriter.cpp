@@ -3,6 +3,8 @@
 #include <STEPControl_StepModelType.hxx>
 #include <STEPControl_Writer.hxx>
 
+#include "../logger/Logger.hpp"
+
 StepWriter::StepWriter() : fileName(""), shape() {}
 
 StepWriter::StepWriter(std::string &fileName, TopoDS_Shape shape)
@@ -16,12 +18,12 @@ bool StepWriter::write() {
   STEPControl_StepModelType type = STEPControl_AsIs;
   res = writer.Transfer(this->shape, type);
   if (res != IFSelect_RetDone) {
-    std::cerr << "Unable to transfer" << std::endl;
+    Logger::ERROR("Unable to transfer");
     return false;
   }
   writer.Write(this->fileName.c_str());
   if (res != IFSelect_RetDone) {
-    std::cerr << "Unable to write" << std::endl;
+    Logger::ERROR("Unable to write");
     return false;
   }
   return true;

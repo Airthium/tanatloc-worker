@@ -2,8 +2,22 @@
 
 #include "../../src/logger/Logger.hpp"
 
-TEST_CASE("LOG") { Logger::LOG("log"); }
+TEST_CASE("LOG") {
+  INFO("Logger::LOG");
+  Logger::LOG("log");
+}
 
-TEST_CASE("WARNING") { Logger::WARNING("warning"); }
+TEST_CASE("DISP") {
+  INFO("Logger::DISP");
+  Logger::DISP("info");
+}
 
-TEST_CASE("ERROR") { Logger::ERROR("error"); }
+TEST_CASE("WARNING") {
+  INFO("Logger::WARNING");
+  Logger::WARNING("warning");
+}
+
+TEST_CASE("ERROR") {
+  INFO("Logger::ERROR");
+  Logger::ERROR("error");
+}

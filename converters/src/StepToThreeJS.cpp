@@ -5,6 +5,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+#include "logger/Logger.hpp"
 #include "occ/StepReader.hpp"
 #include "occ/Triangulation.hpp"
 #include "occ/getElements.hpp"
@@ -24,13 +25,14 @@ constexpr float DEFAULT_FACE_COLOR_B = 0.75;
  */
 int main(int argc, char *argv[]) {
   bool res;
-  uint i, j;
+  uint i;
+  uint j;
   std::string stepFile;
   std::string threeJSPath;
 
   if (argc < 2) {
-    std::cerr << "USAGE:" << std::endl;
-    std::cerr << "./StepToThreeJS stepFile [threeJSPath]" << std::endl;
+    Logger::ERROR("USAGE:");
+    Logger::ERROR("./StepToThreeJS stepFile [threeJSPath]");
     return EXIT_FAILURE;
   }
   stepFile = argv[1];
@@ -46,9 +48,9 @@ int main(int argc, char *argv[]) {
   }
 
   // Create path
-  int err = mkdir(threeJSPath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+  int err = mkdir(threeJSPath.c_str(), S_IRWXU | S_IRWXG);
   if (err && errno != EEXIST) {
-    std::cerr << "Unable to create threeJS path" << std::endl;
+    Logger::ERROR("Unable to create threeJS path");
     return EXIT_FAILURE;
   }
 
@@ -56,7 +58,7 @@ int main(int argc, char *argv[]) {
   StepReader reader = StepReader(stepFile);
   res = reader.read();
   if (!res) {
-    std::cerr << "Unable to load step file " << stepFile << std::endl;
+    Logger::ERROR("Unable to load step file " + stepFile);
     return EXIT_FAILURE;
   }
   std::vector<TopoDS_Shape> shapes = reader.getShapes();
@@ -114,7 +116,7 @@ int main(int argc, char *argv[]) {
     oss << threeJSPath << "/" << SOLID << (i + 1) << ".json";
     res = solid.save(oss.str());
     if (!res) {
-      std::cerr << "Unable to write ThreeJS file " << oss.str() << std::endl;
+      Logger::ERROR("Unable to write ThreeJS file " + oss.str());
       return EXIT_FAILURE;
     }
     // std::cout << 0.5 * (i / (solids.size())) << std::endl;
@@ -146,7 +148,7 @@ int main(int argc, char *argv[]) {
     oss << threeJSPath << "/" << FACE << (i + 1) << ".json";
     res = face.save(oss.str());
     if (!res) {
-      std::cerr << "Unable to write ThreeJS file " << oss.str() << std::endl;
+      Logger::ERROR("Unable to write ThreeJS file " + oss.str());
       return EXIT_FAILURE;
     }
     // std::cout << 0.5 + 0.5 * (i / (faces.size() - 1.)) << std::endl;
@@ -158,7 +160,7 @@ int main(int argc, char *argv[]) {
   oss << threeJSPath << "/part.json";
   res = part.writePartFile(oss.str(), "geometry", solids.size(), faces.size());
   if (!res) {
-    std::cerr << "Unable to write ThreeJS part file " << oss.str() << std::endl;
+    Logger::ERROR("Unable to write ThreeJS part file " + oss.str());
     return EXIT_FAILURE;
   }
 

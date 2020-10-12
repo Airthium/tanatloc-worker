@@ -7,6 +7,7 @@
 #include <sys/types.h>
 
 #include "gmsh/Gmsh.hpp"
+#include "logger/Logger.hpp"
 #include "threeJS/ThreeJS.hpp"
 
 void generateColor(float *, float *, float *);
@@ -22,8 +23,8 @@ int main(int argc, char *argv[]) {
   Gmsh *mesh = nullptr;
 
   if (argc < 2) {
-    std::cerr << "USAGE:" << std::endl;
-    std::cerr << "./GmshToThreeJS meshFile [threeJSPath]" << std::endl;
+    Logger::ERROR("USAGE:");
+    Logger::ERROR("./GmshToThreeJS meshFile [threeJSPath]");
     return EXIT_FAILURE;
   }
   meshFile = argv[1];
@@ -39,9 +40,9 @@ int main(int argc, char *argv[]) {
   }
 
   // Create path
-  int err = mkdir(threeJSPath.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+  int err = mkdir(threeJSPath.c_str(), S_IRWXU | S_IRWXG);
   if (err && errno != EEXIST) {
-    std::cerr << "Unable to create threeJS path" << std::endl;
+    Logger::ERROR("Unable to create threeJS path");
     return EXIT_FAILURE;
   }
 
@@ -49,7 +50,7 @@ int main(int argc, char *argv[]) {
   mesh = new Gmsh();
   res = mesh->load(meshFile);
   if (!res) {
-    std::cerr << "Unable to load Gmsh file " << meshFile << std::endl;
+    Logger::ERROR("Unable to load Gmsh file " + meshFile);
     return EXIT_FAILURE;
   }
 
@@ -61,10 +62,12 @@ int main(int argc, char *argv[]) {
   // Create & save ThreeJS
   for (i = 0; i < mesh->getNumberOfTetrahedronLabels(); ++i) {
     double *vertices = &volumesVertices[i][0];
-    uint size = volumesVertices[i].size();
+    uint size = (uint)volumesVertices[i].size();
     ThreeJS volume(vertices, size);
-    float **colors = new float *[1];
-    float r, g, b;
+    auto **colors = new float *[1];
+    float r;
+    float g;
+    float b;
     generateColor(&r, &g, &b);
     colors[0] = new float[3];
     colors[0][0] = r;
@@ -74,20 +77,22 @@ int main(int argc, char *argv[]) {
     volume.setLabel(mesh->getTetrahedronLabel(i));
 
     std::ostringstream oss;
-    oss << threeJSPath << "/" << SOLID << (i+1) << ".json";
+    oss << threeJSPath << "/" << SOLID << (i + 1) << ".json";
     res = volume.save(oss.str());
     if (!res) {
-      std::cerr << "Unable to write ThreeJS file " << oss.str() << std::endl;
+      Logger::ERROR("Unable to write ThreeJS file " + oss.str());
       return EXIT_FAILURE;
     }
   }
 
   for (i = 0; i < mesh->getNumberOfTriangleLabels(); ++i) {
     double *vertices = &surfacesVertices[i][0];
-    uint size = surfacesVertices[i].size();
+    uint size = (uint)surfacesVertices[i].size();
     ThreeJS surface(vertices, size);
     float **colors = new float *[1];
-    float r, g, b;
+    float r;
+    float g;
+    float b;
     generateColor(&r, &g, &b);
     colors[0] = new float[3];
     colors[0][0] = r;
@@ -96,10 +101,10 @@ int main(int argc, char *argv[]) {
     surface.setColors(colors, 1);
     surface.setLabel(mesh->getTriangleLabel(i));
     std::ostringstream oss;
-    oss << threeJSPath << "/" << FACE << (i+1) << ".json";
+    oss << threeJSPath << "/" << FACE << (i + 1) << ".json";
     res = surface.save(oss.str());
     if (!res) {
-      std::cerr << "Unable to write ThreeJS file " << oss.str() << std::endl;
+      Logger::ERROR("Unable to write ThreeJS file " + oss.str());
       return EXIT_FAILURE;
     }
   }
@@ -112,7 +117,7 @@ int main(int argc, char *argv[]) {
                            mesh->getNumberOfTetrahedronLabels(),
                            mesh->getNumberOfTriangleLabels());
   if (!res) {
-    std::cerr << "Unable to write ThreeJS part file " << oss.str() << std::endl;
+    Logger::ERROR("Unable to write ThreeJS part file " + oss.str());
     return EXIT_FAILURE;
   }
 
@@ -120,26 +125,22 @@ int main(int argc, char *argv[]) {
 
   return EXIT_SUCCESS;
 }
+
+/**
+ * Generate random
+ */
+double generateRandom() {
+  std::random_device rd;
+  std::mt19937 generator(rd());
+  std::uniform_real_distribution<> dist(0., 1.);
+  return dist(generator);
+}
+
 /**
  * Generate random color
  */
 void generateColor(float *r, float *g, float *b) {
-  {
-    std::random_device rd;
-    std::mt19937 generator(rd());
-    std::uniform_real_distribution<> dist(0., 1.);
-    *r = dist(generator);
-  }
-  {
-    std::random_device rd;
-    std::mt19937 generator(rd());
-    std::uniform_real_distribution<> dist(0., 1.);
-    *g = dist(generator);
-  }
-  {
-    std::random_device rd;
-    std::mt19937 generator(rd());
-    std::uniform_real_distribution<> dist(0., 1.);
-    *b = dist(generator);
-  }
+  *r = (float)generateRandom();
+  *g = (float)generateRandom();
+  *b = (float)generateRandom();
 }

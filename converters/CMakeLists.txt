@@ -99,6 +99,9 @@ set(LOGGER_TESTS
 
 set(GMSH_TESTS
   test/gmsh/Gmsh.test.cpp
+  test/gmsh/Tetrahedron.test.cpp
+  test/gmsh/Triangle.test.cpp
+  test/gmsh/Vertex.test.cpp
 )
 
 set(SOURCE_TESTS

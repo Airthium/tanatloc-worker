@@ -12,6 +12,8 @@
 #include <XCAFDoc_DocumentTool.hxx>
 #include <XCAFDoc_ShapeTool.hxx>
 
+#include "../logger/Logger.hpp"
+
 /**
  * Constructor
  */
@@ -48,29 +50,16 @@ bool StepReader::read() {
 
   app->NewDocument("STEP-XCAF", this->document);
 
-  // STEP reader
-  STEPControl_Reader reader = STEPControl_Reader();
-  status = reader.ReadFile(fileName.c_str());
-  if (status != IFSelect_RetDone) {
-    std::cerr << "Unable to read " << fileName << std::endl;
-    return false;
-  }
-
-  Handle(StepData_StepModel) model = reader.StepModel();
-  Handle(StepData_Protocol) protocol =
-      Handle(StepData_Protocol)::DownCast(model->Protocol());
-  std::cout << protocol->SchemaName() << std::endl;
-
   // STEP CAF reader
   STEPCAFControl_Reader caf_reader = STEPCAFControl_Reader();
   status = caf_reader.ReadFile(fileName.c_str());
   if (status != IFSelect_RetDone) {
-    std::cerr << "Unable to read " << fileName << std::endl;
+    Logger::ERROR("Unable to read " + fileName);
     return false;
   }
 
   if (!caf_reader.Transfer(this->document)) {
-    std::cerr << "Unable to transfert root" << std::endl;
+    Logger::ERROR("Unable to transfert root");
     return false;
   }
 
@@ -78,8 +67,6 @@ bool StepReader::read() {
       XCAFDoc_DocumentTool::ShapeTool(this->document->Main());
   TDF_LabelSequence shapes;
   shapeContent->GetShapes(shapes);
-
-  std::cout << shapes.Size() << std::endl;
 
   for (int i = 1; i <= shapes.Size(); ++i) {
     if (shapeContent->IsFree(shapes.Value(i)))

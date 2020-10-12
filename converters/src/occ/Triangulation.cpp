@@ -11,6 +11,8 @@
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
 
+#include "../logger/Logger.hpp"
+
 /**
  * Constructor
  */
@@ -144,7 +146,7 @@ void Triangulation::triangulateLoop(TopoDS_Face &face, const uint iDelta) {
       BRep_Tool::Triangulation(face, location);
 
   if (triangulation.IsNull()) {
-    std::cerr << "Null triangulation" << std::endl;
+    Logger::ERROR("Null triangulation");
     return;
   }
   Poly_Connect pc(triangulation);

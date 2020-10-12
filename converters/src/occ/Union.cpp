@@ -3,6 +3,8 @@
 #include <BRepAlgoAPI_Fuse.hxx>
 #include <ShapeUpgrade_UnifySameDomain.hxx>
 
+#include "../logger/Logger.hpp"
+
 /**
  * Constructor
  */
@@ -79,7 +81,7 @@ TopoDS_Shape Union::compute() {
   fuse.Build();
 
   if (!fuse.IsDone()) {
-    std::cerr << "Fuse failed" << std::endl;
+    Logger::ERROR("Fuse failed");
     return TopoDS_Shape();
   }
 

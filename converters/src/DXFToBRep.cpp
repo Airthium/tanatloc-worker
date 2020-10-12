@@ -2,14 +2,16 @@
 
 #include "DXFConverter.hpp"
 
+#include "logger/Logger.hpp"
+
 int main(int argc, char **argv) {
   bool res;
   std::string dxfFile, brepFile;
 
   // Input arguments
   if (argc < 3) {
-    std::cerr << "USAGE:" << std::endl;
-    std::cerr << "DXFToBRep file.dxf file.brep" << std::endl;
+    Logger::ERROR("USAGE:");
+    Logger::ERROR("DXFToBRep file.dxf file.brep");
     return EXIT_FAILURE;
   }
 
@@ -28,14 +30,14 @@ int main(int argc, char **argv) {
   // Convert
   res = converter->convert();
   if (!res) {
-    std::cerr << "Unable to convert " << dxfFile << std::endl;
+    Logger::ERROR("Unable to convert " + dxfFile);
     return EXIT_FAILURE;
   }
 
   // Write
   res = converter->write();
   if (!res) {
-    std::cerr << "Unable to write " << brepFile << std::endl;
+    Logger::ERROR("Unable to write " + brepFile);
     return EXIT_FAILURE;
   }
 

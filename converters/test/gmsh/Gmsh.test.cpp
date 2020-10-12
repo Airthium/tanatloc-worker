@@ -2,7 +2,8 @@
 
 #include "../../src/gmsh/Gmsh.hpp"
 
-TEST_CASE("Constructor") {
+TEST_CASE("Gmsh constructor") {
+  INFO("Gmsh::Gmsh()");
   Gmsh mesh = Gmsh();
   REQUIRE(mesh.getNumberOfVertices() == 0);
   REQUIRE(mesh.getNumberOfTriangles() == 0);
@@ -17,14 +18,16 @@ TEST_CASE("Constructor") {
   REQUIRE(mesh.getSurfacesVertices() == nullptr);
 }
 
-TEST_CASE("load (no file)") {
+TEST_CASE("Gmsh load (no file)") {
+  INFO("Gmsh::load('')");
   Gmsh mesh = Gmsh();
 
   bool res = mesh.load("");
   REQUIRE(res == false);
 }
 
-TEST_CASE("load (file)") {
+TEST_CASE("Gmsh load (file)") {
+  INFO("Gmsh::load(file)");
   Gmsh mesh = Gmsh();
 
   bool res = mesh.load("./test/assets/Cube.msh");

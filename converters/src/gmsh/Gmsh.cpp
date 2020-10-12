@@ -132,7 +132,7 @@ bool Gmsh::load(const std::string &fileName) {
     }
   }
 
-  this->m_numberOfTriangles = triangles.size();
+  this->m_numberOfTriangles = (uint)triangles.size();
   if (!this->m_numberOfTriangles) {
     Logger::ERROR("No triangles");
     return false;
@@ -141,7 +141,7 @@ bool Gmsh::load(const std::string &fileName) {
   std::copy(triangles.begin(), triangles.end(), this->m_triangles);
   triangles.clear();
 
-  this->m_numberOfTetrahedra = tetrahedra.size();
+  this->m_numberOfTetrahedra = (uint)tetrahedra.size();
   this->m_tetrahedra = new Tetrahedron[this->m_numberOfTetrahedra];
   std::copy(tetrahedra.begin(), tetrahedra.end(), this->m_tetrahedra);
   tetrahedra.clear();
@@ -172,13 +172,13 @@ void Gmsh::computeLabels() {
       tetrahedronLabels.push_back(label);
   }
 
-  this->m_numberOfTriangleLabels = triangleLabels.size();
+  this->m_numberOfTriangleLabels = (uint)triangleLabels.size();
   this->m_triangleLabels = new uint[this->m_numberOfTriangleLabels];
   std::copy(triangleLabels.begin(), triangleLabels.end(),
             this->m_triangleLabels);
   triangleLabels.clear();
 
-  this->m_numberOfTetrahedronLabels = tetrahedronLabels.size();
+  this->m_numberOfTetrahedronLabels = (uint)tetrahedronLabels.size();
   this->m_tetrahedronLabels = new uint[this->m_numberOfTetrahedronLabels];
   std::copy(tetrahedronLabels.begin(), tetrahedronLabels.end(),
             this->m_tetrahedronLabels);
@@ -245,8 +245,7 @@ std::vector<double> *Gmsh::getVolumesVertices() const {
   if (!this->m_numberOfTetrahedronLabels)
     return nullptr;
 
-  std::vector<double> *vertices =
-      new std::vector<double>[this->m_numberOfTetrahedronLabels];
+  auto *vertices = new std::vector<double>[this->m_numberOfTetrahedronLabels];
   for (uint i = 0; i < this->m_numberOfTetrahedronLabels; ++i) {
     for (uint j = 0; j < this->m_numberOfTetrahedra; ++j) {
       if (this->m_tetrahedra[j].getLabel() == this->m_tetrahedronLabels[i]) {
@@ -274,8 +273,7 @@ std::vector<double> *Gmsh::getSurfacesVertices() const {
   if (!this->m_numberOfTriangleLabels)
     return nullptr;
 
-  std::vector<double> *vertices =
-      new std::vector<double>[this->m_numberOfTriangleLabels];
+  auto *vertices = new std::vector<double>[this->m_numberOfTriangleLabels];
   for (uint i = 0; i < this->m_numberOfTriangleLabels; ++i) {
     for (uint j = 0; j < this->m_numberOfTriangles; ++j) {
       if (this->m_triangles[j].getLabel() == this->m_triangleLabels[i]) {

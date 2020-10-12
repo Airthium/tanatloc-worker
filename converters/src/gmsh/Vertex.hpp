@@ -9,17 +9,15 @@ typedef unsigned int uint;
 class Vertex {
 private:
   // Coordinate x
-  double x;
+  double m_x = 0;
   // Coordinate y
-  double y;
+  double m_y = 0;
   // Coordinate z
-  double z;
+  double m_z = 0;
 
 public:
   // Constructor
   Vertex();
-  // Destructor
-  ~Vertex();
 
   // Set coordinates
   void setCoordinates(const double, const double, const double);

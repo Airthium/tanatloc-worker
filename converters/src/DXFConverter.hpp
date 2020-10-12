@@ -1,8 +1,6 @@
 #ifndef _DXFCONVERTER_HPP_
 #define _DXFCONVERTER_HPP_
 
-#define DEBUG 1
-
 #include <vector>
 
 #include "dxflib/dl_creationadapter.h"
@@ -12,14 +10,14 @@
 
 class DXFConverter : public DL_CreationAdapter {
 private:
-  std::string input;
-  std::string output;
+  std::string m_input = "";
+  std::string m_output = "";
 
-  std::vector<DL_VertexData> vertices;
-  std::vector<TopoDS_Wire> wires;
-  std::vector<TopoDS_Shape> faces;
+  std::vector<DL_VertexData> m_vertices;
+  std::vector<TopoDS_Wire> m_wires;
+  std::vector<TopoDS_Shape> m_faces;
 
-  TopoDS_Shape shape;
+  TopoDS_Shape m_shape;
 
   virtual void processCodeValuePair(unsigned int, const std::string &) override;
   virtual void addLine(const DL_LineData &) override;
