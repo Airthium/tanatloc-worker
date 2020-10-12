@@ -40,7 +40,7 @@ void DXFConverter::setOutput(const std::string &output) {
 }
 
 bool DXFConverter::convert() {
-  DL_Dxf *dxf = new DL_Dxf();
+  auto *dxf = new DL_Dxf();
   if (!dxf->in(this->m_input, this)) {
     Logger::ERROR("DXFConverter::Unable to open" + this->m_input);
     return false;
@@ -49,7 +49,7 @@ bool DXFConverter::convert() {
   return true;
 }
 
-bool DXFConverter::write() {
+bool DXFConverter::write() const {
   return BRepTools::Write(this->m_shape, this->m_output.c_str());
 }
 
@@ -105,10 +105,10 @@ void DXFConverter::addCircle(const DL_CircleData &data) {
   circle.SetLocation(center);
   circle.SetRadius(data.radius);
 
-  BRepBuilderAPI_MakeEdge edgeBuilder = BRepBuilderAPI_MakeEdge(circle);
+  auto edgeBuilder = BRepBuilderAPI_MakeEdge(circle);
   TopoDS_Edge edge = edgeBuilder.Edge();
 
-  BRepBuilderAPI_MakeWire wireBuilder = BRepBuilderAPI_MakeWire(edge);
+  auto wireBuilder = BRepBuilderAPI_MakeWire(edge);
   TopoDS_Wire wire = wireBuilder.Wire();
 
   this->m_wires.push_back(wire);
@@ -142,13 +142,12 @@ void DXFConverter::buildWire() {
 #ifdef DEBUG
   Logger::DEBUG("DXFConverter::buildWire");
 #endif
-  uint i;
-  uint size = this->m_vertices.size();
+  uint size = (uint)this->m_vertices.size();
   if (!size)
     return;
 
   BRepBuilderAPI_MakeWire wireBuilder = BRepBuilderAPI_MakeWire();
-  for (i = 0; i < size; ++i) {
+  for (uint i = 0; i < size; ++i) {
     DL_VertexData v1 = this->m_vertices[i];
     DL_VertexData v2 = this->m_vertices[(i + 1) % size];
 
@@ -160,7 +159,7 @@ void DXFConverter::buildWire() {
       // Thanks to
       // https://github.com/FreeCAD/FreeCAD/blob/master/src/Mod/Draft/importDXF.py
       gp_Vec chord(point1, point2);
-      float sagitta = (v1.bulge * chord.Magnitude()) / 2.;
+      double sagitta = (v1.bulge * chord.Magnitude()) / 2.;
       gp_Vec perp = chord.Crossed(gp_Vec(0, 0, 1));
       gp_Vec startPoint(point1.X() + 0.5 * chord.X(),
                         point1.Y() + 0.5 * chord.Y(), 0);
@@ -172,8 +171,7 @@ void DXFConverter::buildWire() {
       GC_MakeArcOfCircle circleArc(point1, point3, point2);
       opencascade::handle<Geom_TrimmedCurve> edgeGeometry = circleArc.Value();
 
-      BRepBuilderAPI_MakeEdge edgeBuilder =
-          BRepBuilderAPI_MakeEdge(edgeGeometry);
+      auto edgeBuilder = BRepBuilderAPI_MakeEdge(edgeGeometry);
       edge = edgeBuilder.Edge();
     } else {
       gp_Pnt point1(v1.x, v1.y, 0);
@@ -203,15 +201,14 @@ void DXFConverter::buildFace() {
 #ifdef DEBUG
   Logger::DEBUG("DXFConverter::buildFace");
 #endif
-  uint i;
-  uint size = this->m_wires.size();
+  uint size = (uint)this->m_wires.size();
   if (size == 0)
     return;
 
   // Build face
   BRepBuilderAPI_MakeFace faceBuilder =
       BRepBuilderAPI_MakeFace(this->m_wires[0], true);
-  for (i = 1; i < size; ++i) {
+  for (uint i = 1; i < size; ++i) {
     TopoDS_Wire wire = this->m_wires[i];
     faceBuilder.Add(wire);
   }
@@ -234,8 +231,7 @@ void DXFConverter::buildShape() {
     // Check if face build needed
     this->buildFace();
   }
-  uint i;
-  uint size = this->m_faces.size();
+  uint size = (uint)this->m_faces.size();
   if (size == 0)
     return;
 
@@ -243,7 +239,7 @@ void DXFConverter::buildShape() {
   TopoDS_Compound group;
   BRep_Builder builder;
   builder.MakeCompound(group);
-  for (i = 0; i < size; ++i) {
+  for (uint i = 0; i < size; ++i) {
     builder.Add(group, this->m_faces[i]);
   }
 
