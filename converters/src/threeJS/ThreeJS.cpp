@@ -183,8 +183,6 @@ void ThreeJS::setColors(float **colors, const uint size) {
  * @returns {boolean} Save status
  */
 bool ThreeJS::save(const std::string &fileName) const {
-  uint i;
-
   std::ofstream file(fileName, std::ios::out | std::ios::trunc);
   if (!file) {
     Logger::ERROR("Unable to open " + fileName);
@@ -192,6 +190,33 @@ bool ThreeJS::save(const std::string &fileName) const {
   }
 
   // Headers
+  this->saveHeader(file);
+
+  // Vertices
+  if (this->m_vertices) {
+    this->saveVertices(file);
+  }
+
+  // Normals
+  if (this->m_normals) {
+    this->saveNormals(file);
+  }
+
+  // Colors
+  if (this->m_colors) {
+    this->saveColors(file);
+  }
+
+  // Footer
+  this->saveFooter(file);
+
+  return true;
+}
+
+/**
+ * Save header
+ */
+void ThreeJS::saveHeader(std::ofstream &file) const {
   file << "{" << std::endl;
   file << "\t\"metadata\": {" << std::endl;
   file << "\t\t\"version\": 4.4," << std::endl;
@@ -204,95 +229,107 @@ bool ThreeJS::save(const std::string &fileName) const {
   file << "\t\"type\": \"BufferGeometry\"," << std::endl;
   file << "\t\"data\": {" << std::endl;
   file << "\t\t\"attributes\": {" << std::endl;
+}
 
-  // Vertices
-  if (this->m_vertices) {
-    file << "\t\t\t\"position\": {" << std::endl;
-    file << "\t\t\t\t\"itemSize\": " << this->m_dimension << "," << std::endl;
-    file << "\t\t\t\t\"type\": \"Float32Array\"," << std::endl;
-    file << "\t\t\t\t\"array\": [";
+/**
+ * Save vertices
+ */
+void ThreeJS::saveVertices(std::ofstream &file) const {
+  uint i;
 
-    if (this->m_indices) {
-      for (i = 0; i < this->m_numberOfIndices; ++i) {
-        file << this->m_vertices[3 * this->m_indices[i] + 0] << ","
-             << this->m_vertices[3 * this->m_indices[i] + 1] << ","
-             << this->m_vertices[3 * this->m_indices[i] + 2];
-        if (i < (this->m_numberOfIndices - 1))
-          file << ",";
-      }
-    } else {
-      for (i = 0; i < this->m_numberOfVertices; ++i) {
-        file << this->m_vertices[i];
-        if (i < (this->m_numberOfVertices - 1))
-          file << ",";
-      }
-    }
+  file << "\t\t\t\"position\": {" << std::endl;
+  file << "\t\t\t\t\"itemSize\": " << this->m_dimension << "," << std::endl;
+  file << "\t\t\t\t\"type\": \"Float32Array\"," << std::endl;
+  file << "\t\t\t\t\"array\": [";
 
-    file << "]" << std::endl;
-    file << "\t\t\t}";
-
-    if (this->m_normals || this->m_colors)
-      file << "," << std::endl;
-    else
-      file << std::endl;
-  }
-
-  // Normals
-  if (this->m_normals) {
-    file << "\t\t\t\"normal\": {" << std::endl;
-    file << "\t\t\t\t\"itemSize\": " << this->m_dimension << "," << std::endl;
-    file << "\t\t\t\t\"type\": \"Float32Array\"," << std::endl;
-    file << "\t\t\t\t\"array\": [";
-
-    if (this->m_indices) {
-      for (i = 0; i < this->m_numberOfIndices; ++i) {
-        file << this->m_normals[3 * this->m_indices[i] + 0] << ","
-             << this->m_normals[3 * this->m_indices[i] + 1] << ","
-             << this->m_normals[3 * this->m_indices[i] + 2];
-        if (i < (this->m_numberOfIndices - 1))
-          file << ",";
-      }
-    } else {
-      for (i = 0; i < this->m_numberOfNormals; ++i) {
-        file << this->m_normals[i];
-        if (i < (this->m_numberOfNormals - 1))
-          file << ",";
-      }
-    }
-
-    file << "]" << std::endl;
-    file << "\t\t\t}";
-
-    if (this->m_colors)
-      file << "," << std::endl;
-    else
-      file << std::endl;
-  }
-
-  // Colors
-  if (this->m_colors) {
-    file << "\t\t\t\"color\": {" << std::endl;
-    file << "\t\t\t\t\"itemSize\": " << this->m_dimension << "," << std::endl;
-    file << "\t\t\t\t\"type\": \"Float32Array\"," << std::endl;
-    file << "\t\t\t\t\"array\": [";
-
-    for (i = 0; i < this->m_numberOfColors; ++i) {
-      file << this->m_colors[i][0] << "," << this->m_colors[i][1] << ","
-           << this->m_colors[i][2];
-      if (i < (this->m_numberOfColors - 1))
+  if (this->m_indices) {
+    for (i = 0; i < this->m_numberOfIndices; ++i) {
+      file << this->m_vertices[3 * this->m_indices[i] + 0] << ","
+           << this->m_vertices[3 * this->m_indices[i] + 1] << ","
+           << this->m_vertices[3 * this->m_indices[i] + 2];
+      if (i < (this->m_numberOfIndices - 1))
         file << ",";
     }
-
-    file << "]" << std::endl;
-    file << "\t\t\t}" << std::endl;
+  } else {
+    for (i = 0; i < this->m_numberOfVertices; ++i) {
+      file << this->m_vertices[i];
+      if (i < (this->m_numberOfVertices - 1))
+        file << ",";
+    }
   }
 
-  // Footer
+  file << "]" << std::endl;
+  file << "\t\t\t}";
+
+  if (this->m_normals || this->m_colors)
+    file << "," << std::endl;
+  else
+    file << std::endl;
+}
+
+/**
+ * Save normals
+ */
+void ThreeJS::saveNormals(std::ofstream &file) const {
+  uint i;
+
+  file << "\t\t\t\"normal\": {" << std::endl;
+  file << "\t\t\t\t\"itemSize\": " << this->m_dimension << "," << std::endl;
+  file << "\t\t\t\t\"type\": \"Float32Array\"," << std::endl;
+  file << "\t\t\t\t\"array\": [";
+
+  if (this->m_indices) {
+    for (i = 0; i < this->m_numberOfIndices; ++i) {
+      file << this->m_normals[3 * this->m_indices[i] + 0] << ","
+           << this->m_normals[3 * this->m_indices[i] + 1] << ","
+           << this->m_normals[3 * this->m_indices[i] + 2];
+      if (i < (this->m_numberOfIndices - 1))
+        file << ",";
+    }
+  } else {
+    for (i = 0; i < this->m_numberOfNormals; ++i) {
+      file << this->m_normals[i];
+      if (i < (this->m_numberOfNormals - 1))
+        file << ",";
+    }
+  }
+
+  file << "]" << std::endl;
+  file << "\t\t\t}";
+
+  if (this->m_colors)
+    file << "," << std::endl;
+  else
+    file << std::endl;
+}
+
+/**
+ * Save colors
+ */
+void ThreeJS::saveColors(std::ofstream &file) const {
+  file << "\t\t\t\"color\": {" << std::endl;
+  file << "\t\t\t\t\"itemSize\": " << this->m_dimension << "," << std::endl;
+  file << "\t\t\t\t\"type\": \"Float32Array\"," << std::endl;
+  file << "\t\t\t\t\"array\": [";
+
+  for (uint i = 0; i < this->m_numberOfColors; ++i) {
+    file << this->m_colors[i][0] << "," << this->m_colors[i][1] << ","
+         << this->m_colors[i][2];
+    if (i < (this->m_numberOfColors - 1))
+      file << ",";
+  }
+
+  file << "]" << std::endl;
+  file << "\t\t\t}" << std::endl;
+}
+
+/**
+ * Save footer
+ */
+void ThreeJS::saveFooter(std::ofstream &file) const {
   file << "\t\t}" << std::endl;
   file << "\t}" << std::endl;
   file << "}" << std::endl;
-
-  return true;
 }
 
 /**

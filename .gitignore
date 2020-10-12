@@ -7,6 +7,9 @@ converters
 !converters/test/**/*
 !converters/CMakeFile
 
+# Tests
+converters/test/assets/Cube
+
 # Coverage
 coverage
 

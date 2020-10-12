@@ -61,6 +61,11 @@ public:
 
   // Saver
   bool save(const std::string &) const;
+  void saveHeader(std::ofstream &file) const;
+  void saveVertices(std::ofstream &file) const;
+  void saveNormals(std::ofstream &file) const;
+  void saveColors(std::ofstream &file) const;
+  void saveFooter(std::ofstream &file) const;
 
   // Write part file
   bool writePartFile(const std::string &, const std::string &, const uint,

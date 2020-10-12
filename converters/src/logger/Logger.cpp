@@ -2,6 +2,16 @@
 
 #include <iostream>
 
+void Logger::DEBUG(const std::string &message) {
+  try {
+    std::cout << "\033[1;34m";
+    std::cout << message;
+    std::cout << "\033[0m" << std::endl;
+  } catch (const std::exception &e) {
+    std::cerr << e.what() << std::endl;
+  }
+}
+
 void Logger::LOG(const std::string &message) {
   try {
     std::cout << message << std::endl;
@@ -20,7 +30,9 @@ void Logger::DISP(const std::string &message) {
 
 void Logger::WARNING(const std::string &message) {
   try {
-    std::cout << message << std::endl;
+    std::cout << "\033[1;33m";
+    std::cout << message;
+    std::cout << "\033[0m" << std::endl;
   } catch (const std::exception &e) {
     std::cerr << e.what() << std::endl;
   }
@@ -28,7 +40,9 @@ void Logger::WARNING(const std::string &message) {
 
 void Logger::ERROR(const std::string &message) {
   try {
-    std::cout << message << std::endl;
+    std::cout << "\033[1;31m";
+    std::cout << message;
+    std::cout << "\033[0m" << std::endl;
   } catch (const std::exception &e) {
     std::cerr << e.what() << std::endl;
   }

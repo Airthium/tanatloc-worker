@@ -3,23 +3,13 @@
 #include "../../src/logger/Logger.hpp"
 
 TEST_CASE("Logger") {
-  SECTION("LOG") {
-    INFO("Logger::LOG");
-    Logger::LOG("log");
-  }
+  SECTION("DEBUG") { Logger::DEBUG("debug"); }
 
-  SECTION("DISP") {
-    INFO("Logger::DISP");
-    Logger::DISP("info");
-  }
+  SECTION("LOG") { Logger::LOG("log"); }
 
-  SECTION("WARNING") {
-    INFO("Logger::WARNING");
-    Logger::WARNING("warning");
-  }
+  SECTION("DISP") { Logger::DISP("info"); }
 
-  SECTION("ERROR") {
-    INFO("Logger::ERROR");
-    Logger::ERROR("error");
-  }
+  SECTION("WARNING") { Logger::WARNING("warning"); }
+
+  SECTION("ERROR") { Logger::ERROR("error"); }
 }

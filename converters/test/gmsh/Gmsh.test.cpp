@@ -6,35 +6,69 @@ TEST_CASE("Gmsh") {
 
   SECTION("Constructor") {
     Gmsh mesh = Gmsh();
-    REQUIRE(mesh.getNumberOfVertices() == 0);
-    REQUIRE(mesh.getNumberOfTriangles() == 0);
-    REQUIRE(mesh.getNumberOfTriangleLabels() == 0);
-    REQUIRE(mesh.getNumberOfTetrahedra() == 0);
-    REQUIRE(mesh.getNumberOfTetrahedronLabels() == 0);
+    CHECK(mesh.getNumberOfVertices() == 0);
+    CHECK(mesh.getNumberOfTriangles() == 0);
+    CHECK(mesh.getNumberOfTriangleLabels() == 0);
+    CHECK(mesh.getNumberOfTetrahedra() == 0);
+    CHECK(mesh.getNumberOfTetrahedronLabels() == 0);
 
-    REQUIRE(mesh.getTetrahedronLabel(0) == 0);
-    REQUIRE(mesh.getTriangleLabel(0) == 0);
+    CHECK(mesh.getTetrahedronLabel(0) == 0);
+    CHECK(mesh.getTriangleLabel(0) == 0);
 
-    REQUIRE(mesh.getVolumesVertices() == nullptr);
-    REQUIRE(mesh.getSurfacesVertices() == nullptr);
+    CHECK(mesh.getVolumesVertices() == nullptr);
+    CHECK(mesh.getSurfacesVertices() == nullptr);
   }
 
   SECTION("load - no file") {
-    SECTION("Empty") {
-      INFO("Gmsh::load()");
-      Gmsh mesh = Gmsh();
+    Gmsh mesh = Gmsh();
 
-      bool res = mesh.load("");
-      REQUIRE(!res);
-    }
+    bool res = mesh.load("");
+    CHECK(!res);
   }
 
-  SECTION("load - empty file") {
-    INFO("Gmsh::load(file)");
+  SECTION("load - wrong file") {
+    Gmsh mesh = Gmsh();
+
+    bool res = mesh.load("./test/assets/Cube.wrong.msh");
+    CHECK(res == false);
+  }
+
+  SECTION("load - correct file") {
     Gmsh mesh = Gmsh();
 
     bool res = mesh.load("./test/assets/Cube.msh");
-    REQUIRE(res == true);
+    CHECK(res == true);
+  }
+
+  SECTION("computeLabels") {
+    Gmsh mesh = Gmsh();
+
+    mesh.load("./test/assets/Cube.msh");
+    mesh.computeLabels();
+
+    CHECK(mesh.getTriangleLabel(0) == 1);
+    CHECK(mesh.getTetrahedronLabel(0) == 1);
+
+    // Out of bound
+    CHECK(mesh.getTriangleLabel(10) == 0);
+    CHECK(mesh.getTetrahedronLabel(10) == 0);
+  }
+
+  SECTION("getVolumesVertices") {
+    Gmsh mesh = Gmsh();
+
+    mesh.load("./test/assets/Cube.msh");
+    mesh.computeLabels();
+    std::vector<double> *vertices = mesh.getVolumesVertices();
+    CHECK(vertices->size() > 0);
+  }
+
+  SECTION("getSurfacesVertices") {
+    Gmsh mesh = Gmsh();
+
+    mesh.load("./test/assets/Cube.msh");
+    mesh.computeLabels();
+    std::vector<double> *vertices = mesh.getSurfacesVertices();
+    CHECK(vertices->size() > 0);
   }
 }
-// TODO

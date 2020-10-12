@@ -74,7 +74,7 @@ void Triangulation::triangulate() {
  */
 void Triangulation::triangulateSolid(TopoDS_Shape &shape) {
   TopExp_Explorer explorer;
-  BRepMesh_IncrementalMesh(shape, this->m_maxBb * meshQuality);
+  BRepMesh_IncrementalMesh mesh(shape, this->m_maxBb * meshQuality);
   for (explorer.Init(shape, TopAbs_FACE); explorer.More(); explorer.Next()) {
     TopoDS_Face face = TopoDS::Face(explorer.Current());
     this->triangulateLoop(face, (uint)this->m_vertices.size() / 3);
@@ -86,7 +86,7 @@ void Triangulation::triangulateSolid(TopoDS_Shape &shape) {
  * @param shape Shape
  */
 void Triangulation::triangulateFace(TopoDS_Shape &shape) {
-  BRepMesh_IncrementalMesh(shape, this->m_maxBb * meshQuality);
+  BRepMesh_IncrementalMesh mesh(shape, this->m_maxBb * meshQuality);
   this->triangulateLoop(TopoDS::Face(shape));
 }
 
@@ -97,8 +97,8 @@ void Triangulation::triangulateFace(TopoDS_Shape &shape) {
 void Triangulation::triangulateEdge(TopoDS_Shape &shape) {
   gp_Pnt p;
 
-  BRepMesh_IncrementalMesh(shape, this->m_maxBb * 2.e-2 * meshQuality, false,
-                           0.5 * meshQuality, false);
+  BRepMesh_IncrementalMesh mesh(shape, this->m_maxBb * 2.e-2 * meshQuality,
+                                false, 0.5 * meshQuality, false);
   TopLoc_Location location;
   Handle(Poly_Polygon3D) polygon =
       BRep_Tool::Polygon3D(TopoDS::Edge(shape), location);

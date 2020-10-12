@@ -5,6 +5,7 @@
 
 class Logger {
 public:
+  static void DEBUG(const std::string &);
   static void LOG(const std::string &);
   static void DISP(const std::string &);
   static void WARNING(const std::string &);

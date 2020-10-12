@@ -1,4 +1,4 @@
-gmsh -3 Cube.geo -setnumber L 1 -setnumber h 0.1
+// gmsh -3 Cube.geo -setnumber L 1 -setnumber h 0.1
 
 /*SetFactory("OpenCASCADE");*/
 Mesh.Optimize = 1;

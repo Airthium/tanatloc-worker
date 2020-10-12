@@ -60,24 +60,18 @@ bool DXFConverter::write() const {
 void DXFConverter::processCodeValuePair(unsigned int code,
                                         const std::string &value) {
   if (value == "ENDSEC") {
-#ifdef DEBUG
     Logger::DEBUG("DXFConverter::ENDSEC");
-#endif
     this->buildFace();
   }
 
   else if (value == "EOF") {
-#ifdef DEBUG
     Logger::DEBUG("DXFConverter::EOF");
-#endif
     this->buildShape();
   }
 }
 
 void DXFConverter::addLine(const DL_LineData &data) {
-#ifdef DEBUG
   Logger::DEBUG("DXFConverter::LINE");
-#endif
 
   DL_VertexData v1 = {data.x1, data.y1, 0, 0};
   DL_VertexData v2 = {data.x2, data.y2, 0, 0};
@@ -89,16 +83,12 @@ void DXFConverter::addLine(const DL_LineData &data) {
 }
 
 void DXFConverter::addArc(const DL_ArcData &) {
-#ifdef DEBUG
   Logger::DEBUG("DXFConverter::ARC");
-#endif
   Logger::ERROR("TODO");
 }
 
 void DXFConverter::addCircle(const DL_CircleData &data) {
-#ifdef DEBUG
-  Logger::DEBUG("DXFConverter::CIRCLE" << std::endl;
-#endif
+  Logger::DEBUG("DXFConverter::CIRCLE");
 
   gp_Circ circle;
   gp_Pnt center(data.cx, data.cy, 0);
@@ -115,23 +105,17 @@ void DXFConverter::addCircle(const DL_CircleData &data) {
 }
 
 void DXFConverter::addPolyline(const DL_PolylineData &data) {
-#ifdef DEBUG
   Logger::DEBUG("DXFConverter::POLYLINE");
-#endif
 }
 
 void DXFConverter::addVertex(const DL_VertexData &data) {
-#ifdef DEBUG
   Logger::DEBUG("DXFConverter::VERTEX");
-#endif
 
   this->m_vertices.push_back(data);
 }
 
 void DXFConverter::endEntity() {
-#ifdef DEBUG
   Logger::DEBUG("DXFConverter::END ENTITY");
-#endif
 
   this->buildWire();
 }
@@ -139,10 +123,9 @@ void DXFConverter::endEntity() {
 // occ
 
 void DXFConverter::buildWire() {
-#ifdef DEBUG
   Logger::DEBUG("DXFConverter::buildWire");
-#endif
-  uint size = (uint)this->m_vertices.size();
+
+  auto size = (uint)this->m_vertices.size();
   if (!size)
     return;
 
@@ -198,10 +181,9 @@ void DXFConverter::buildWire() {
 }
 
 void DXFConverter::buildFace() {
-#ifdef DEBUG
   Logger::DEBUG("DXFConverter::buildFace");
-#endif
-  uint size = (uint)this->m_wires.size();
+
+  auto size = (uint)this->m_wires.size();
   if (size == 0)
     return;
 
@@ -222,16 +204,14 @@ void DXFConverter::buildFace() {
 }
 
 void DXFConverter::buildShape() {
-#ifdef DEBUG
   Logger::DEBUG("DXFConverter::buildShape");
-#endif
-  {
-    // Check if wire build needed
-    this->buildWire();
-    // Check if face build needed
-    this->buildFace();
-  }
-  uint size = (uint)this->m_faces.size();
+
+  // Check if wire build needed
+  this->buildWire();
+  // Check if face build needed
+  this->buildFace();
+
+  auto size = (uint)this->m_faces.size();
   if (size == 0)
     return;
 
