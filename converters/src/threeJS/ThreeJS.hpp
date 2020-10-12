@@ -13,31 +13,31 @@ typedef unsigned int uint;
 class ThreeJS {
 private:
   // Dimension
-  uint dimension;
+  uint m_dimension = 3;
 
   // Number of vertices
-  uint numberOfVertices;
+  uint m_numberOfVertices = 0;
   // Number of normals
-  uint numberOfNormals;
+  uint m_numberOfNormals = 0;
   // Number of indices
-  uint numberOfIndices;
+  uint m_numberOfIndices = 0;
   // Number of colors
-  uint numberOfColors;
+  uint m_numberOfColors = 0;
 
   // Min Bb
-  double minBb;
+  double m_minBb = 0;
   // Max Bb
-  double maxBb;
+  double m_maxBb = 0;
   // Label
-  uint label;
+  uint m_label = 0;
   // Vertices
-  float *vertices;
+  float *m_vertices = nullptr;
   // Normals
-  float *normals;
+  float *m_normals = nullptr;
   // Indices
-  uint *indices;
+  uint *m_indices = nullptr;
   // Colors
-  float **colors;
+  float **m_colors = nullptr;
 
   // Generate UUID
   std::string generateUUID() const;
@@ -45,7 +45,6 @@ private:
 public:
   // Constructor
   ThreeJS();
-  ThreeJS(const ThreeJS &);
   ThreeJS(float *, const uint);
   ThreeJS(double *, const uint);
   ThreeJS(float *, const uint, float *, const uint);
@@ -72,9 +71,6 @@ public:
   // Write part file
   bool writePartFile(const std::string &, const std::string &, const uint,
                      const uint, const uint numberOfEdges = 0) const;
-
-  // Operator
-  ThreeJS &operator=(const ThreeJS &);
 };
 
 #endif

@@ -5,19 +5,19 @@
 
 class StepWriter {
 private:
-  std::string fileName;
-  TopoDS_Shape shape;
+  std::string m_fileName = "";
+  TopoDS_Shape m_shape;
 
 public:
   // Constructor
   StepWriter();
   // Constructor
-  StepWriter(std::string &, TopoDS_Shape);
+  StepWriter(const std::string &, TopoDS_Shape);
   // Destructor
   ~StepWriter();
 
   // Write
-  bool write();
+  bool write() const;
 };
 
 #endif

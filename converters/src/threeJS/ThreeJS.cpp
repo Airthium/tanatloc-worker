@@ -5,24 +5,12 @@
 #include <random>
 #include <sstream>
 
+#include "../logger/Logger.hpp"
+
 /**
  * Constructor
  */
-ThreeJS::ThreeJS()
-    : dimension(3), numberOfVertices(0), numberOfNormals(0), numberOfIndices(0),
-      numberOfColors(0), minBb(0.), maxBb(0.), label(0), vertices(nullptr),
-      normals(nullptr), indices(nullptr), colors(nullptr) {}
-
-/**
- * Copy Constructor
- */
-ThreeJS::ThreeJS(const ThreeJS &)
-    : dimension(3), numberOfVertices(0), numberOfNormals(0), numberOfIndices(0),
-      numberOfColors(0), minBb(0.), maxBb(0.), label(0), vertices(nullptr),
-      normals(nullptr), indices(nullptr), colors(nullptr) {
-  std::cerr << "Copy constructore not defined" << std::endl;
-  throw std::string("Copy constructore not defined");
-}
+ThreeJS::ThreeJS() {}
 
 /**
  * Constructor
@@ -30,11 +18,9 @@ ThreeJS::ThreeJS(const ThreeJS &)
  * @param numberOfVertices Number of vertices
  */
 ThreeJS::ThreeJS(float *vertices, const uint numberOfVertices)
-    : dimension(3), numberOfVertices(numberOfVertices), numberOfNormals(0),
-      numberOfIndices(0), numberOfColors(0), minBb(0.), maxBb(0.), label(0),
-      normals(nullptr), indices(nullptr), colors(nullptr) {
-  this->vertices = new float[this->numberOfVertices];
-  std::copy(vertices, vertices + numberOfVertices, this->vertices);
+    : m_numberOfVertices(numberOfVertices) {
+  this->m_vertices = new float[numberOfVertices];
+  std::copy(vertices, vertices + numberOfVertices, this->m_vertices);
 }
 
 /**
@@ -43,13 +29,11 @@ ThreeJS::ThreeJS(float *vertices, const uint numberOfVertices)
  * @param numberOfVertices Number of vertices
  */
 ThreeJS::ThreeJS(double *vertices, const uint numberOfVertices)
-    : dimension(3), numberOfVertices(numberOfVertices), numberOfNormals(0),
-      numberOfIndices(0), numberOfColors(0), minBb(0.), maxBb(0.), label(0),
-      normals(nullptr), indices(nullptr), colors(nullptr) {
+    : m_numberOfVertices(numberOfVertices) {
   uint i;
-  this->vertices = new float[this->numberOfVertices];
+  this->m_vertices = new float[numberOfVertices];
   for (i = 0; i < numberOfVertices; ++i) {
-    this->vertices[i] = (float)vertices[i];
+    this->m_vertices[i] = (float)vertices[i];
   }
 }
 
@@ -62,13 +46,11 @@ ThreeJS::ThreeJS(double *vertices, const uint numberOfVertices)
  */
 ThreeJS::ThreeJS(float *vertices, const uint numberOfVertices, float *normals,
                  const uint numberOfNormals)
-    : dimension(3), numberOfVertices(numberOfVertices),
-      numberOfNormals(numberOfNormals), numberOfColors(0), numberOfIndices(0),
-      minBb(0.), maxBb(0.), label(0), indices(nullptr), colors(nullptr) {
-  this->vertices = new float[this->numberOfVertices];
-  std::copy(vertices, vertices + numberOfVertices, this->vertices);
-  this->normals = new float[this->numberOfNormals];
-  std::copy(normals, normals + numberOfNormals, this->normals);
+    : m_numberOfVertices(numberOfVertices), m_numberOfNormals(numberOfNormals) {
+  this->m_vertices = new float[this->m_numberOfVertices];
+  std::copy(vertices, vertices + numberOfVertices, this->m_vertices);
+  this->m_normals = new float[this->m_numberOfNormals];
+  std::copy(normals, normals + numberOfNormals, this->m_normals);
 }
 
 /**
@@ -83,62 +65,61 @@ ThreeJS::ThreeJS(float *vertices, const uint numberOfVertices, float *normals,
 ThreeJS::ThreeJS(float *vertices, const uint numberOfVertices, float *normals,
                  const uint numberOfNormals, uint *indices,
                  const uint numberOfIndices)
-    : dimension(3), numberOfVertices(numberOfVertices),
-      numberOfNormals(numberOfNormals), numberOfIndices(numberOfIndices),
-      numberOfColors(0), minBb(0.), maxBb(0.), label(0), colors(nullptr) {
-  this->vertices = new float[this->numberOfVertices];
-  std::copy(vertices, vertices + numberOfVertices, this->vertices);
-  this->normals = new float[this->numberOfNormals];
-  std::copy(normals, normals + numberOfNormals, this->normals);
-  this->indices = new uint[this->numberOfIndices];
-  std::copy(indices, indices + numberOfIndices, this->indices);
+    : m_numberOfVertices(numberOfVertices), m_numberOfNormals(numberOfNormals),
+      m_numberOfIndices(numberOfIndices) {
+  this->m_vertices = new float[this->m_numberOfVertices];
+  std::copy(vertices, vertices + numberOfVertices, this->m_vertices);
+  this->m_normals = new float[this->m_numberOfNormals];
+  std::copy(normals, normals + numberOfNormals, this->m_normals);
+  this->m_indices = new uint[this->m_numberOfIndices];
+  std::copy(indices, indices + numberOfIndices, this->m_indices);
 }
 
 /**
  * Destructor
  */
 ThreeJS::~ThreeJS() {
-  if (this->vertices) {
-    delete[] this->vertices;
-    this->vertices = nullptr;
+  if (this->m_vertices) {
+    delete[] this->m_vertices;
+    this->m_vertices = nullptr;
   }
-  if (this->normals) {
-    delete[] this->normals;
-    this->normals = nullptr;
+  if (this->m_normals) {
+    delete[] this->m_normals;
+    this->m_normals = nullptr;
   }
-  if (this->indices) {
-    delete[] this->indices;
-    this->indices = nullptr;
+  if (this->m_indices) {
+    delete[] this->m_indices;
+    this->m_indices = nullptr;
   }
-  if (this->colors) {
-    for (uint i = 0; i < this->numberOfColors; ++i) {
-      if (this->colors[i]) {
-        delete[] this->colors[i];
-        this->colors[i] = nullptr;
+  if (this->m_colors) {
+    for (uint i = 0; i < this->m_numberOfColors; ++i) {
+      if (this->m_colors[i]) {
+        delete[] this->m_colors[i];
+        this->m_colors[i] = nullptr;
       }
     }
-    delete[] this->colors;
-    this->colors = nullptr;
+    delete[] this->m_colors;
+    this->m_colors = nullptr;
   }
-  this->dimension = 0;
-  this->numberOfVertices = 0;
-  this->numberOfNormals = 0;
-  this->numberOfIndices = 0;
+  this->m_dimension = 0;
+  this->m_numberOfVertices = 0;
+  this->m_numberOfNormals = 0;
+  this->m_numberOfIndices = 0;
 }
 
 /**
  * Set min & max
  */
 void ThreeJS::setMinMax(double min, double max) {
-  this->minBb = min;
-  this->maxBb = max;
+  this->m_minBb = min;
+  this->m_maxBb = max;
 }
 
 /**
  * Set label
  * @param number Label
  */
-void ThreeJS::setLabel(uint number) { this->label = number; }
+void ThreeJS::setLabel(uint number) { this->m_label = number; }
 
 /**
  * Set vertices
@@ -146,13 +127,13 @@ void ThreeJS::setLabel(uint number) { this->label = number; }
  * @param size Size
  */
 void ThreeJS::setVertices(float *vertices, const uint size) {
-  if (this->vertices) {
-    delete[] this->vertices;
+  if (this->m_vertices) {
+    delete[] this->m_vertices;
   }
 
-  this->numberOfVertices = size;
-  this->vertices = new float[this->numberOfVertices];
-  std::copy(vertices, vertices + size, this->vertices);
+  this->m_numberOfVertices = size;
+  this->m_vertices = new float[this->m_numberOfVertices];
+  std::copy(vertices, vertices + size, this->m_vertices);
 }
 
 /**
@@ -161,13 +142,13 @@ void ThreeJS::setVertices(float *vertices, const uint size) {
  * @param size Size
  */
 void ThreeJS::setNormals(float *normals, const uint size) {
-  if (this->normals) {
-    delete[] this->normals;
+  if (this->m_normals) {
+    delete[] this->m_normals;
   }
 
-  this->numberOfNormals = size;
-  this->normals = new float[this->numberOfNormals];
-  std::copy(normals, normals + size, this->normals);
+  this->m_numberOfNormals = size;
+  this->m_normals = new float[this->m_numberOfNormals];
+  std::copy(normals, normals + size, this->m_normals);
 }
 
 /**
@@ -176,32 +157,32 @@ void ThreeJS::setNormals(float *normals, const uint size) {
  * @param size Size
  */
 void ThreeJS::setIndices(uint *indices, const uint size) {
-  if (!this->indices) {
-    delete[] this->indices;
+  if (!this->m_indices) {
+    delete[] this->m_indices;
   }
 
-  this->numberOfIndices = size;
-  this->indices = new uint[this->numberOfIndices];
-  std::copy(indices, indices + size, this->indices);
+  this->m_numberOfIndices = size;
+  this->m_indices = new uint[this->m_numberOfIndices];
+  std::copy(indices, indices + size, this->m_indices);
 }
 
 void ThreeJS::setColors(float **colors, const uint size) {
   uint i;
-  if (!this->colors) {
-    for (i = 0; i < this->numberOfColors; ++i) {
-      if (this->colors[i]) {
-        delete[] this->colors[i];
-        this->colors[i] = nullptr;
+  if (!this->m_colors) {
+    for (i = 0; i < this->m_numberOfColors; ++i) {
+      if (this->m_colors[i]) {
+        delete[] this->m_colors[i];
+        this->m_colors[i] = nullptr;
       }
     }
-    delete[] this->colors;
+    delete[] this->m_colors;
   }
 
-  this->numberOfColors = size;
-  this->colors = new float *[this->numberOfColors];
-  for (i = 0; i < this->numberOfColors; ++i) {
-    this->colors[i] = new float[3];
-    std::copy(colors[i], colors[i] + 3, this->colors[i]);
+  this->m_numberOfColors = size;
+  this->m_colors = new float *[this->m_numberOfColors];
+  for (i = 0; i < this->m_numberOfColors; ++i) {
+    this->m_colors[i] = new float[3];
+    std::copy(colors[i], colors[i] + 3, this->m_colors[i]);
   }
 }
 
@@ -215,7 +196,7 @@ bool ThreeJS::save(const std::string &fileName) const {
 
   std::ofstream file(fileName, std::ios::out | std::ios::trunc);
   if (!file) {
-    std::cerr << "Unable to open " << fileName << std::endl;
+    Logger::ERROR("Unable to open " + fileName);
     return false;
   }
 
@@ -227,33 +208,31 @@ bool ThreeJS::save(const std::string &fileName) const {
   file << "\t\t\"generator\": \"Tanatloc\"" << std::endl;
   file << "\t}," << std::endl;
   file << "\t\"uuid\": \"" << this->generateUUID() << "\"," << std::endl;
-  file << "\t\"minSize\": \"" << this->minBb << "\"," << std::endl;
-  file << "\t\"maxSize\": \"" << this->maxBb << "\"," << std::endl;
-  if (this->label)
-    file << "\t\"label\": \"" << this->label << "\"," << std::endl;
+  if (this->m_label)
+    file << "\t\"label\": \"" << this->m_label << "\"," << std::endl;
   file << "\t\"type\": \"BufferGeometry\"," << std::endl;
   file << "\t\"data\": {" << std::endl;
   file << "\t\t\"attributes\": {" << std::endl;
 
   // Vertices
-  if (this->vertices) {
+  if (this->m_vertices) {
     file << "\t\t\t\"position\": {" << std::endl;
-    file << "\t\t\t\t\"itemSize\": " << this->dimension << "," << std::endl;
+    file << "\t\t\t\t\"itemSize\": " << this->m_dimension << "," << std::endl;
     file << "\t\t\t\t\"type\": \"Float32Array\"," << std::endl;
     file << "\t\t\t\t\"array\": [";
 
-    if (this->indices) {
-      for (i = 0; i < this->numberOfIndices; ++i) {
-        file << this->vertices[3 * this->indices[i] + 0] << ","
-             << this->vertices[3 * this->indices[i] + 1] << ","
-             << this->vertices[3 * this->indices[i] + 2];
-        if (i < (this->numberOfIndices - 1))
+    if (this->m_indices) {
+      for (i = 0; i < this->m_numberOfIndices; ++i) {
+        file << this->m_vertices[3 * this->m_indices[i] + 0] << ","
+             << this->m_vertices[3 * this->m_indices[i] + 1] << ","
+             << this->m_vertices[3 * this->m_indices[i] + 2];
+        if (i < (this->m_numberOfIndices - 1))
           file << ",";
       }
     } else {
-      for (i = 0; i < this->numberOfVertices; ++i) {
-        file << this->vertices[i];
-        if (i < (this->numberOfVertices - 1))
+      for (i = 0; i < this->m_numberOfVertices; ++i) {
+        file << this->m_vertices[i];
+        if (i < (this->m_numberOfVertices - 1))
           file << ",";
       }
     }
@@ -261,31 +240,31 @@ bool ThreeJS::save(const std::string &fileName) const {
     file << "]" << std::endl;
     file << "\t\t\t}";
 
-    if (this->normals || this->colors)
+    if (this->m_normals || this->m_colors)
       file << "," << std::endl;
     else
       file << std::endl;
   }
 
   // Normals
-  if (this->normals) {
+  if (this->m_normals) {
     file << "\t\t\t\"normal\": {" << std::endl;
-    file << "\t\t\t\t\"itemSize\": " << this->dimension << "," << std::endl;
+    file << "\t\t\t\t\"itemSize\": " << this->m_dimension << "," << std::endl;
     file << "\t\t\t\t\"type\": \"Float32Array\"," << std::endl;
     file << "\t\t\t\t\"array\": [";
 
-    if (this->indices) {
-      for (i = 0; i < this->numberOfIndices; ++i) {
-        file << this->normals[3 * this->indices[i] + 0] << ","
-             << this->normals[3 * this->indices[i] + 1] << ","
-             << this->normals[3 * this->indices[i] + 2];
-        if (i < (this->numberOfIndices - 1))
+    if (this->m_indices) {
+      for (i = 0; i < this->m_numberOfIndices; ++i) {
+        file << this->m_normals[3 * this->m_indices[i] + 0] << ","
+             << this->m_normals[3 * this->m_indices[i] + 1] << ","
+             << this->m_normals[3 * this->m_indices[i] + 2];
+        if (i < (this->m_numberOfIndices - 1))
           file << ",";
       }
     } else {
-      for (i = 0; i < this->numberOfNormals; ++i) {
-        file << this->normals[i];
-        if (i < (this->numberOfNormals - 1))
+      for (i = 0; i < this->m_numberOfNormals; ++i) {
+        file << this->m_normals[i];
+        if (i < (this->m_numberOfNormals - 1))
           file << ",";
       }
     }
@@ -293,23 +272,23 @@ bool ThreeJS::save(const std::string &fileName) const {
     file << "]" << std::endl;
     file << "\t\t\t}";
 
-    if (this->colors)
+    if (this->m_colors)
       file << "," << std::endl;
     else
       file << std::endl;
   }
 
   // Colors
-  if (this->colors) {
+  if (this->m_colors) {
     file << "\t\t\t\"color\": {" << std::endl;
-    file << "\t\t\t\t\"itemSize\": " << this->dimension << "," << std::endl;
+    file << "\t\t\t\t\"itemSize\": " << this->m_dimension << "," << std::endl;
     file << "\t\t\t\t\"type\": \"Float32Array\"," << std::endl;
     file << "\t\t\t\t\"array\": [";
 
-    for (i = 0; i < this->numberOfColors; ++i) {
-      file << this->colors[i][0] << "," << this->colors[i][1] << ","
-           << this->colors[i][2];
-      if (i < (this->numberOfColors - 1))
+    for (i = 0; i < this->m_numberOfColors; ++i) {
+      file << this->m_colors[i][0] << "," << this->m_colors[i][1] << ","
+           << this->m_colors[i][2];
+      if (i < (this->m_numberOfColors - 1))
         file << ",";
     }
 
@@ -341,7 +320,7 @@ bool ThreeJS::writePartFile(const std::string &fileName,
 
   std::ofstream file(fileName, std::ios::out | std::ios::trunc);
   if (!file) {
-    std::cerr << "Unable to open " << fileName << std::endl;
+    Logger::ERROR("Unable to open " + fileName);
     return false;
   }
 
@@ -351,9 +330,9 @@ bool ThreeJS::writePartFile(const std::string &fileName,
 
   for (i = 0; i < numberOfVolumes; ++i) {
     file << "\t\t{" << std::endl;
-    file << "\t\t\t\"name\": \"" << SOLID << (i+1) << "\"," << std::endl;
-    file << "\t\t\t\"path\": \"" << SOLID << (i+1) << ".json\"," << std::endl;
-    file << "\t\t\t\"number\": \"" << (i+1) << "\"" << std::endl;
+    file << "\t\t\t\"name\": \"" << SOLID << (i + 1) << "\"," << std::endl;
+    file << "\t\t\t\"path\": \"" << SOLID << (i + 1) << ".json\"," << std::endl;
+    file << "\t\t\t\"number\": \"" << (i + 1) << "\"" << std::endl;
     if (i < numberOfVolumes - 1)
       file << "\t\t}," << std::endl;
     else
@@ -365,9 +344,9 @@ bool ThreeJS::writePartFile(const std::string &fileName,
 
   for (i = 0; i < numberOfSurfaces; ++i) {
     file << "\t\t{" << std::endl;
-    file << "\t\t\t\"name\": \"" << FACE << (i+1) << "\"," << std::endl;
-    file << "\t\t\t\"path\": \"" << FACE << (i+1) << ".json\"," << std::endl;
-    file << "\t\t\t\"number\": \"" << (i+1) << "\"" << std::endl;
+    file << "\t\t\t\"name\": \"" << FACE << (i + 1) << "\"," << std::endl;
+    file << "\t\t\t\"path\": \"" << FACE << (i + 1) << ".json\"," << std::endl;
+    file << "\t\t\t\"number\": \"" << (i + 1) << "\"" << std::endl;
     if (i < numberOfSurfaces - 1)
       file << "\t\t}," << std::endl;
     else
@@ -382,9 +361,10 @@ bool ThreeJS::writePartFile(const std::string &fileName,
 
     for (i = 0; i < numberOfEdges; ++i) {
       file << "\t\t{" << std::endl;
-      file << "\t\t\t\"name\": \"" << EDGE << (i+1) << "\"," << std::endl;
-      file << "\t\t\t\"path\": \"" << EDGE << (i+1) << ".json\"," << std::endl;
-      file << "\t\t\t\"number\": \"" << (i+1) << "\"" << std::endl;
+      file << "\t\t\t\"name\": \"" << EDGE << (i + 1) << "\"," << std::endl;
+      file << "\t\t\t\"path\": \"" << EDGE << (i + 1) << ".json\","
+           << std::endl;
+      file << "\t\t\t\"number\": \"" << (i + 1) << "\"" << std::endl;
       if (i < numberOfEdges - 1)
         file << "\t\t}," << std::endl;
       else
@@ -397,27 +377,6 @@ bool ThreeJS::writePartFile(const std::string &fileName,
   file << "}" << std::endl;
 
   return true;
-}
-
-/**
- * Operator
- */
-ThreeJS &ThreeJS::operator=(const ThreeJS &) {
-  this->dimension = 3;
-  this->numberOfVertices = 0;
-  this->numberOfNormals = 0;
-  this->numberOfIndices = 0;
-  this->numberOfColors = 0;
-  this->minBb = 0.;
-  this->maxBb = 0.;
-  this->label = 0;
-  this->vertices = nullptr;
-  this->normals = nullptr;
-  this->indices = nullptr;
-  this->colors = nullptr;
-  std::cerr << "Copy constructore not defined" << std::endl;
-  throw std::string("Equality operator not defined");
-  return *this;
 }
 
 /**

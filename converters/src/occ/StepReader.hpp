@@ -8,15 +8,15 @@
 
 class StepReader {
 private:
-  std::string fileName;
-  std::vector<TopoDS_Shape> shapes;
-  Handle(TDocStd_Document) document;
+  std::string m_fileName = "";
+  std::vector<TopoDS_Shape> m_shapes;
+  Handle(TDocStd_Document) m_document;
 
 public:
   // Constructor
   StepReader();
   // Constructor
-  explicit StepReader(std::string &);
+  explicit StepReader(const std::string &);
   // Destructor
   ~StepReader();
 
