@@ -10,12 +10,12 @@
 
 class Triangulation {
 private:
-  TopoDS_Shape shape;
-  double minBb;
-  double maxBb;
-  std::vector<float> vertices;
-  std::vector<float> normals;
-  std::vector<uint> indices;
+  TopoDS_Shape m_shape;
+  double m_minBb = 0;
+  double m_maxBb = 0;
+  std::vector<float> m_vertices;
+  std::vector<float> m_normals;
+  std::vector<uint> m_indices;
 
   // Compute max bounding box
   void computeBb();

@@ -104,15 +104,28 @@ set(GMSH_TESTS
   test/gmsh/Vertex.test.cpp
 )
 
+set(OCC_TESTS
+  test/occ/getElements.test.cpp
+)
+
+set(THREEJS_TESTS
+  test/threeJS/ThreeJS.test.cpp
+)
+
 set(SOURCE_TESTS
   test/main.cpp
   ${LOGGER_TESTS}
   ${LOGGER_SOURCE}
   ${GMSH_TESTS}
   ${GMSH_SOURCE}
+  ${OCC_TESTS}
+  ${OCC_SOURCE}
+  ${THREEJS_TESTS}
+  ${THREEJS_SOURCE}
 )
 
 add_executable(tests ${SOURCE_TESTS})
+target_link_libraries(tests ${OCC_LIBS})
 
 target_link_libraries(tests Catch2::Catch2)
 ParseAndAddCatchTests(tests)

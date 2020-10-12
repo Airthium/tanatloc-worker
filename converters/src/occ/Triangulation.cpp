@@ -16,22 +16,20 @@
 /**
  * Constructor
  */
-Triangulation::Triangulation()
-    : shape(), minBb(0.), maxBb(0.), vertices(), normals(), indices() {}
+Triangulation::Triangulation() {}
 
 /**
  * Constructor
  * @param shape Shape
  */
-Triangulation::Triangulation(TopoDS_Shape shape)
-    : shape(shape), minBb(0.), maxBb(0.), vertices(), normals(), indices() {
+Triangulation::Triangulation(TopoDS_Shape shape) : m_shape(shape) {
   this->computeBb();
 }
 
 /**
  * Destructor
  */
-Triangulation::~Triangulation() { this->maxBb = 0; }
+Triangulation::~Triangulation() { this->m_maxBb = 0; }
 
 /**
  * Compute max bounding box dimension
@@ -39,30 +37,35 @@ Triangulation::~Triangulation() { this->maxBb = 0; }
  */
 void Triangulation::computeBb() {
   Bnd_Box boundingBox;
-  double xMin, yMin, zMin, xMax, yMax, zMax;
+  double xMin;
+  double yMin;
+  double zMin;
+  double xMax;
+  double yMax;
+  double zMax;
 
-  BRepBndLib::Add(this->shape, boundingBox);
+  BRepBndLib::Add(this->m_shape, boundingBox);
   boundingBox.Get(xMin, yMin, zMin, xMax, yMax, zMax);
 
-  double xDim = std::abs((double)xMax - (double)xMin);
-  double yDim = std::abs((double)yMax - (double)yMin);
-  double zDim = std::abs((double)zMax - (double)zMin);
+  double xDim = std::abs(xMax - xMin);
+  double yDim = std::abs(yMax - yMin);
+  double zDim = std::abs(zMax - zMin);
 
-  this->minBb = std::min(xDim, std::min(yDim, zDim));
-  this->maxBb = std::max(xDim, std::max(yDim, zDim));
+  this->m_minBb = std::min(xDim, std::min(yDim, zDim));
+  this->m_maxBb = std::max(xDim, std::max(yDim, zDim));
 }
 
 /**
  * Triangulate
  */
 void Triangulation::triangulate() {
-  TopAbs_ShapeEnum type = this->shape.ShapeType();
+  TopAbs_ShapeEnum type = this->m_shape.ShapeType();
   if (type == TopAbs_SOLID)
-    this->triangulateSolid(this->shape);
+    this->triangulateSolid(this->m_shape);
   else if (type == TopAbs_FACE)
-    this->triangulateFace(this->shape);
+    this->triangulateFace(this->m_shape);
   else if (type == TopAbs_EDGE)
-    this->triangulateEdge(this->shape);
+    this->triangulateEdge(this->m_shape);
 }
 
 /**
@@ -71,10 +74,10 @@ void Triangulation::triangulate() {
  */
 void Triangulation::triangulateSolid(TopoDS_Shape &shape) {
   TopExp_Explorer explorer;
-  BRepMesh_IncrementalMesh(shape, this->maxBb * meshQuality);
+  BRepMesh_IncrementalMesh(shape, this->m_maxBb * meshQuality);
   for (explorer.Init(shape, TopAbs_FACE); explorer.More(); explorer.Next()) {
     TopoDS_Face face = TopoDS::Face(explorer.Current());
-    this->triangulateLoop(face, this->vertices.size() / 3);
+    this->triangulateLoop(face, (uint)this->m_vertices.size() / 3);
   }
 }
 
@@ -83,7 +86,7 @@ void Triangulation::triangulateSolid(TopoDS_Shape &shape) {
  * @param shape Shape
  */
 void Triangulation::triangulateFace(TopoDS_Shape &shape) {
-  BRepMesh_IncrementalMesh(shape, this->maxBb * meshQuality);
+  BRepMesh_IncrementalMesh(shape, this->m_maxBb * meshQuality);
   this->triangulateLoop(TopoDS::Face(shape));
 }
 
@@ -92,42 +95,20 @@ void Triangulation::triangulateFace(TopoDS_Shape &shape) {
  * @param shape Shape
  */
 void Triangulation::triangulateEdge(TopoDS_Shape &shape) {
-  // TopoDS_Edge edge = TopoDS::Edge(shape);
-  // ShapeAnalysis_Edge analyser;
-  // TopoDS_Vertex start = analyser.FirstVertex(edge);
-  // TopoDS_Vertex end = analyser.LastVertex(edge);
-  //
-  // gp_Pnt startPoint = BRep_Tool::Pnt(start);
-  // gp_Pnt endPoint = BRep_Tool::Pnt(end);
-  //
-  // this->vertices.push_back(static_cast<float>(startPoint.X()));
-  // this->vertices.push_back(static_cast<float>(startPoint.Y()));
-  // this->vertices.push_back(static_cast<float>(startPoint.Z()));
-  //
-  // this->vertices.push_back(static_cast<float>((startPoint.X() + endPoint.X())
-  // / 2.)); this->vertices.push_back(static_cast<float>((startPoint.Y() +
-  // endPoint.Y()) / 2.));
-  // this->vertices.push_back(static_cast<float>((startPoint.Z() + endPoint.Z())
-  // / 2.));
-  //
-  // this->vertices.push_back(static_cast<float>(endPoint.X()));
-  // this->vertices.push_back(static_cast<float>(endPoint.Y()));
-  // this->vertices.push_back(static_cast<float>(endPoint.Z()));
-  uint i;
   gp_Pnt p;
 
-  BRepMesh_IncrementalMesh(shape, this->maxBb * 2.e-2 * meshQuality, false,
+  BRepMesh_IncrementalMesh(shape, this->m_maxBb * 2.e-2 * meshQuality, false,
                            0.5 * meshQuality, false);
   TopLoc_Location location;
   Handle(Poly_Polygon3D) polygon =
       BRep_Tool::Polygon3D(TopoDS::Edge(shape), location);
 
   const TColgp_Array1OfPnt &nodes = polygon->Nodes();
-  for (i = nodes.Lower(); i <= nodes.Upper(); ++i) {
+  for (uint i = nodes.Lower(); i <= nodes.Upper(); ++i) {
     p = nodes(i).Transformed(location.Transformation());
-    this->vertices.push_back(static_cast<float>(p.X()));
-    this->vertices.push_back(static_cast<float>(p.Y()));
-    this->vertices.push_back(static_cast<float>(p.Z()));
+    this->m_vertices.push_back(static_cast<float>(p.X()));
+    this->m_vertices.push_back(static_cast<float>(p.Y()));
+    this->m_vertices.push_back(static_cast<float>(p.Z()));
   }
 }
 
@@ -155,9 +136,9 @@ void Triangulation::triangulateLoop(TopoDS_Face &face, const uint iDelta) {
   const TColgp_Array1OfPnt &nodes = triangulation->Nodes();
   for (i = nodes.Lower(); i <= nodes.Upper(); ++i) {
     p = nodes(i).Transformed(location.Transformation());
-    this->vertices.push_back(static_cast<float>(p.X()));
-    this->vertices.push_back(static_cast<float>(p.Y()));
-    this->vertices.push_back(static_cast<float>(p.Z()));
+    this->m_vertices.push_back(static_cast<float>(p.X()));
+    this->m_vertices.push_back(static_cast<float>(p.Y()));
+    this->m_vertices.push_back(static_cast<float>(p.Z()));
   }
 
   // normal
@@ -165,13 +146,15 @@ void Triangulation::triangulateLoop(TopoDS_Face &face, const uint iDelta) {
   SST.Normal(face, pc, normals);
   for (i = normals.Lower(); i <= normals.Upper(); ++i) {
     d = normals(i).Transformed(location.Transformation());
-    this->normals.push_back(static_cast<float>(d.X()));
-    this->normals.push_back(static_cast<float>(d.Y()));
-    this->normals.push_back(static_cast<float>(d.Z()));
+    this->m_normals.push_back(static_cast<float>(d.X()));
+    this->m_normals.push_back(static_cast<float>(d.Y()));
+    this->m_normals.push_back(static_cast<float>(d.Z()));
   }
 
   // indices
-  int n1, n2, n3;
+  int n1;
+  int n2;
+  int n3;
   TopAbs_Orientation orient = face.Orientation();
   const Poly_Array1OfTriangle &triangles = triangulation->Triangles();
   for (i = 1; i <= triangulation->NbTriangles(); ++i) {
@@ -182,9 +165,9 @@ void Triangulation::triangulateLoop(TopoDS_Face &face, const uint iDelta) {
       n2 = tmp;
     }
     if (this->isValid(nodes(n1), nodes(n2), nodes(n3))) {
-      this->indices.push_back(--n1 + iDelta);
-      this->indices.push_back(--n2 + iDelta);
-      this->indices.push_back(--n3 + iDelta);
+      this->m_indices.push_back(--n1 + iDelta);
+      this->m_indices.push_back(--n2 + iDelta);
+      this->m_indices.push_back(--n3 + iDelta);
     }
   }
 }
@@ -193,27 +176,29 @@ void Triangulation::triangulateLoop(TopoDS_Face &face, const uint iDelta) {
  * Get Bb
  */
 void Triangulation::getBb(double *min, double *max) const {
-  *min = this->minBb;
-  *max = this->maxBb;
+  *min = this->m_minBb;
+  *max = this->m_maxBb;
 }
 
 /**
  * Get vertices
  * @returns Vertices
  */
-std::vector<float> Triangulation::getVertices() const { return this->vertices; }
+std::vector<float> Triangulation::getVertices() const {
+  return this->m_vertices;
+}
 
 /**
  * Get normals
  * @returns normals
  */
-std::vector<float> Triangulation::getNormals() const { return this->normals; }
+std::vector<float> Triangulation::getNormals() const { return this->m_normals; }
 
 /**
  * Get indices
  * @returns indices
  */
-std::vector<uint> Triangulation::getIndices() const { return this->indices; }
+std::vector<uint> Triangulation::getIndices() const { return this->m_indices; }
 
 /**
  * Is valid

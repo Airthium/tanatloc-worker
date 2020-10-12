@@ -92,7 +92,6 @@ int main(int argc, char *argv[]) {
     double min;
     double max;
     triangulation.getBb(&min, &max);
-    solid.setMinMax(min, max);
 
     std::ostringstream oss;
     oss << threeJSPath << "/" << SOLID << (i + 1) << ".json";

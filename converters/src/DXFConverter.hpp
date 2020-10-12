@@ -41,7 +41,7 @@ public:
   void setInput(const std::string &);
   void setOutput(const std::string &);
   bool convert();
-  bool write();
+  bool write() const;
 };
 
 #endif //_DXFCONVERTER_HPP_
