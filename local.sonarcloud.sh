@@ -1,7 +1,9 @@
 #!/bin/sh
 
 cd converters
-cmake .
+mkdir build
+cd build
+cmake -DCOVERAGE=ON ..
 build-wrapper-linux-x86-64 --out-dir bw-output make clean all
 sonar-scanner \
   -Dsonar.organization=airthium \
