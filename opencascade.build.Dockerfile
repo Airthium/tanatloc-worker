@@ -1,5 +1,5 @@
 # OpenCascade 7.4.0
-FROM ubuntu:20.04 as build
+FROM ubuntu:20.10 as build
 
 ENV OCCPATH /root/occ
 
