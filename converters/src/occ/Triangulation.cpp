@@ -27,17 +27,6 @@ Triangulation::Triangulation(TopoDS_Shape shape) : m_shape(shape) {
 }
 
 /**
- * Destructor
- */
-Triangulation::~Triangulation() {
-  this->m_minBb = 0;
-  this->m_maxBb = 0;
-  m_vertices.clear();
-  m_normals.clear();
-  m_indices.clear();
-}
-
-/**
  * Compute max bounding box dimension
  * @returns Max bounding box dimension
  */

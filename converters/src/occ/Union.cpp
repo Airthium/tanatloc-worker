@@ -33,14 +33,6 @@ Union::Union(std::vector<TopoDS_Shape> &objects,
 }
 
 /**
- * Destructor
- */
-Union::~Union() {
-  this->m_objects.Clear();
-  this->m_tools.Clear();
-}
-
-/**
  * Set objects
  * @param objects Objects
  */

@@ -18,8 +18,6 @@ public:
   // Constructor
   Union(std::vector<TopoDS_Shape> &objects, std::vector<TopoDS_Shape> &tools,
         double tolerance);
-  // Destructor
-  ~Union();
 
   // Set objects
   void setObjects(std::vector<TopoDS_Shape> &objects);

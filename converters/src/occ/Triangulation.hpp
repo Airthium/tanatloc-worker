@@ -35,8 +35,6 @@ public:
   Triangulation();
   // Constructor
   explicit Triangulation(TopoDS_Shape shape);
-  // Destructor
-  ~Triangulation();
 
   // Triangulate
   void triangulate();
