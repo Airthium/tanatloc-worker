@@ -106,6 +106,9 @@ bool Gmsh::load(const std::string &fileName) {
  */
 void Gmsh::computeLabels() {
 
+  this->m_triangleLabels.clear();
+  this->m_tetrahedronLabels.clear();
+
   // Triangle labels
   std::for_each(this->m_triangles.begin(), this->m_triangles.end(),
                 [this](const Triangle &T) {
