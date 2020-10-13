@@ -6,7 +6,8 @@
 
 int main(int argc, char **argv) {
   bool res;
-  std::string dxfFile, brepFile;
+  std::string dxfFile;
+  std::string brepFile;
 
   // Input arguments
   if (argc < 3) {
@@ -19,7 +20,7 @@ int main(int argc, char **argv) {
   brepFile = argv[2];
 
   // Converter
-  DXFConverter *converter = new DXFConverter();
+  auto *converter = new DXFConverter();
 
   // Set input
   converter->setInput(dxfFile);

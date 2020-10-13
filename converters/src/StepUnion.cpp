@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "logger/Logger.hpp"
 #include "occ/StepReader.hpp"
 #include "occ/StepWriter.hpp"
 #include "occ/Union.hpp"
@@ -7,13 +8,12 @@
 
 int main(int argc, char *argv[]) {
   bool res;
-  uint i;
   std::string input;
   std::string output;
 
   if (argc < 3) {
-    std::cerr << "USAGE:" << std::endl;
-    std::cerr << "./StepUnion input output" << std::endl;
+    Logger::ERROR("USAGE:");
+    Logger::ERROR("./StepUnion input output");
     return EXIT_FAILURE;
   }
   input = argv[1];
@@ -22,14 +22,14 @@ int main(int argc, char *argv[]) {
   StepReader reader = StepReader(input);
   res = reader.read();
   if (!res) {
-    std::cerr << "Unable to load step file " << input << std::endl;
+    Logger::ERROR("Unable to load step file " + input);
     return EXIT_FAILURE;
   }
   std::vector<TopoDS_Shape> inputShapes = reader.getShapes();
 
   // Get solids
   std::vector<TopoDS_Shape> solids = std::vector<TopoDS_Shape>();
-  for (i = 0; i < inputShapes.size(); ++i) {
+  for (uint i = 0; i < inputShapes.size(); ++i) {
     std::vector<TopoDS_Shape> solidTemp = getSolids(inputShapes[i]);
     std::copy(solidTemp.begin(), solidTemp.end(), back_inserter(solids));
   }
@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
   StepWriter writer = StepWriter(output, outputShape);
   res = writer.write();
   if (!res) {
-    std::cerr << "Unable to write step file " << output << std::endl;
+    Logger::ERROR("Unable to write step file " + output);
     return EXIT_FAILURE;
   }
 

@@ -26,7 +26,6 @@ constexpr float DEFAULT_FACE_COLOR_B = 0.75;
 int main(int argc, char *argv[]) {
   bool res;
   uint i;
-  uint j;
   std::string stepFile;
   std::string threeJSPath;
 
@@ -74,7 +73,7 @@ int main(int argc, char *argv[]) {
     std::vector<TopoDS_Shape> solidTemp =
         getSolids(shapes[i], document, &solidColors);
     std::copy(solidTemp.begin(), solidTemp.end(), back_inserter(solids));
-    for (j = 0; j < solidTemp.size(); ++j) {
+    for (uint j = 0; j < solidTemp.size(); ++j) {
       std::vector<std::pair<bool, Quantity_Color>> tempColors;
       std::vector<TopoDS_Shape> faceTemp =
           getFaces(solidTemp[j], document, &tempColors);
@@ -92,20 +91,20 @@ int main(int argc, char *argv[]) {
     std::vector<float> normals = triangulation.getNormals();
     std::vector<uint> indices = triangulation.getIndices();
 
-    float **colors = new float *[1];
+    auto **colors = new float *[1];
     colors[0] = new float[3];
     colors[0][0] = std::get<0>(solidColors[i])
-                       ? std::get<1>(solidColors[i]).Red()
+                       ? (float)std::get<1>(solidColors[i]).Red()
                        : DEFAULT_SOLID_COLOR_R;
     colors[0][1] = std::get<0>(solidColors[i])
-                       ? std::get<1>(solidColors[i]).Green()
+                       ? (float)std::get<1>(solidColors[i]).Green()
                        : DEFAULT_SOLID_COLOR_G;
     colors[0][2] = std::get<0>(solidColors[i])
-                       ? std::get<1>(solidColors[i]).Blue()
+                       ? (float)std::get<1>(solidColors[i]).Blue()
                        : DEFAULT_SOLID_COLOR_B;
 
-    ThreeJS solid(&vertices[0], vertices.size(), &normals[0], normals.size(),
-                  &indices[0], indices.size());
+    ThreeJS solid(&vertices[0], (uint)vertices.size(), &normals[0],
+                  (uint)normals.size(), &indices[0], (uint)indices.size());
     solid.setColors(colors, 1);
     solid.setLabel(i + 1);
     double min;
@@ -118,7 +117,7 @@ int main(int argc, char *argv[]) {
       Logger::ERROR("Unable to write ThreeJS file " + oss.str());
       return EXIT_FAILURE;
     }
-    // std::cout << 0.5 * (i / (solids.size())) << std::endl;
+    Logger::DISP(std::to_string(0.5 * (i / (solids.size()))));
   }
 
   for (i = 0; i < faces.size(); ++i) {
@@ -130,17 +129,18 @@ int main(int argc, char *argv[]) {
 
     float **colors = new float *[1];
     colors[0] = new float[3];
-    colors[0][0] = std::get<0>(faceColors[i]) ? std::get<1>(faceColors[i]).Red()
-                                              : DEFAULT_FACE_COLOR_R;
+    colors[0][0] = std::get<0>(faceColors[i])
+                       ? (float)std::get<1>(faceColors[i]).Red()
+                       : DEFAULT_FACE_COLOR_R;
     colors[0][1] = std::get<0>(faceColors[i])
-                       ? std::get<1>(faceColors[i]).Green()
+                       ? (float)std::get<1>(faceColors[i]).Green()
                        : DEFAULT_FACE_COLOR_G;
     colors[0][2] = std::get<0>(faceColors[i])
-                       ? std::get<1>(faceColors[i]).Blue()
+                       ? (float)std::get<1>(faceColors[i]).Blue()
                        : DEFAULT_FACE_COLOR_B;
 
-    ThreeJS face(&vertices[0], vertices.size(), &normals[0], normals.size(),
-                 &indices[0], indices.size());
+    ThreeJS face(&vertices[0], (uint)vertices.size(), &normals[0],
+                 (uint)normals.size(), &indices[0], (uint)indices.size());
     face.setColors(colors, 1);
     face.setLabel(i + 1);
     std::ostringstream oss;
@@ -150,14 +150,15 @@ int main(int argc, char *argv[]) {
       Logger::ERROR("Unable to write ThreeJS file " + oss.str());
       return EXIT_FAILURE;
     }
-    // std::cout << 0.5 + 0.5 * (i / (faces.size() - 1.)) << std::endl;
+    Logger::DISP(std::to_string(0.5 + 0.5 * (i / (faces.size() - 1.))));
   }
 
   // Write part file
   ThreeJS part;
   std::ostringstream oss;
   oss << threeJSPath << "/part.json";
-  res = part.writePartFile(oss.str(), "geometry", solids.size(), faces.size());
+  res = part.writePartFile(oss.str(), "geometry", (uint)solids.size(),
+                           (uint)faces.size());
   if (!res) {
     Logger::ERROR("Unable to write ThreeJS part file " + oss.str());
     return EXIT_FAILURE;
