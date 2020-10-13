@@ -11,48 +11,15 @@
 Gmsh::Gmsh() {}
 
 /**
- * Destructor
- */
-Gmsh::~Gmsh() {
-  if (this->m_vertices) {
-    delete[] this->m_vertices;
-    this->m_vertices = nullptr;
-  }
-  if (this->m_triangles) {
-    delete[] this->m_triangles;
-    this->m_triangles = nullptr;
-  }
-  if (this->m_triangleLabels) {
-    delete[] this->m_triangleLabels;
-    this->m_triangleLabels = nullptr;
-  }
-  if (this->m_tetrahedra) {
-    delete[] this->m_tetrahedra;
-    this->m_tetrahedra = nullptr;
-  }
-  if (this->m_tetrahedronLabels) {
-    delete[] this->m_tetrahedronLabels;
-    this->m_tetrahedronLabels = nullptr;
-  }
-
-  this->m_numberOfVertices = 0;
-  this->m_numberOfTriangles = 0;
-  this->m_numberOfTriangleLabels = 0;
-  this->m_numberOfTetrahedra = 0;
-  this->m_numberOfTetrahedronLabels = 0;
-}
-
-/**
  * Loader
  * @param {string} fileName File name
  * @returns {boolean} Loading status
  */
 bool Gmsh::load(const std::string &fileName) {
   uint i;
+  uint numberOfVertices;
   uint numberOfElements;
   std::string buffer;
-  std::vector<Triangle> triangles;
-  std::vector<Tetrahedron> tetrahedra;
 
   // Read file
   std::ifstream file(fileName, std::ios::in);
@@ -66,20 +33,19 @@ bool Gmsh::load(const std::string &fileName) {
   while (buffer != "$Nodes" && !file.eof())
     file >> buffer;
 
-  file >> this->m_numberOfVertices;
-  if (!this->m_numberOfVertices) {
+  file >> numberOfVertices;
+  if (!numberOfVertices) {
     Logger::ERROR("No vertices");
     return false;
   }
 
-  this->m_vertices = new Vertex[this->m_numberOfVertices];
-
-  for (i = 0; i < this->m_numberOfVertices; ++i) {
+  for (i = 0; i < numberOfVertices; ++i) {
     double x;
     double y;
     double z;
     file >> buffer >> x >> y >> z;
-    this->m_vertices[i].setCoordinates(x, y, z);
+    Vertex vertex = Vertex(x, y, z);
+    this->m_vertices.push_back(vertex);
   }
 
   // Elements
@@ -109,7 +75,7 @@ bool Gmsh::load(const std::string &fileName) {
       uint index3;
       file >> index1 >> index2 >> index3;
       Triangle triangle = Triangle(--index1, --index2, --index3, label);
-      triangles.push_back(triangle);
+      this->m_triangles.push_back(triangle);
     } else if (type == 4) { // 4-nodes tetrahedron
       uint index1;
       uint index2;
@@ -118,7 +84,7 @@ bool Gmsh::load(const std::string &fileName) {
       file >> index1 >> index2 >> index3 >> index4;
       Tetrahedron tetrahedron =
           Tetrahedron(--index1, --index2, --index3, --index4, label);
-      tetrahedra.push_back(tetrahedron);
+      this->m_tetrahedra.push_back(tetrahedron);
     } else if (type == 15) { // 1-node point
       uint index1;
       file >> index1;
@@ -132,20 +98,6 @@ bool Gmsh::load(const std::string &fileName) {
     }
   }
 
-  this->m_numberOfTriangles = (uint)triangles.size();
-  if (!this->m_numberOfTriangles) {
-    Logger::ERROR("No triangles");
-    return false;
-  }
-  this->m_triangles = new Triangle[this->m_numberOfTriangles];
-  std::copy(triangles.begin(), triangles.end(), this->m_triangles);
-  triangles.clear();
-
-  this->m_numberOfTetrahedra = (uint)tetrahedra.size();
-  this->m_tetrahedra = new Tetrahedron[this->m_numberOfTetrahedra];
-  std::copy(tetrahedra.begin(), tetrahedra.end(), this->m_tetrahedra);
-  tetrahedra.clear();
-
   return true;
 }
 
@@ -153,77 +105,73 @@ bool Gmsh::load(const std::string &fileName) {
  * Compute number of different labels
  */
 void Gmsh::computeLabels() {
-  uint i;
-  std::vector<uint> triangleLabels;
-  std::vector<uint> tetrahedronLabels;
-  std::vector<uint>::iterator it;
 
-  for (i = 0; i < this->m_numberOfTriangles; ++i) {
-    uint label = this->m_triangles[i].getLabel();
-    it = find(triangleLabels.begin(), triangleLabels.end(), label);
-    if (it == triangleLabels.end())
-      triangleLabels.push_back(label);
-  }
+  // Triangle labels
+  std::for_each(this->m_triangles.begin(), this->m_triangles.end(),
+                [this](const Triangle &T) {
+                  uint label = T.getLabel();
+                  std::vector<uint>::iterator it =
+                      std::find(this->m_triangleLabels.begin(),
+                                this->m_triangleLabels.end(), label);
+                  if (it == this->m_triangleLabels.end())
+                    this->m_triangleLabels.push_back(label);
+                });
 
-  for (i = 0; i < this->m_numberOfTetrahedra; ++i) {
-    uint label = this->m_tetrahedra[i].getLabel();
-    it = find(tetrahedronLabels.begin(), tetrahedronLabels.end(), label);
-    if (it == tetrahedronLabels.end())
-      tetrahedronLabels.push_back(label);
-  }
-
-  this->m_numberOfTriangleLabels = (uint)triangleLabels.size();
-  this->m_triangleLabels = new uint[this->m_numberOfTriangleLabels];
-  std::copy(triangleLabels.begin(), triangleLabels.end(),
-            this->m_triangleLabels);
-  triangleLabels.clear();
-
-  this->m_numberOfTetrahedronLabels = (uint)tetrahedronLabels.size();
-  this->m_tetrahedronLabels = new uint[this->m_numberOfTetrahedronLabels];
-  std::copy(tetrahedronLabels.begin(), tetrahedronLabels.end(),
-            this->m_tetrahedronLabels);
-  tetrahedronLabels.clear();
+  // Tetrahedra labels
+  std::for_each(this->m_tetrahedra.begin(), this->m_tetrahedra.end(),
+                [this](const Tetrahedron &T) {
+                  uint label = T.getLabel();
+                  std::vector<uint>::iterator it =
+                      std::find(this->m_tetrahedronLabels.begin(),
+                                this->m_tetrahedronLabels.end(), label);
+                  if (it == this->m_tetrahedronLabels.end())
+                    this->m_tetrahedronLabels.push_back(label);
+                });
 }
 
 /**
  * Get number of vertices
  * @returns Number of vertices
  */
-uint Gmsh::getNumberOfVertices() const { return this->m_numberOfVertices; }
+uint Gmsh::getNumberOfVertices() const { return (uint)this->m_vertices.size(); }
 
 /**
  * Get number of triangles
  * @returns Number of triangles
  */
-uint Gmsh::getNumberOfTriangles() const { return this->m_numberOfTriangles; }
+uint Gmsh::getNumberOfTriangles() const {
+  return (uint)this->m_triangles.size();
+}
 
 /**
  * Get number of triangle labels
  * @returns Number of triangle labels
  */
 uint Gmsh::getNumberOfTriangleLabels() const {
-  return this->m_numberOfTriangleLabels;
+  return (uint)this->m_triangleLabels.size();
 }
 
 /**
  * Get number of tetrahedra
  * @returns Number of tetrahedra
  */
-uint Gmsh::getNumberOfTetrahedra() const { return this->m_numberOfTetrahedra; }
+uint Gmsh::getNumberOfTetrahedra() const {
+  return (uint)this->m_tetrahedra.size();
+}
 
 /**
  * Get number of tetrahedron labels
  * @returns Number of tetrahedron labels
  */
 uint Gmsh::getNumberOfTetrahedronLabels() const {
-  return this->m_numberOfTetrahedronLabels;
+  return (uint)this->m_tetrahedronLabels.size();
 }
 
 /**
  * Get tetrahedron label
  */
 uint Gmsh::getTetrahedronLabel(const uint i) const {
-  if (i < this->m_numberOfTetrahedronLabels)
+  if (i < this->m_tetrahedronLabels.size())
     return this->m_tetrahedronLabels[i];
   return 0;
 }
@@ -232,9 +180,42 @@ uint Gmsh::getTetrahedronLabel(const uint i) const {
  * Get triangle label
  */
 uint Gmsh::getTriangleLabel(const uint i) const {
-  if (i < this->m_numberOfTriangleLabels)
+  if (i < this->m_triangleLabels.size())
     return this->m_triangleLabels[i];
   return 0;
+}
+
+/**
+ * Copy vertices from tetrahedron to vector
+ * @param {Tetrahedron} Tetrahedron
+ * @param {vector} Vector
+ */
+void Gmsh::copyVertices(const Tetrahedron &T,
+                        std::vector<double> *vector) const {
+  uint *indices = T.getIndices();
+  std::for_each(indices, indices + 4, [this, vector](const uint &index) {
+    Vertex vertex = this->m_vertices[index];
+    double *coordinates = vertex.getCoordinates();
+    std::for_each(
+        coordinates, coordinates + 3,
+        [vector](const double &coordinate) { vector->push_back(coordinate); });
+  });
+}
+
+/**
+ * Copy vertices from triangle to vector
+ * @param {Triangle} Triangle
+ * @param {vector} Vector
+ */
+void Gmsh::copyVertices(const Triangle &T, std::vector<double> *vector) const {
+  uint *indices = T.getIndices();
+  std::for_each(indices, indices + 3, [this, vector](const uint &index) {
+    Vertex vertex = this->m_vertices[index];
+    double *coordinates = vertex.getCoordinates();
+    std::for_each(
+        coordinates, coordinates + 3,
+        [vector](const double &coordinate) { vector->push_back(coordinate); });
+  });
 }
 
 /**
@@ -242,25 +223,21 @@ uint Gmsh::getTriangleLabel(const uint i) const {
  * @returns Vertices
  */
 std::vector<double> *Gmsh::getVolumesVertices() const {
-  if (!this->m_numberOfTetrahedronLabels)
+  if (!this->m_tetrahedronLabels.size())
     return nullptr;
 
-  auto *vertices = new std::vector<double>[this->m_numberOfTetrahedronLabels];
-  for (uint i = 0; i < this->m_numberOfTetrahedronLabels; ++i) {
-    for (uint j = 0; j < this->m_numberOfTetrahedra; ++j) {
-      if (this->m_tetrahedra[j].getLabel() == this->m_tetrahedronLabels[i]) {
-        uint *indices = this->m_tetrahedra[j].getIndices();
-        for (uint k = 0; k < 4; ++k) {
-          double *coordinates = this->m_vertices[indices[k]].getCoordinates();
-          for (uint l = 0; l < 3; ++l) {
-            vertices[i].push_back(coordinates[l]);
-          }
-          delete[] coordinates;
-        }
-        delete[] indices;
-      }
-    }
-  }
+  auto *vertices = new std::vector<double>[this->m_tetrahedronLabels.size()];
+  std::for_each(
+      this->m_tetrahedronLabels.begin(), this->m_tetrahedronLabels.end(),
+      [this, vertices](const int &i) {
+        const uint label = this->m_tetrahedronLabels[i];
+        std::for_each(this->m_tetrahedra.begin(), this->m_tetrahedra.end(),
+                      [this, i, label, vertices](const Tetrahedron T) {
+                        if (T.getLabel() == label) {
+                          this->copyVertices(T, &vertices[i]);
+                        }
+                      });
+      });
 
   return vertices;
 }
@@ -270,25 +247,21 @@ std::vector<double> *Gmsh::getVolumesVertices() const {
  * @returns Vertices
  */
 std::vector<double> *Gmsh::getSurfacesVertices() const {
-  if (!this->m_numberOfTriangleLabels)
+  if (!this->m_triangleLabels.size())
     return nullptr;
 
-  auto *vertices = new std::vector<double>[this->m_numberOfTriangleLabels];
-  for (uint i = 0; i < this->m_numberOfTriangleLabels; ++i) {
-    for (uint j = 0; j < this->m_numberOfTriangles; ++j) {
-      if (this->m_triangles[j].getLabel() == this->m_triangleLabels[i]) {
-        uint *indices = this->m_triangles[j].getIndices();
-        for (uint k = 0; k < 3; ++k) {
-          double *coordinates = this->m_vertices[indices[k]].getCoordinates();
-          for (uint l = 0; l < 3; ++l) {
-            vertices[i].push_back(coordinates[l]);
-          }
-          delete[] coordinates;
-        }
-        delete[] indices;
-      }
-    }
-  }
+  auto *vertices = new std::vector<double>[this->m_triangleLabels.size()];
+  std::for_each(this->m_triangleLabels.begin(), this->m_triangleLabels.end(),
+                [this, vertices](const int &i) {
+                  const uint label = this->m_triangleLabels[i];
+                  std::for_each(this->m_triangles.begin(),
+                                this->m_triangles.end(),
+                                [this, i, label, vertices](const Triangle T) {
+                                  if (T.getLabel() == label) {
+                                    this->copyVertices(T, &vertices[i]);
+                                  }
+                                });
+                });
 
   return vertices;
 }

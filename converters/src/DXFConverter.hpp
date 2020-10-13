@@ -36,7 +36,6 @@ private:
 
 public:
   DXFConverter();
-  ~DXFConverter();
 
   void setInput(const std::string &);
   void setOutput(const std::string &);

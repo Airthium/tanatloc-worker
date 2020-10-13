@@ -18,6 +18,7 @@ private:
 public:
   // Constructor
   Vertex();
+  Vertex(const double, const double, const double);
 
   // Set coordinates
   void setCoordinates(const double, const double, const double);

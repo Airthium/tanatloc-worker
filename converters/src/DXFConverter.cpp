@@ -27,12 +27,6 @@
 
 DXFConverter::DXFConverter() { this->m_vertices.clear(); }
 
-DXFConverter::~DXFConverter() {
-  this->m_input = "";
-  this->m_output = "";
-  this->m_vertices.clear();
-}
-
 void DXFConverter::setInput(const std::string &input) { this->m_input = input; }
 
 void DXFConverter::setOutput(const std::string &output) {

@@ -15,33 +15,24 @@ typedef unsigned int uint;
  */
 class Gmsh {
 private:
-  // Number of nodes
-  uint m_numberOfVertices = 0;
-  // Number of triangles
-  uint m_numberOfTriangles = 0;
-  // Number of triangle labels
-  uint m_numberOfTriangleLabels = 0;
-  // Number of tetrahedra
-  uint m_numberOfTetrahedra = 0;
-  // Number of tetrahedron labels
-  uint m_numberOfTetrahedronLabels = 0;
-
   // Vertices
-  Vertex *m_vertices = nullptr;
+  std::vector<Vertex> m_vertices = std::vector<Vertex>();
   // Triangles
-  Triangle *m_triangles = nullptr;
+  std::vector<Triangle> m_triangles = std::vector<Triangle>();
   // Triangle labels
-  uint *m_triangleLabels = nullptr;
+  std::vector<uint> m_triangleLabels = std::vector<uint>();
   // Tetrahedra
-  Tetrahedron *m_tetrahedra = nullptr;
+  std::vector<Tetrahedron> m_tetrahedra = std::vector<Tetrahedron>();
   // Tetrahedron labels
-  uint *m_tetrahedronLabels = nullptr;
+  std::vector<uint> m_tetrahedronLabels = std::vector<uint>();
+
+  // Copy vertices
+  void copyVertices(const Tetrahedron &, std::vector<double> *) const;
+  void copyVertices(const Triangle &, std::vector<double> *) const;
 
 public:
   // Constructor
   Gmsh();
-  // Destructor
-  ~Gmsh();
 
   // Loader
   bool load(const std::string &);
