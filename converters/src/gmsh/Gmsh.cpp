@@ -20,9 +20,10 @@ bool Gmsh::load(const std::string &fileName) {
   uint numberOfVertices;
   uint numberOfElements;
   std::string buffer;
+  std::ifstream file;
 
   // Read file
-  std::ifstream file(fileName, std::ios::in);
+  file.open(fileName, std::ios::in);
   if (!file) {
     Logger::ERROR("Unable to open " + fileName);
     return false;
@@ -65,7 +66,7 @@ bool Gmsh::load(const std::string &fileName) {
     uint label;
     file >> buffer >> type >> numberOfLabels;
 
-    file >> buffer >> label;
+    file >> label >> buffer;
     for (uint j = 2; j < numberOfLabels; ++j)
       file >> buffer;
 
@@ -112,7 +113,7 @@ void Gmsh::computeLabels() {
   // Triangle labels
   std::for_each(this->m_triangles.begin(), this->m_triangles.end(),
                 [this](const Triangle &T) {
-                  uint label = T.getLabel();
+                  const uint label = T.getLabel();
                   std::vector<uint>::iterator it =
                       std::find(this->m_triangleLabels.begin(),
                                 this->m_triangleLabels.end(), label);
@@ -123,7 +124,7 @@ void Gmsh::computeLabels() {
   // Tetrahedra labels
   std::for_each(this->m_tetrahedra.begin(), this->m_tetrahedra.end(),
                 [this](const Tetrahedron &T) {
-                  uint label = T.getLabel();
+                  const uint label = T.getLabel();
                   std::vector<uint>::iterator it =
                       std::find(this->m_tetrahedronLabels.begin(),
                                 this->m_tetrahedronLabels.end(), label);
@@ -229,17 +230,18 @@ std::vector<double> *Gmsh::getVolumesVertices() const {
   if (!this->m_tetrahedronLabels.size())
     return nullptr;
 
+  uint i = 0;
   auto *vertices = new std::vector<double>[this->m_tetrahedronLabels.size()];
   std::for_each(
       this->m_tetrahedronLabels.begin(), this->m_tetrahedronLabels.end(),
-      [this, vertices](const int &i) {
-        const uint label = this->m_tetrahedronLabels[i];
+      [&i, this, vertices](const uint &label) {
         std::for_each(this->m_tetrahedra.begin(), this->m_tetrahedra.end(),
-                      [this, i, label, vertices](const Tetrahedron T) {
+                      [i, this, vertices, label](const Tetrahedron &T) {
                         if (T.getLabel() == label) {
                           this->copyVertices(T, &vertices[i]);
                         }
                       });
+        ++i;
       });
 
   return vertices;
@@ -253,17 +255,18 @@ std::vector<double> *Gmsh::getSurfacesVertices() const {
   if (!this->m_triangleLabels.size())
     return nullptr;
 
+  uint i = 0;
   auto *vertices = new std::vector<double>[this->m_triangleLabels.size()];
   std::for_each(this->m_triangleLabels.begin(), this->m_triangleLabels.end(),
-                [this, vertices](const int &i) {
-                  const uint label = this->m_triangleLabels[i];
+                [&i, this, vertices](const uint &label) {
                   std::for_each(this->m_triangles.begin(),
                                 this->m_triangles.end(),
-                                [this, i, label, vertices](const Triangle T) {
+                                [i, this, vertices, label](const Triangle &T) {
                                   if (T.getLabel() == label) {
                                     this->copyVertices(T, &vertices[i]);
                                   }
                                 });
+                  ++i;
                 });
 
   return vertices;

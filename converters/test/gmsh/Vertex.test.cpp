@@ -3,7 +3,7 @@
 #include "../../src/gmsh/Vertex.hpp"
 
 TEST_CASE("Vertex") {
-  SECTION("Construtor") {
+  SECTION("Construtor 1") {
     Vertex vertex = Vertex();
     CHECK(vertex.getCoordinate(0) == 0);
     CHECK(vertex.getCoordinate(1) == 0);
@@ -16,6 +16,22 @@ TEST_CASE("Vertex") {
     CHECK(coordinates[0] == 0);
     CHECK(coordinates[1] == 0);
     CHECK(coordinates[2] == 0);
+    delete coordinates;
+  }
+
+  SECTION("Construtor 2") {
+    double x = 1.;
+    double y = 2.;
+    double z = 3;
+    Vertex vertex = Vertex(x, y, z);
+    CHECK(vertex.getCoordinate(0) == x);
+    CHECK(vertex.getCoordinate(1) == y);
+    CHECK(vertex.getCoordinate(2) == z);
+
+    double *coordinates = vertex.getCoordinates();
+    CHECK(coordinates[0] == x);
+    CHECK(coordinates[1] == y);
+    CHECK(coordinates[2] == z);
     delete coordinates;
   }
 
