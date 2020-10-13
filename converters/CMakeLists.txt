@@ -106,6 +106,7 @@ set(GMSH_TESTS
 
 set(OCC_TESTS
   test/occ/getElements.test.cpp
+  test/occ/StepReader.test.cpp
   test/occ/StepWriter.test.cpp
   test/occ/Triangulation.test.cpp
   test/occ/Union.test.cpp
@@ -115,10 +116,10 @@ set(THREEJS_TESTS
   test/threeJS/ThreeJS.test.cpp
 )
 
-# set(MAIN_TESTS
-#   test/DXFConverter.test.cpp
-#   src/DXFConverter.cpp
-# )
+set(MAIN_TESTS
+  test/DXFConverter.test.cpp
+  src/DXFConverter.cpp
+)
 
 set(SOURCE_TESTS
   test/main.cpp
@@ -130,8 +131,8 @@ set(SOURCE_TESTS
   ${OCC_SOURCE}
   ${THREEJS_TESTS}
   ${THREEJS_SOURCE}
-  # ${MAIN_TESTS}
-  # ${DXF_SOURCE}
+  ${MAIN_TESTS}
+  ${DXF_SOURCE}
 )
 
 add_executable(tests ${SOURCE_TESTS})

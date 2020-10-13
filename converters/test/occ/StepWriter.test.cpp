@@ -12,4 +12,13 @@ TEST_CASE("StepWriter") {
     TopoDS_Shape shape = TopoDS_Shape();
     StepWriter stepWriter = StepWriter(fileName, shape);
   }
+
+  SECTION("write") {
+    std::string fileName = "fileName";
+    TopoDS_Shape shape = TopoDS_Shape();
+    StepWriter stepWriter = StepWriter(fileName, shape);
+
+    bool res = stepWriter.write();
+    CHECK(res);
+  }
 }

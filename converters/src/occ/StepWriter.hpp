@@ -13,8 +13,6 @@ public:
   StepWriter();
   // Constructor
   StepWriter(const std::string &, TopoDS_Shape);
-  // Destructor
-  ~StepWriter();
 
   // Write
   bool write() const;

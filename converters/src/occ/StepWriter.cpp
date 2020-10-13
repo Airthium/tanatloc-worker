@@ -17,11 +17,6 @@ StepWriter::StepWriter(const std::string &fileName, TopoDS_Shape shape)
     : m_fileName(fileName), m_shape(shape) {}
 
 /**
- * Desctructor
- */
-StepWriter::~StepWriter() { this->m_fileName = ""; }
-
-/**
  * Write
  */
 bool StepWriter::write() const {
@@ -33,10 +28,12 @@ bool StepWriter::write() const {
     Logger::ERROR("Unable to transfer");
     return false;
   }
+
   writer.Write(this->m_fileName.c_str());
   if (res != IFSelect_RetDone) {
     Logger::ERROR("Unable to write");
     return false;
   }
+
   return true;
 }
