@@ -26,14 +26,6 @@ StepReader::StepReader() {}
 StepReader::StepReader(const std::string &fileName) : m_fileName(fileName) {}
 
 /**
- * Destructor
- */
-StepReader::~StepReader() {
-  this->m_fileName = "";
-  this->m_shapes.clear();
-}
-
-/**
  * Read
  * @returns Status
  */
@@ -69,8 +61,8 @@ bool StepReader::read() {
   shapeContent->GetShapes(shapes);
 
   for (int i = 1; i <= shapes.Size(); ++i) {
-    if (shapeContent->IsFree(shapes.Value(i)))
-      this->m_shapes.push_back(shapeContent->GetShape(shapes.Value(i)));
+    if (XCAFDoc_ShapeTool::IsFree(shapes.Value(i)))
+      this->m_shapes.push_back(XCAFDoc_ShapeTool::GetShape(shapes.Value(i)));
   }
 
   return true;

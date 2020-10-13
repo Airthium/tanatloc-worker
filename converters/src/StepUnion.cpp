@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iostream>
 
 #include "logger/Logger.hpp"
@@ -29,10 +30,12 @@ int main(int argc, char *argv[]) {
 
   // Get solids
   std::vector<TopoDS_Shape> solids = std::vector<TopoDS_Shape>();
-  for (uint i = 0; i < inputShapes.size(); ++i) {
-    std::vector<TopoDS_Shape> solidTemp = getSolids(inputShapes[i]);
-    std::copy(solidTemp.begin(), solidTemp.end(), back_inserter(solids));
-  }
+  std::for_each(inputShapes.begin(), inputShapes.end(),
+                [&solids](const TopoDS_Shape &shape) {
+                  std::vector<TopoDS_Shape> solidTemp = getSolids(shape);
+                  std::copy(solidTemp.begin(), solidTemp.end(),
+                            back_inserter(solids));
+                });
 
   // Union
   Union fuse = Union();

@@ -17,8 +17,6 @@ public:
   StepReader();
   // Constructor
   explicit StepReader(const std::string &);
-  // Destructor
-  ~StepReader();
 
   // Read
   bool read();
