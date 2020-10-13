@@ -91,8 +91,7 @@ target_link_libraries(StepUnion ${OCC_LIBS})
 
 ## Tests
 include(CTest)
-include(Catch)
-# include(ParseAndAddCatchTests)
+include(ParseAndAddCatchTests)
 
 set(LOGGER_TESTS
   test/logger/Logger.test.cpp
@@ -116,6 +115,11 @@ set(THREEJS_TESTS
   test/threeJS/ThreeJS.test.cpp
 )
 
+set(MAIN_TESTS
+  test/DXFConverter.test.cpp
+  src/DXFConverter.cpp
+)
+
 set(SOURCE_TESTS
   test/main.cpp
   ${LOGGER_TESTS}
@@ -126,14 +130,15 @@ set(SOURCE_TESTS
   ${OCC_SOURCE}
   ${THREEJS_TESTS}
   ${THREEJS_SOURCE}
+  ${MAIN_TESTS}
+  ${DXF_SOURCE}
 )
 
 add_executable(tests ${SOURCE_TESTS})
 target_link_libraries(tests ${OCC_LIBS})
 
 target_link_libraries(tests Catch2::Catch2)
-# ParseAndAddCatchTests(tests)
-catch_discover_tests(tests)
+ParseAndAddCatchTests(tests)
 
 ## Coverage
 option(COVERAGE "Enable coverage flags" OFF)

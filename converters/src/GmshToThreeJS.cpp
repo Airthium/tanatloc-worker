@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
 
   // Create & save ThreeJS
   for (i = 0; i < mesh->getNumberOfTetrahedronLabels(); ++i) {
-    double *vertices = &volumesVertices[i][0];
+    const double *vertices = &volumesVertices[i][0];
     auto size = (uint)volumesVertices[i].size();
     ThreeJS volume(vertices, size);
     auto **colors = new float *[1];
@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
   }
 
   for (i = 0; i < mesh->getNumberOfTriangleLabels(); ++i) {
-    double *vertices = &surfacesVertices[i][0];
+    const double *vertices = &surfacesVertices[i][0];
     auto size = (uint)surfacesVertices[i].size();
     ThreeJS surface(vertices, size);
     auto **colors = new float *[1];
