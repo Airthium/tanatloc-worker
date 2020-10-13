@@ -1,5 +1,7 @@
 #include "Union.hpp"
 
+#include <algorithm>
+
 #include <BRepAlgoAPI_Fuse.hxx>
 #include <ShapeUpgrade_UnifySameDomain.hxx>
 
@@ -16,17 +18,18 @@ Union::Union() {}
  * @param tools Tools
  */
 Union::Union(std::vector<TopoDS_Shape> &objects,
-             std::vector<TopoDS_Shape> &tools, double tolerance) {
+             std::vector<TopoDS_Shape> &tools, double tolerance)
+    : m_tolerance(tolerance) {
+
   this->m_objects = TopTools_ListOfShape();
+  std::for_each(
+      objects.begin(), objects.end(),
+      [this](const TopoDS_Shape &object) { this->m_objects.Append(object); });
+
   this->m_tools = TopTools_ListOfShape();
-
-  for (int i = 0; i < objects.size(); ++i)
-    this->m_objects.Append(objects[i]);
-
-  for (int i = 0; i < tools.size(); ++i)
-    this->m_tools.Append(tools[i]);
-
-  this->m_tolerance = tolerance;
+  std::for_each(tools.begin(), tools.end(), [this](const TopoDS_Shape &tool) {
+    this->m_tools.Append(tool);
+  });
 }
 
 /**
@@ -43,8 +46,9 @@ Union::~Union() {
  */
 void Union::setObjects(std::vector<TopoDS_Shape> &objects) {
   this->m_objects = TopTools_ListOfShape();
-  for (int i = 0; i < objects.size(); ++i)
-    this->m_objects.Append(objects[i]);
+  std::for_each(
+      objects.begin(), objects.end(),
+      [this](const TopoDS_Shape &object) { this->m_objects.Append(object); });
 }
 
 /**
@@ -53,8 +57,9 @@ void Union::setObjects(std::vector<TopoDS_Shape> &objects) {
  */
 void Union::setTools(std::vector<TopoDS_Shape> &tools) {
   this->m_tools = TopTools_ListOfShape();
-  for (int i = 0; i < tools.size(); ++i)
-    this->m_tools.Append(tools[i]);
+  std::for_each(tools.begin(), tools.end(), [this](const TopoDS_Shape &tool) {
+    this->m_tools.Append(tool);
+  });
 }
 
 /**
@@ -66,7 +71,7 @@ void Union::setTolerance(double tolerance) { this->m_tolerance = tolerance; }
 /**
  * Compute
  */
-TopoDS_Shape Union::compute() {
+TopoDS_Shape Union::compute() const {
   BRepAlgoAPI_Fuse fuse;
   TopoDS_Shape result;
 

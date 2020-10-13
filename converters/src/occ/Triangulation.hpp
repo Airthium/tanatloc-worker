@@ -6,7 +6,7 @@
 #include <TopoDS_Face.hxx>
 #include <TopoDS_Shape.hxx>
 
-#define meshQuality 0.01
+constexpr double meshQuality = 0.01;
 
 class Triangulation {
 private:
@@ -20,13 +20,13 @@ private:
   // Compute max bounding box
   void computeBb();
   // Triangulate solid
-  void triangulateSolid(TopoDS_Shape &shape);
+  void triangulateSolid(const TopoDS_Shape &shape);
   // Triangulate face
-  void triangulateFace(TopoDS_Shape &shape);
+  void triangulateFace(const TopoDS_Shape &shape);
   // Triangulate edge
-  void triangulateEdge(TopoDS_Shape &shape);
+  void triangulateEdge(const TopoDS_Shape &shape);
   // Triangulate loop (solid & face)
-  void triangulateLoop(TopoDS_Face &face, const uint iDelta = 0);
+  void triangulateLoop(const TopoDS_Face &face, const uint iDelta = 0);
   // Is valid
   bool isValid(const gp_Pnt &, const gp_Pnt &, const gp_Pnt &) const;
 

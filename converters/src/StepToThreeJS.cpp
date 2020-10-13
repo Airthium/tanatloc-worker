@@ -127,7 +127,7 @@ int main(int argc, char *argv[]) {
     std::vector<float> normals = triangulation.getNormals();
     std::vector<uint> indices = triangulation.getIndices();
 
-    float **colors = new float *[1];
+    auto **colors = new float *[1];
     colors[0] = new float[3];
     colors[0][0] = std::get<0>(faceColors[i])
                        ? (float)std::get<1>(faceColors[i]).Red()
@@ -150,7 +150,7 @@ int main(int argc, char *argv[]) {
       Logger::ERROR("Unable to write ThreeJS file " + oss.str());
       return EXIT_FAILURE;
     }
-    Logger::DISP(std::to_string(0.5 + 0.5 * (i / (faces.size() - 1.))));
+    Logger::DISP(std::to_string(0.5 + 0.5 * (i / ((double)faces.size() - 1.))));
   }
 
   // Write part file

@@ -29,7 +29,13 @@ Triangulation::Triangulation(TopoDS_Shape shape) : m_shape(shape) {
 /**
  * Destructor
  */
-Triangulation::~Triangulation() { this->m_maxBb = 0; }
+Triangulation::~Triangulation() {
+  this->m_minBb = 0;
+  this->m_maxBb = 0;
+  m_vertices.clear();
+  m_normals.clear();
+  m_indices.clear();
+}
 
 /**
  * Compute max bounding box dimension
@@ -72,7 +78,7 @@ void Triangulation::triangulate() {
  * Triangulate solid [private]
  * @param shape Shape
  */
-void Triangulation::triangulateSolid(TopoDS_Shape &shape) {
+void Triangulation::triangulateSolid(const TopoDS_Shape &shape) {
   TopExp_Explorer explorer;
   BRepMesh_IncrementalMesh mesh(shape, this->m_maxBb * meshQuality);
   for (explorer.Init(shape, TopAbs_FACE); explorer.More(); explorer.Next()) {
@@ -85,7 +91,7 @@ void Triangulation::triangulateSolid(TopoDS_Shape &shape) {
  * Triangulate face [private]
  * @param shape Shape
  */
-void Triangulation::triangulateFace(TopoDS_Shape &shape) {
+void Triangulation::triangulateFace(const TopoDS_Shape &shape) {
   BRepMesh_IncrementalMesh mesh(shape, this->m_maxBb * meshQuality);
   this->triangulateLoop(TopoDS::Face(shape));
 }
@@ -94,7 +100,7 @@ void Triangulation::triangulateFace(TopoDS_Shape &shape) {
  * Triangulate edge [private]
  * @param shape Shape
  */
-void Triangulation::triangulateEdge(TopoDS_Shape &shape) {
+void Triangulation::triangulateEdge(const TopoDS_Shape &shape) {
   gp_Pnt p;
 
   BRepMesh_IncrementalMesh mesh(shape, this->m_maxBb * 2.e-2 * meshQuality,
@@ -116,11 +122,11 @@ void Triangulation::triangulateEdge(TopoDS_Shape &shape) {
  * Triangulate loop [private]
  * @param face Face
  */
-void Triangulation::triangulateLoop(TopoDS_Face &face, const uint iDelta) {
+void Triangulation::triangulateLoop(const TopoDS_Face &face,
+                                    const uint iDelta) {
   uint i;
   gp_Pnt p;
   gp_Dir d;
-  StdPrs_ToolTriangulatedShape SST;
 
   TopLoc_Location location;
   Handle(Poly_Triangulation) triangulation =
@@ -143,7 +149,7 @@ void Triangulation::triangulateLoop(TopoDS_Face &face, const uint iDelta) {
 
   // normal
   TColgp_Array1OfDir normals(nodes.Lower(), nodes.Upper());
-  SST.Normal(face, pc, normals);
+  StdPrs_ToolTriangulatedShape::Normal(face, pc, normals);
   for (i = normals.Lower(); i <= normals.Upper(); ++i) {
     d = normals(i).Transformed(location.Transformation());
     this->m_normals.push_back(static_cast<float>(d.X()));

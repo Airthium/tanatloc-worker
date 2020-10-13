@@ -91,7 +91,8 @@ target_link_libraries(StepUnion ${OCC_LIBS})
 
 ## Tests
 include(CTest)
-include(ParseAndAddCatchTests)
+include(Catch)
+# include(ParseAndAddCatchTests)
 
 set(LOGGER_TESTS
   test/logger/Logger.test.cpp
@@ -106,6 +107,9 @@ set(GMSH_TESTS
 
 set(OCC_TESTS
   test/occ/getElements.test.cpp
+  test/occ/StepWriter.test.cpp
+  test/occ/Triangulation.test.cpp
+  test/occ/Union.test.cpp
 )
 
 set(THREEJS_TESTS
@@ -128,7 +132,8 @@ add_executable(tests ${SOURCE_TESTS})
 target_link_libraries(tests ${OCC_LIBS})
 
 target_link_libraries(tests Catch2::Catch2)
-ParseAndAddCatchTests(tests)
+# ParseAndAddCatchTests(tests)
+catch_discover_tests(tests)
 
 ## Coverage
 option(COVERAGE "Enable coverage flags" OFF)

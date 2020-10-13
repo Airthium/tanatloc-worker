@@ -31,7 +31,7 @@ public:
   void setTolerance(double tolerance);
 
   // Compute
-  TopoDS_Shape compute();
+  TopoDS_Shape compute() const;
 };
 
 #endif

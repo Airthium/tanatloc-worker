@@ -40,6 +40,41 @@ TEST_CASE("Gmsh") {
     CHECK(res == true);
   }
 
+  SECTION("load - no vertices") {
+    Gmsh mesh = Gmsh();
+
+    bool res = mesh.load("./test/assets/Cube.no_vertices.msh");
+    CHECK(res == false);
+  }
+
+  SECTION("load - no elements") {
+    Gmsh mesh = Gmsh();
+
+    bool res = mesh.load("./test/assets/Cube.no_elements.msh");
+    CHECK(res == false);
+  }
+
+  SECTION("load - no triangles") {
+    Gmsh mesh = Gmsh();
+
+    bool res = mesh.load("./test/assets/Cube.no_triangles.msh");
+    CHECK(res == false);
+  }
+
+  SECTION("load - 2D") {
+    Gmsh mesh = Gmsh();
+
+    bool res = mesh.load("./test/assets/Square.msh");
+    CHECK(res == true);
+  }
+
+  SECTION("load - 1D") {
+    Gmsh mesh = Gmsh();
+
+    bool res = mesh.load("./test/assets/Point.msh");
+    CHECK(res == true);
+  }
+
   SECTION("computeLabels") {
     Gmsh mesh = Gmsh();
 
