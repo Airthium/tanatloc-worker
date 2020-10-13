@@ -30,49 +30,49 @@ TEST_CASE("Gmsh") {
     Gmsh mesh = Gmsh();
 
     bool res = mesh.load("./test/assets/Cube.wrong.msh");
-    CHECK(res == false);
+    CHECK(!res);
   }
 
   SECTION("load - correct file") {
     Gmsh mesh = Gmsh();
 
     bool res = mesh.load("./test/assets/Cube.msh");
-    CHECK(res == true);
+    CHECK(res);
   }
 
   SECTION("load - no vertices") {
     Gmsh mesh = Gmsh();
 
     bool res = mesh.load("./test/assets/Cube.no_vertices.msh");
-    CHECK(res == false);
+    CHECK(!res);
   }
 
   SECTION("load - no elements") {
     Gmsh mesh = Gmsh();
 
     bool res = mesh.load("./test/assets/Cube.no_elements.msh");
-    CHECK(res == false);
+    CHECK(!res);
   }
 
   SECTION("load - no triangles") {
     Gmsh mesh = Gmsh();
 
     bool res = mesh.load("./test/assets/Cube.no_triangles.msh");
-    CHECK(res == false);
+    CHECK(!res);
   }
 
   SECTION("load - 2D") {
     Gmsh mesh = Gmsh();
 
     bool res = mesh.load("./test/assets/Square.msh");
-    CHECK(res == true);
+    CHECK(res);
   }
 
   SECTION("load - 1D") {
     Gmsh mesh = Gmsh();
 
     bool res = mesh.load("./test/assets/Point.msh");
-    CHECK(res == true);
+    CHECK(res);
   }
 
   SECTION("computeLabels") {
@@ -95,7 +95,7 @@ TEST_CASE("Gmsh") {
     mesh.load("./test/assets/Cube.msh");
     mesh.computeLabels();
     std::vector<double> *vertices = mesh.getVolumesVertices();
-    CHECK(vertices->size() > 0);
+    CHECK(vertices[0].size() > 0);
   }
 
   SECTION("getSurfacesVertices") {
@@ -104,6 +104,6 @@ TEST_CASE("Gmsh") {
     mesh.load("./test/assets/Cube.msh");
     mesh.computeLabels();
     std::vector<double> *vertices = mesh.getSurfacesVertices();
-    CHECK(vertices->size() > 0);
+    CHECK(vertices[0].size() > 0);
   }
 }
