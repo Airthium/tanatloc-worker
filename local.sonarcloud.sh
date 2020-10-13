@@ -17,6 +17,7 @@ done
 
 echo "Scanner"
 sonar-scanner \
+  -Dsonar.projectVersion=1.0 \
   -Dsonar.scm.exclusions.disabled=true \
   -Dsonar.cfamily.threads="$(nproc)" \
   -Dsonar.cfamily.cache.enabled=true \
