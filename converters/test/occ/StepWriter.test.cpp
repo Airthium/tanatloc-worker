@@ -1,6 +1,8 @@
 #include <catch2/catch.hpp>
 
+#include <BRepBuilderAPI_MakeSolid.hxx>
 #include <TopoDS_Shape.hxx>
+#include <TopoDS_Solid.hxx>
 
 #include "../../src/occ/StepWriter.hpp"
 
@@ -19,6 +21,18 @@ TEST_CASE("StepWriter") {
     StepWriter stepWriter = StepWriter(fileName, shape);
 
     bool res = stepWriter.write();
+    CHECK(!res);
+
+    BRepBuilderAPI_MakeSolid makeSolid = BRepBuilderAPI_MakeSolid();
+    TopoDS_Solid solid = makeSolid.Solid();
+    StepWriter solidWriter = StepWriter(fileName, solid);
+
+    res = solidWriter.write();
     CHECK(res);
+
+    // StepWriter failWriter = StepWriter("/", solid);
+
+    // res = failWriter.write();
+    // CHECK(!res);
   }
 }
