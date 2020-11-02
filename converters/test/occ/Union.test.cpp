@@ -1,6 +1,8 @@
 #include <catch2/catch.hpp>
 
+#include <BRepBuilderAPI_MakeSolid.hxx>
 #include <TopoDS_Shape.hxx>
+#include <TopoDS_Solid.hxx>
 #include <vector>
 
 #include "../../src/occ/Union.hpp"
@@ -36,6 +38,8 @@ TEST_CASE("Union") {
     Union u = Union();
 
     u.setObjects(objects);
+
+    u.setObjects(objects);
   }
 
   SECTION("setObjects") {
@@ -45,6 +49,8 @@ TEST_CASE("Union") {
       tools.push_back(TopoDS_Shape());
 
     Union u = Union();
+
+    u.setTools(tools);
 
     u.setTools(tools);
   }
@@ -63,5 +69,19 @@ TEST_CASE("Union") {
 
     u.setTolerance(1.);
     u.compute();
+
+    uint nObjects = 1;
+    uint nTools = 1;
+
+    BRepBuilderAPI_MakeSolid makeSolid = BRepBuilderAPI_MakeSolid();
+    TopoDS_Solid solid = makeSolid.Solid();
+    auto objects = std::vector<TopoDS_Shape>();
+    objects.push_back(solid);
+    auto tools = std::vector<TopoDS_Shape>();
+    tools.push_back(solid);
+    double tolerance = 1.;
+
+    Union u2 = Union(objects, tools, tolerance);
+    u2.compute();
   }
 }
