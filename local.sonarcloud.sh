@@ -24,7 +24,7 @@ sonar-scanner \
   -Dsonar.cfamily.cache.path=/tmp \
   -Dsonar.organization=airthium \
   -Dsonar.projectKey=Airthium_tanatloc-dockers \
-  -Dsonar.sources=src,test \
+  -Dsonar.sources=src \
   -Dsonar.test.inclusions=**.test.cpp \
   -Dsonar.exclusions=src/dxflib/*,src/logger/Logger.cpp \
   -Dsonar.host.url=https://sonarcloud.io \

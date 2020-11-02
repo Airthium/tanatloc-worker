@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
   input = argv[1];
   output = argv[2];
 
-  StepReader reader = StepReader(input);
+  auto reader = StepReader(input);
   res = reader.read();
   if (!res) {
     Logger::ERROR("Unable to load step file " + input);

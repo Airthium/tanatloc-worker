@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
   }
 
   // Read step file
-  StepReader reader = StepReader(stepFile);
+  auto reader = StepReader(stepFile);
   res = reader.read();
   if (!res) {
     Logger::ERROR("Unable to load step file " + stepFile);

@@ -137,6 +137,7 @@ set(SOURCE_TESTS
 
 add_executable(tests ${SOURCE_TESTS})
 target_link_libraries(tests ${OCC_LIBS})
+target_compile_options(tests PUBLIC "-I test/FakeIt/include/ -I test/FakeIt/config/catch/")
 
 target_link_libraries(tests Catch2::Catch2)
 ParseAndAddCatchTests(tests)
