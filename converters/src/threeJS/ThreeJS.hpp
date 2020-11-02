@@ -2,6 +2,7 @@
 #define _THREEJS_
 
 #include <string>
+#include <vector>
 
 typedef unsigned int uint;
 
@@ -10,30 +11,27 @@ const std::string SOLID = "solid_";
 const std::string EDGE = "edge_";
 const uint UUID_LENGHT = 16;
 
+struct Color {
+  float red = 0.;
+  float green = 0.;
+  float blue = 0.;
+};
+
 class ThreeJS {
 private:
   // Dimension
   uint m_dimension = 3;
 
-  // Number of vertices
-  uint m_numberOfVertices = 0;
-  // Number of normals
-  uint m_numberOfNormals = 0;
-  // Number of indices
-  uint m_numberOfIndices = 0;
-  // Number of colors
-  uint m_numberOfColors = 0;
-
   // Label
   uint m_label = 0;
   // Vertices
-  float *m_vertices = nullptr;
+  std::vector<float> m_vertices = std::vector<float>();
   // Normals
-  float *m_normals = nullptr;
+  std::vector<float> m_normals = std::vector<float>();
   // Indices
-  uint *m_indices = nullptr;
+  std::vector<uint> m_indices = std::vector<uint>();
   // Colors
-  float **m_colors = nullptr;
+  std::vector<Color> m_colors;
 
   // Generate UUID
   std::string generateUUID() const;
@@ -41,23 +39,21 @@ private:
 public:
   // Constructor
   ThreeJS();
-  ThreeJS(float *, const uint);
-  ThreeJS(const double *, const uint);
-  ThreeJS(float *, const uint, float *, const uint);
-  ThreeJS(float *, const uint, float *, const uint, uint *, const uint);
-  // Destructor
-  ~ThreeJS();
+  explicit ThreeJS(const std::vector<float> &);
+  ThreeJS(const std::vector<float> &, const std::vector<float> &);
+  ThreeJS(const std::vector<float> &, const std::vector<float> &,
+          const std::vector<uint> &);
 
   // Set label
   void setLabel(uint);
   // Set vertices
-  void setVertices(float *, const uint);
+  void setVertices(const std::vector<float> &);
   // Set normals
-  void setNormals(float *, const uint);
+  void setNormals(const std::vector<float> &);
   // Set indices
-  void setIndices(uint *, const uint);
+  void setIndices(const std::vector<uint> &);
   // Set colors
-  void setColors(float **, const uint);
+  void setColors(const std::vector<Color> &);
 
   // Saver
   bool save(const std::string &) const;

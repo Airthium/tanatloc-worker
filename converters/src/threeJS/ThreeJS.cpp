@@ -1,5 +1,6 @@
 #include "ThreeJS.hpp"
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <random>
@@ -15,166 +16,73 @@ ThreeJS::ThreeJS() {}
 /**
  * Constructor
  * @param vertices Vertices (float)
- * @param numberOfVertices Number of vertices
  */
-ThreeJS::ThreeJS(float *vertices, const uint numberOfVertices)
-    : m_numberOfVertices(numberOfVertices),
-      m_vertices(new float[numberOfVertices]) {
-  std::copy(vertices, vertices + numberOfVertices, this->m_vertices);
-}
-
-/**
- * Constructor
- * @param vertices Vertices (double)
- * @param numberOfVertices Number of vertices
- */
-ThreeJS::ThreeJS(const double *vertices, const uint numberOfVertices)
-    : m_numberOfVertices(numberOfVertices),
-      m_vertices(new float[numberOfVertices]) {
-  for (uint i = 0; i < numberOfVertices; ++i) {
-    this->m_vertices[i] = (float)vertices[i];
-  }
-}
+ThreeJS::ThreeJS(const std::vector<float> &vertices) : m_vertices(vertices) {}
 
 /**
  * Constructor
  * @param vertices Vertices
- * @param numberOfVertices Number of vertices
  * @param normals Normals
- * @param numberOfNormals Number of normals
  */
-ThreeJS::ThreeJS(float *vertices, const uint numberOfVertices, float *normals,
-                 const uint numberOfNormals)
-    : m_numberOfVertices(numberOfVertices), m_numberOfNormals(numberOfNormals) {
-  this->m_vertices = new float[this->m_numberOfVertices];
-  std::copy(vertices, vertices + numberOfVertices, this->m_vertices);
-  this->m_normals = new float[this->m_numberOfNormals];
-  std::copy(normals, normals + numberOfNormals, this->m_normals);
-}
+ThreeJS::ThreeJS(const std::vector<float> &vertices,
+                 const std::vector<float> &normals)
+    : m_vertices(vertices), m_normals(normals) {}
 
 /**
  * Constructor
  * @param vertices Vertices
- * @param numberOfVertices Number of vertices
  * @param normals Normals
- * @param numberOfNormals Number of normals
  * @param indices Indices
- * @param numberOfIndices Number of indices
  */
-ThreeJS::ThreeJS(float *vertices, const uint numberOfVertices, float *normals,
-                 const uint numberOfNormals, uint *indices,
-                 const uint numberOfIndices)
-    : m_numberOfVertices(numberOfVertices), m_numberOfNormals(numberOfNormals),
-      m_numberOfIndices(numberOfIndices) {
-  this->m_vertices = new float[this->m_numberOfVertices];
-  std::copy(vertices, vertices + numberOfVertices, this->m_vertices);
-  this->m_normals = new float[this->m_numberOfNormals];
-  std::copy(normals, normals + numberOfNormals, this->m_normals);
-  this->m_indices = new uint[this->m_numberOfIndices];
-  std::copy(indices, indices + numberOfIndices, this->m_indices);
-}
-
-/**
- * Destructor
- */
-ThreeJS::~ThreeJS() {
-  if (this->m_vertices) {
-    delete[] this->m_vertices;
-    this->m_vertices = nullptr;
-  }
-  if (this->m_normals) {
-    delete[] this->m_normals;
-    this->m_normals = nullptr;
-  }
-  if (this->m_indices) {
-    delete[] this->m_indices;
-    this->m_indices = nullptr;
-  }
-  if (this->m_colors) {
-    for (uint i = 0; i < this->m_numberOfColors; ++i) {
-      if (this->m_colors[i]) {
-        delete[] this->m_colors[i];
-        this->m_colors[i] = nullptr;
-      }
-    }
-    delete[] this->m_colors;
-    this->m_colors = nullptr;
-  }
-  this->m_dimension = 0;
-  this->m_numberOfVertices = 0;
-  this->m_numberOfNormals = 0;
-  this->m_numberOfIndices = 0;
-}
+ThreeJS::ThreeJS(const std::vector<float> &vertices,
+                 const std::vector<float> &normals,
+                 const std::vector<uint> &indices)
+    : m_vertices(vertices), m_normals(normals), m_indices(indices) {}
 
 /**
  * Set label
  * @param number Label
  */
-void ThreeJS::setLabel(uint number) { this->m_label = number; }
+void ThreeJS::setLabel(uint label) { this->m_label = label; }
 
 /**
  * Set vertices
  * @param vertices Vertices
- * @param size Size
  */
-void ThreeJS::setVertices(float *vertices, const uint size) {
-  if (this->m_vertices) {
-    delete[] this->m_vertices;
-  }
+void ThreeJS::setVertices(const std::vector<float> &vertices) {
+  if (this->m_vertices.size())
+    this->m_vertices.clear();
 
-  this->m_numberOfVertices = size;
-  this->m_vertices = new float[this->m_numberOfVertices];
-  std::copy(vertices, vertices + size, this->m_vertices);
+  this->m_vertices = vertices;
 }
 
 /**
  * Set normals
  * @param normals Normals
- * @param size Size
  */
-void ThreeJS::setNormals(float *normals, const uint size) {
-  if (this->m_normals) {
-    delete[] this->m_normals;
-  }
+void ThreeJS::setNormals(const std::vector<float> &normals) {
+  if (this->m_normals.size())
+    this->m_normals.clear();
 
-  this->m_numberOfNormals = size;
-  this->m_normals = new float[this->m_numberOfNormals];
-  std::copy(normals, normals + size, this->m_normals);
+  this->m_normals = normals;
 }
 
 /**
  * Set indices
  * @param indices Indices
- * @param size Size
  */
-void ThreeJS::setIndices(uint *indices, const uint size) {
-  if (!this->m_indices) {
-    delete[] this->m_indices;
-  }
+void ThreeJS::setIndices(const std::vector<uint> &indices) {
+  if (this->m_indices.size())
+    this->m_indices.clear();
 
-  this->m_numberOfIndices = size;
-  this->m_indices = new uint[this->m_numberOfIndices];
-  std::copy(indices, indices + size, this->m_indices);
+  this->m_indices = indices;
 }
 
-void ThreeJS::setColors(float **colors, const uint size) {
-  uint i;
-  if (this->m_colors) {
-    for (i = 0; i < this->m_numberOfColors; ++i) {
-      if (this->m_colors[i]) {
-        delete[] this->m_colors[i];
-        this->m_colors[i] = nullptr;
-      }
-    }
-    delete[] this->m_colors;
-  }
+void ThreeJS::setColors(const std::vector<Color> &colors) {
+  if (this->m_colors.size())
+    this->m_colors.clear();
 
-  this->m_numberOfColors = size;
-  this->m_colors = new float *[this->m_numberOfColors];
-  for (i = 0; i < this->m_numberOfColors; ++i) {
-    this->m_colors[i] = new float[3];
-    std::copy(colors[i], colors[i] + 3, this->m_colors[i]);
-  }
+  this->m_colors = colors;
 }
 
 /**
@@ -193,17 +101,17 @@ bool ThreeJS::save(const std::string &fileName) const {
   this->saveHeader(file);
 
   // Vertices
-  if (this->m_vertices) {
+  if (this->m_vertices.size()) {
     this->saveVertices(file);
   }
 
   // Normals
-  if (this->m_normals) {
+  if (this->m_normals.size()) {
     this->saveNormals(file);
   }
 
   // Colors
-  if (this->m_colors) {
+  if (this->m_colors.size()) {
     this->saveColors(file);
   }
 
@@ -242,18 +150,22 @@ void ThreeJS::saveVertices(std::ofstream &file) const {
   file << "\t\t\t\t\"type\": \"Float32Array\"," << std::endl;
   file << "\t\t\t\t\"array\": [";
 
-  if (this->m_indices) {
-    for (i = 0; i < this->m_numberOfIndices; ++i) {
+  const auto numberOfIndices = this->m_indices.size();
+  if (numberOfIndices) {
+    // With indices
+    for (i = 0; i < numberOfIndices; ++i) {
       file << this->m_vertices[3 * this->m_indices[i] + 0] << ","
            << this->m_vertices[3 * this->m_indices[i] + 1] << ","
            << this->m_vertices[3 * this->m_indices[i] + 2];
-      if (i < (this->m_numberOfIndices - 1))
+      if (i < (numberOfIndices - 1))
         file << ",";
     }
   } else {
-    for (i = 0; i < this->m_numberOfVertices; ++i) {
+    // Without indices
+    const auto numberOfVertices = this->m_vertices.size();
+    for (i = 0; i < numberOfVertices; ++i) {
       file << this->m_vertices[i];
-      if (i < (this->m_numberOfVertices - 1))
+      if (i < (numberOfVertices - 1))
         file << ",";
     }
   }
@@ -261,7 +173,7 @@ void ThreeJS::saveVertices(std::ofstream &file) const {
   file << "]" << std::endl;
   file << "\t\t\t}";
 
-  if (this->m_normals || this->m_colors)
+  if (this->m_normals.size() || this->m_colors.size())
     file << "," << std::endl;
   else
     file << std::endl;
@@ -278,18 +190,22 @@ void ThreeJS::saveNormals(std::ofstream &file) const {
   file << "\t\t\t\t\"type\": \"Float32Array\"," << std::endl;
   file << "\t\t\t\t\"array\": [";
 
-  if (this->m_indices) {
-    for (i = 0; i < this->m_numberOfIndices; ++i) {
+  const auto numberOfIndices = this->m_indices.size();
+  if (numberOfIndices) {
+    // With indices
+    for (i = 0; i < numberOfIndices; ++i) {
       file << this->m_normals[3 * this->m_indices[i] + 0] << ","
            << this->m_normals[3 * this->m_indices[i] + 1] << ","
            << this->m_normals[3 * this->m_indices[i] + 2];
-      if (i < (this->m_numberOfIndices - 1))
+      if (i < (numberOfIndices - 1))
         file << ",";
     }
   } else {
-    for (i = 0; i < this->m_numberOfNormals; ++i) {
+    // Without indices
+    const auto numberOfNormals = this->m_normals.size();
+    for (i = 0; i < numberOfNormals; ++i) {
       file << this->m_normals[i];
-      if (i < (this->m_numberOfNormals - 1))
+      if (i < (numberOfNormals - 1))
         file << ",";
     }
   }
@@ -297,7 +213,7 @@ void ThreeJS::saveNormals(std::ofstream &file) const {
   file << "]" << std::endl;
   file << "\t\t\t}";
 
-  if (this->m_colors)
+  if (this->m_colors.size())
     file << "," << std::endl;
   else
     file << std::endl;
@@ -312,10 +228,11 @@ void ThreeJS::saveColors(std::ofstream &file) const {
   file << "\t\t\t\t\"type\": \"Float32Array\"," << std::endl;
   file << "\t\t\t\t\"array\": [";
 
-  for (uint i = 0; i < this->m_numberOfColors; ++i) {
-    file << this->m_colors[i][0] << "," << this->m_colors[i][1] << ","
-         << this->m_colors[i][2];
-    if (i < (this->m_numberOfColors - 1))
+  const auto numberOfColors = this->m_colors.size();
+  for (uint i = 0; i < numberOfColors; ++i) {
+    file << this->m_colors[i].red << "," << this->m_colors[i].green << ","
+         << this->m_colors[i].blue;
+    if (i < (numberOfColors - 1))
       file << ",";
   }
 

@@ -13,6 +13,8 @@
 #include "occ/getElements.hpp"
 #include "threeJS/ThreeJS.hpp"
 
+bool elementToThreeJS(const TopoDS_Shape, const std::string &, const uint);
+
 /**
  * Main function
  */
@@ -77,60 +79,31 @@ int main(int argc, char *argv[]) {
   }
 
   // Save ThreeJS files
+  // Solids
   for (i = 0; i < solids.size(); ++i) {
-    Triangulation triangulation(solids[i]);
-    triangulation.triangulate();
-    std::vector<float> vertices = triangulation.getVertices();
-    std::vector<float> normals = triangulation.getNormals();
-    std::vector<uint> indices = triangulation.getIndices();
-
-    ThreeJS solid(&vertices[0], (uint)vertices.size(), &normals[0],
-                  (uint)normals.size(), &indices[0], (uint)indices.size());
-
-    solid.setLabel(i + 1);
-
-    double min;
-    double max;
-    triangulation.getBb(&min, &max);
-
-    std::ostringstream oss;
-    oss << threeJSPath << "/" << SOLID << (i + 1) << ".json";
-    res = solid.save(oss.str());
-    if (!res) {
-      Logger::ERROR("Unable to write ThreeJS file " + oss.str());
+    res = elementToThreeJS(solids[i], threeJSPath + "/" + SOLID, i + 1);
+    if (!res)
       return EXIT_FAILURE;
-    }
+
     Logger::DISP(std::to_string(0.5 * (i / (solids.size()))));
   }
 
+  // Faces
   for (i = 0; i < faces.size(); ++i) {
-    Triangulation triangulation(faces[i]);
-    triangulation.triangulate();
-    std::vector<float> vertices = triangulation.getVertices();
-    std::vector<float> normals = triangulation.getNormals();
-    std::vector<uint> indices = triangulation.getIndices();
-
-    ThreeJS face(&vertices[0], (uint)vertices.size(), &normals[0],
-                 (uint)normals.size(), &indices[0], (uint)indices.size());
-
-    face.setLabel(i + 1);
-
-    std::ostringstream oss;
-    oss << threeJSPath << "/" << FACE << (i + 1) << ".json";
-    res = face.save(oss.str());
-    if (!res) {
-      Logger::ERROR("Unable to write ThreeJS file " + oss.str());
+    res = elementToThreeJS(faces[i], threeJSPath + "/" + FACE, i + 1);
+    if (!res)
       return EXIT_FAILURE;
-    }
+
     Logger::DISP(std::to_string(0.5 + 0.5 * (i / ((double)faces.size() - 1.))));
   }
 
+  // Edges
   for (i = 0; i < edges.size(); ++i) {
     Triangulation triangulation(edges[i]);
     triangulation.triangulate();
     std::vector<float> vertices = triangulation.getVertices();
 
-    ThreeJS edge(&vertices[0], (uint)vertices.size());
+    ThreeJS edge(vertices);
 
     edge.setLabel(i + 1);
 
@@ -156,4 +129,36 @@ int main(int argc, char *argv[]) {
   }
 
   return EXIT_SUCCESS;
+}
+
+/**
+ * OCC Element to ThreeJS
+ * @param element Element
+ * @param path Path
+ * @param index Index
+ */
+bool elementToThreeJS(const TopoDS_Shape element, const std::string &path,
+                      const uint index) {
+  // Triangulation
+  Triangulation triangulation(element);
+  triangulation.triangulate();
+
+  // Vertices, normals, indices
+  std::vector<float> vertices = triangulation.getVertices();
+  std::vector<float> normals = triangulation.getNormals();
+  std::vector<uint> indices = triangulation.getIndices();
+
+  // Part
+  ThreeJS part(vertices, normals, indices);
+  part.setLabel(index);
+
+  // Write
+  std::ostringstream oss;
+  oss << path << index << ".json";
+  if (!part.save(oss.str())) {
+    Logger::ERROR("Unable to write ThreeJS file " + oss.str());
+    return false;
+  }
+
+  return true;
 }

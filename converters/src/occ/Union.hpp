@@ -9,8 +9,8 @@
 class Union {
 private:
   double m_tolerance = 0;
-  TopTools_ListOfShape m_objects;
-  TopTools_ListOfShape m_tools;
+  TopTools_ListOfShape m_objects = TopTools_ListOfShape();
+  TopTools_ListOfShape m_tools = TopTools_ListOfShape();
 
 public:
   // Constructor

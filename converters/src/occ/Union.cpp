@@ -21,12 +21,10 @@ Union::Union(std::vector<TopoDS_Shape> &objects,
              std::vector<TopoDS_Shape> &tools, double tolerance)
     : m_tolerance(tolerance) {
 
-  this->m_objects = TopTools_ListOfShape();
   std::for_each(
       objects.begin(), objects.end(),
       [this](const TopoDS_Shape &object) { this->m_objects.Append(object); });
 
-  this->m_tools = TopTools_ListOfShape();
   std::for_each(tools.begin(), tools.end(), [this](const TopoDS_Shape &tool) {
     this->m_tools.Append(tool);
   });
@@ -37,7 +35,9 @@ Union::Union(std::vector<TopoDS_Shape> &objects,
  * @param objects Objects
  */
 void Union::setObjects(std::vector<TopoDS_Shape> &objects) {
-  this->m_objects = TopTools_ListOfShape();
+  if (!this->m_objects.IsEmpty())
+    this->m_objects.Clear();
+
   std::for_each(
       objects.begin(), objects.end(),
       [this](const TopoDS_Shape &object) { this->m_objects.Append(object); });
@@ -48,7 +48,9 @@ void Union::setObjects(std::vector<TopoDS_Shape> &objects) {
  * @param tools Tools
  */
 void Union::setTools(std::vector<TopoDS_Shape> &tools) {
-  this->m_tools = TopTools_ListOfShape();
+  if (!this->m_tools.IsEmpty())
+    this->m_tools.Clear();
+
   std::for_each(tools.begin(), tools.end(), [this](const TopoDS_Shape &tool) {
     this->m_tools.Append(tool);
   });

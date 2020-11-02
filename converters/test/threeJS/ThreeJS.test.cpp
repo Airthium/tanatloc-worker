@@ -7,53 +7,44 @@ TEST_CASE("ThreeJS") {
 
   SECTION("Constructor 2") {
     uint size = 3;
-    auto *vertices = new float[size];
+    auto vertices = std::vector<float>();
     for (uint i = 0; i < size; ++i)
-      vertices[i] = (float)i;
+      vertices.push_back((float)i);
 
-    ThreeJS threejs = ThreeJS(vertices, size);
+    ThreeJS threejs = ThreeJS(vertices);
   }
 
   SECTION("Constructor 3") {
-    uint size = 3;
-    auto *vertices = new double[size];
-    for (uint i = 0; i < size; ++i)
-      vertices[i] = (double)i;
+    uint vsize = 3;
+    auto vertices = std::vector<float>();
+    for (uint i = 0; i < vsize; ++i)
+      vertices.push_back((float)i);
 
-    ThreeJS threejs = ThreeJS(vertices, size);
+    uint nsize = 3;
+    auto normals = std::vector<float>();
+    for (uint i = 0; i < nsize; ++i)
+      normals.push_back((float)i);
+
+    ThreeJS threejs = ThreeJS(vertices, normals);
   }
 
   SECTION("Constructor 4") {
     uint vsize = 3;
-    auto *vertices = new float[vsize];
+    auto vertices = std::vector<float>();
     for (uint i = 0; i < vsize; ++i)
-      vertices[i] = (float)i;
+      vertices.push_back((float)i);
 
     uint nsize = 3;
-    auto *normals = new float[nsize];
+    auto normals = std::vector<float>();
     for (uint i = 0; i < nsize; ++i)
-      normals[i] = (float)i;
-
-    ThreeJS threejs = ThreeJS(vertices, vsize, normals, nsize);
-  }
-
-  SECTION("Constructor 5") {
-    uint vsize = 3;
-    auto *vertices = new float[vsize];
-    for (uint i = 0; i < vsize; ++i)
-      vertices[i] = (float)i;
-
-    uint nsize = 3;
-    auto *normals = new float[nsize];
-    for (uint i = 0; i < nsize; ++i)
-      normals[i] = (float)i;
+      normals.push_back((float)i);
 
     uint isize = 3;
-    auto *indices = new uint[isize];
+    auto indices = std::vector<uint>();
     for (uint i = 0; i < nsize; ++i)
-      indices[i] = i;
+      indices.push_back(i);
 
-    ThreeJS threejs = ThreeJS(vertices, vsize, normals, nsize, indices, isize);
+    ThreeJS threejs = ThreeJS(vertices, normals, indices);
   }
 
   SECTION("setLabel") {
@@ -65,48 +56,50 @@ TEST_CASE("ThreeJS") {
     ThreeJS threejs = ThreeJS();
 
     uint vsize = 3;
-    auto *vertices = new float[vsize];
+    auto vertices = std::vector<float>();
     for (uint i = 0; i < vsize; ++i)
-      vertices[i] = (float)i;
-    threejs.setVertices(vertices, vsize);
+      vertices.push_back((float)i);
+    threejs.setVertices(vertices);
 
-    threejs.setVertices(vertices, vsize);
+    threejs.setVertices(vertices);
   }
 
   SECTION("setNormals") {
     ThreeJS threejs = ThreeJS();
 
     uint nsize = 3;
-    auto *normals = new float[nsize];
+    auto normals = std::vector<float>();
     for (uint i = 0; i < nsize; ++i)
-      normals[i] = (float)i;
-    threejs.setNormals(normals, nsize);
+      normals.push_back((float)i);
+    threejs.setNormals(normals);
 
-    threejs.setNormals(normals, nsize);
+    threejs.setNormals(normals);
   }
 
   SECTION("setIndices") {
     ThreeJS threejs = ThreeJS();
 
     uint isize = 3;
-    auto *indices = new uint[isize];
+    auto indices = std::vector<uint>();
     for (uint i = 0; i < isize; ++i)
-      indices[i] = i;
-    threejs.setIndices(indices, isize);
+      indices.push_back(i);
+    threejs.setIndices(indices);
 
-    threejs.setIndices(indices, isize);
+    threejs.setIndices(indices);
   }
 
   SECTION("setColors") {
     ThreeJS threejs = ThreeJS();
 
     uint csize = 3;
-    auto **colors = new float *[csize];
-    for (uint i = 0; i < csize; ++i)
-      colors[i] = new float[3];
-    threejs.setColors(colors, csize);
+    auto colors = std::vector<Color>();
+    for (uint i = 0; i < csize; ++i) {
+      Color c;
+      colors.push_back(c);
+    }
+    threejs.setColors(colors);
 
-    threejs.setColors(colors, csize);
+    threejs.setColors(colors);
   }
 
   SECTION("save") {
@@ -124,34 +117,36 @@ TEST_CASE("ThreeJS") {
 
     // + With vertices
     uint vsize = 3;
-    auto *vertices = new float[vsize];
+    auto vertices = std::vector<float>();
     for (uint i = 0; i < vsize; ++i)
-      vertices[i] = (float)i;
-    threejs.setVertices(vertices, vsize);
+      vertices.push_back((float)i);
+    threejs.setVertices(vertices);
     threejs.save("mythreejstest.json");
 
     // + With normals
     uint nsize = 3;
-    auto *normals = new float[nsize];
+    auto normals = std::vector<float>();
     for (uint i = 0; i < nsize; ++i)
-      normals[i] = (float)i;
-    threejs.setNormals(normals, nsize);
+      normals.push_back((float)i);
+    threejs.setNormals(normals);
     threejs.save("mythreejstest.json");
 
     // + With colors
     uint csize = 3;
-    auto **colors = new float *[csize];
-    for (uint i = 0; i < csize; ++i)
-      colors[i] = new float[3];
-    threejs.setColors(colors, csize);
+    auto colors = std::vector<Color>();
+    for (uint i = 0; i < csize; ++i) {
+      Color c;
+      colors.push_back(c);
+    }
+    threejs.setColors(colors);
     threejs.save("mythreejstest.json");
 
     // + With indices
     uint isize = 3;
-    auto *indices = new uint[isize];
+    auto indices = std::vector<uint>();
     for (uint i = 0; i < isize; ++i)
-      indices[i] = i;
-    threejs.setIndices(indices, isize);
+      indices.push_back(i);
+    threejs.setIndices(indices);
     threejs.save("mythreejstest.json");
   }
 

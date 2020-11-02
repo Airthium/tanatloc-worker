@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iostream>
 #include <random>
 #include <sstream>
@@ -10,7 +11,7 @@
 #include "logger/Logger.hpp"
 #include "threeJS/ThreeJS.hpp"
 
-void generateColor(float *, float *, float *);
+Color generateColor();
 
 /**
  * Main function
@@ -22,6 +23,7 @@ int main(int argc, char *argv[]) {
   std::string threeJSPath;
   Gmsh *mesh = nullptr;
 
+  // Arguments
   if (argc < 2) {
     Logger::ERROR("USAGE:");
     Logger::ERROR("./GmshToThreeJS meshFile [threeJSPath]");
@@ -60,22 +62,24 @@ int main(int argc, char *argv[]) {
   std::vector<double> *surfacesVertices = mesh->getSurfacesVertices();
 
   // Create & save ThreeJS
+  // Volumes
   for (i = 0; i < mesh->getNumberOfTetrahedronLabels(); ++i) {
-    const double *vertices = &volumesVertices[i][0];
-    auto size = (uint)volumesVertices[i].size();
-    ThreeJS volume(vertices, size);
-    auto **colors = new float *[1];
-    float r;
-    float g;
-    float b;
-    generateColor(&r, &g, &b);
-    colors[0] = new float[3];
-    colors[0][0] = r;
-    colors[0][1] = g;
-    colors[0][2] = b;
-    volume.setColors(colors, 1);
+    // Vertices
+    auto vertices = std::vector<float>();
+    std::for_each(
+        volumesVertices[i].begin(), volumesVertices[i].end(),
+        [&vertices](const double &v) { vertices.push_back((float)v); });
+    ThreeJS volume(vertices);
+
+    // Color
+    auto colors = std::vector<Color>();
+    colors.push_back(generateColor());
+    volume.setColors(colors);
+
+    // Label
     volume.setLabel(mesh->getTetrahedronLabel(i));
 
+    // Write
     std::ostringstream oss;
     oss << threeJSPath << "/" << SOLID << (i + 1) << ".json";
     res = volume.save(oss.str());
@@ -85,21 +89,24 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  // Surface
   for (i = 0; i < mesh->getNumberOfTriangleLabels(); ++i) {
-    const double *vertices = &surfacesVertices[i][0];
-    auto size = (uint)surfacesVertices[i].size();
-    ThreeJS surface(vertices, size);
-    auto **colors = new float *[1];
-    float r;
-    float g;
-    float b;
-    generateColor(&r, &g, &b);
-    colors[0] = new float[3];
-    colors[0][0] = r;
-    colors[0][1] = g;
-    colors[0][2] = b;
-    surface.setColors(colors, 1);
+    // Vertices
+    auto vertices = std::vector<float>();
+    std::for_each(
+        surfacesVertices[i].begin(), surfacesVertices[i].end(),
+        [&vertices](const double &v) { vertices.push_back((float)v); });
+    ThreeJS surface(vertices);
+
+    // Color
+    auto colors = std::vector<Color>();
+    colors.push_back(generateColor());
+    surface.setColors(colors);
+
+    // Label
     surface.setLabel(mesh->getTriangleLabel(i));
+
+    // Write
     std::ostringstream oss;
     oss << threeJSPath << "/" << FACE << (i + 1) << ".json";
     res = surface.save(oss.str());
@@ -139,8 +146,10 @@ double generateRandom() {
 /**
  * Generate random color
  */
-void generateColor(float *r, float *g, float *b) {
-  *r = (float)generateRandom();
-  *g = (float)generateRandom();
-  *b = (float)generateRandom();
+Color generateColor() {
+  Color c;
+  c.red = (float)generateRandom();
+  c.green = (float)generateRandom();
+  c.blue = (float)generateRandom();
+  return c;
 }

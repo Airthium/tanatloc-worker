@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -11,14 +12,11 @@
 #include "occ/getElements.hpp"
 #include "threeJS/ThreeJS.hpp"
 
-// Default solid color (R G B)
-constexpr float DEFAULT_SOLID_COLOR_R = 0.75;
-constexpr float DEFAULT_SOLID_COLOR_G = 0.75;
-constexpr float DEFAULT_SOLID_COLOR_B = 0.75;
-// Default face color (R G B)
-constexpr float DEFAULT_FACE_COLOR_R = 0.75;
-constexpr float DEFAULT_FACE_COLOR_G = 0.75;
-constexpr float DEFAULT_FACE_COLOR_B = 0.75;
+// Default color
+constexpr Color DEFAULT_COLOR = {0.75, 0.75, 0.75};
+
+bool elementToThreeJS(const TopoDS_Shape, const std::pair<bool, Quantity_Color>,
+                      const std::string &, const uint);
 
 /**
  * Main function
@@ -29,6 +27,7 @@ int main(int argc, char *argv[]) {
   std::string stepFile;
   std::string threeJSPath;
 
+  // Arguments
   if (argc < 2) {
     Logger::ERROR("USAGE:");
     Logger::ERROR("./StepToThreeJS stepFile [threeJSPath]");
@@ -73,83 +72,36 @@ int main(int argc, char *argv[]) {
     std::vector<TopoDS_Shape> solidTemp =
         getSolids(shapes[i], document, &solidColors);
     std::copy(solidTemp.begin(), solidTemp.end(), back_inserter(solids));
-    for (uint j = 0; j < solidTemp.size(); ++j) {
-      std::vector<std::pair<bool, Quantity_Color>> tempColors;
-      std::vector<TopoDS_Shape> faceTemp =
-          getFaces(solidTemp[j], document, &tempColors);
-      std::copy(faceTemp.begin(), faceTemp.end(), back_inserter(faces));
-      std::copy(tempColors.begin(), tempColors.end(),
-                back_inserter(faceColors));
-    }
+    std::for_each(solidTemp.begin(), solidTemp.end(),
+                  [document, &faceColors, &faces](const TopoDS_Shape &solid) {
+                    std::vector<std::pair<bool, Quantity_Color>> tempColors;
+                    std::vector<TopoDS_Shape> faceTemp =
+                        getFaces(solid, document, &tempColors);
+                    std::copy(faceTemp.begin(), faceTemp.end(),
+                              std::back_inserter(faces));
+                    std::copy(tempColors.begin(), tempColors.end(),
+                              std::back_inserter(faceColors));
+                  });
   }
 
   // Save ThreeJS files
+  // Solids
   for (i = 0; i < solids.size(); ++i) {
-    Triangulation triangulation(solids[i]);
-    triangulation.triangulate();
-    std::vector<float> vertices = triangulation.getVertices();
-    std::vector<float> normals = triangulation.getNormals();
-    std::vector<uint> indices = triangulation.getIndices();
-
-    auto **colors = new float *[1];
-    colors[0] = new float[3];
-    colors[0][0] = std::get<0>(solidColors[i])
-                       ? (float)std::get<1>(solidColors[i]).Red()
-                       : DEFAULT_SOLID_COLOR_R;
-    colors[0][1] = std::get<0>(solidColors[i])
-                       ? (float)std::get<1>(solidColors[i]).Green()
-                       : DEFAULT_SOLID_COLOR_G;
-    colors[0][2] = std::get<0>(solidColors[i])
-                       ? (float)std::get<1>(solidColors[i]).Blue()
-                       : DEFAULT_SOLID_COLOR_B;
-
-    ThreeJS solid(&vertices[0], (uint)vertices.size(), &normals[0],
-                  (uint)normals.size(), &indices[0], (uint)indices.size());
-    solid.setColors(colors, 1);
-    solid.setLabel(i + 1);
-    double min;
-    double max;
-    triangulation.getBb(&min, &max);
-    std::ostringstream oss;
-    oss << threeJSPath << "/" << SOLID << (i + 1) << ".json";
-    res = solid.save(oss.str());
-    if (!res) {
-      Logger::ERROR("Unable to write ThreeJS file " + oss.str());
+    res = elementToThreeJS(solids[i], solidColors[i], threeJSPath + "/" + SOLID,
+                           i + 1);
+    if (!res)
       return EXIT_FAILURE;
-    }
+
     Logger::DISP(std::to_string(0.5 * (i / (solids.size()))));
   }
 
+  // Faces
   for (i = 0; i < faces.size(); ++i) {
-    Triangulation triangulation(faces[i]);
-    triangulation.triangulate();
-    std::vector<float> vertices = triangulation.getVertices();
-    std::vector<float> normals = triangulation.getNormals();
-    std::vector<uint> indices = triangulation.getIndices();
-
-    auto **colors = new float *[1];
-    colors[0] = new float[3];
-    colors[0][0] = std::get<0>(faceColors[i])
-                       ? (float)std::get<1>(faceColors[i]).Red()
-                       : DEFAULT_FACE_COLOR_R;
-    colors[0][1] = std::get<0>(faceColors[i])
-                       ? (float)std::get<1>(faceColors[i]).Green()
-                       : DEFAULT_FACE_COLOR_G;
-    colors[0][2] = std::get<0>(faceColors[i])
-                       ? (float)std::get<1>(faceColors[i]).Blue()
-                       : DEFAULT_FACE_COLOR_B;
-
-    ThreeJS face(&vertices[0], (uint)vertices.size(), &normals[0],
-                 (uint)normals.size(), &indices[0], (uint)indices.size());
-    face.setColors(colors, 1);
-    face.setLabel(i + 1);
-    std::ostringstream oss;
-    oss << threeJSPath << "/" << FACE << (i + 1) << ".json";
-    res = face.save(oss.str());
-    if (!res) {
-      Logger::ERROR("Unable to write ThreeJS file " + oss.str());
+    res = elementToThreeJS(faces[i], faceColors[i], threeJSPath + "/" + FACE,
+                           i + 1);
+    if (!res)
       return EXIT_FAILURE;
-    }
+
     Logger::DISP(std::to_string(0.5 + 0.5 * (i / ((double)faces.size() - 1.))));
   }
 
@@ -165,4 +117,50 @@ int main(int argc, char *argv[]) {
   }
 
   return EXIT_SUCCESS;
+}
+
+/**
+ * OCC element to ThreeJS
+ * @param element Element
+ * @param color Color
+ * @param path Path
+ * @param index Index
+ */
+bool elementToThreeJS(const TopoDS_Shape element,
+                      const std::pair<bool, Quantity_Color> color,
+                      const std::string &path, const uint index) {
+  // Triangulation
+  Triangulation triangulation(element);
+  triangulation.triangulate();
+
+  // Vertices, normals, indices
+  std::vector<float> vertices = triangulation.getVertices();
+  std::vector<float> normals = triangulation.getNormals();
+  std::vector<uint> indices = triangulation.getIndices();
+
+  // Color
+  std::vector<Color> colors;
+  Color c;
+  c.red =
+      std::get<0>(color) ? (float)std::get<1>(color).Red() : DEFAULT_COLOR.red;
+  c.green = std::get<0>(color) ? (float)std::get<1>(color).Green()
+                               : DEFAULT_COLOR.green;
+  c.blue = std::get<0>(color) ? (float)std::get<1>(color).Blue()
+                              : DEFAULT_COLOR.blue;
+  colors.push_back(c);
+
+  // Part
+  ThreeJS part(vertices, normals, indices);
+  part.setColors(colors);
+  part.setLabel(index);
+
+  // Write
+  std::ostringstream oss;
+  oss << path << index << ".json";
+  if (!part.save(oss.str())) {
+    Logger::ERROR("Unable to write ThreeJS file " + oss.str());
+    return false;
+  }
+
+  return true;
 }
