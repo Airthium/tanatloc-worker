@@ -137,8 +137,6 @@ set(SOURCE_TESTS
 
 add_executable(tests ${SOURCE_TESTS})
 target_link_libraries(tests ${OCC_LIBS})
-target_compile_options(tests PUBLIC "-I test/FakeIt/include/ -I test/FakeIt/config/catch/")
-
 target_link_libraries(tests Catch2::Catch2)
 ParseAndAddCatchTests(tests)
 
@@ -152,6 +150,12 @@ add_custom_target(coverage
   COMMAND make clean
   COMMAND make
   COMMAND make test
+  COMMAND ./BRepToThreeJS
+  COMMAND ./GmshToThreeJS
+  COMMAND ./StepToThreeJS
+  COMMAND ./StepToThreeJS ./test/cube.step
+  COMMAND ./StepToThreeJS ./test/cube.step ./cube
+  COMMAND ./StepUnion
   COMMAND lcov --directory . -c -o report.info
   COMMAND genhtml -o ../coverage -t "Converters coverage" report.info
 )

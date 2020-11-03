@@ -1,11 +1,10 @@
 #include <catch2/catch.hpp>
 
 #include <BRepPrimAPI_MakeBox.hxx>
+#include <Quantity_Color.hxx>
+#include <TDocStd_Document.hxx>
 #include <TopoDS_Builder.hxx>
-#include <TopoDS_Edge.hxx>
-#include <TopoDS_Face.hxx>
 #include <TopoDS_Shape.hxx>
-#include <TopoDS_Solid.hxx>
 
 #include <vector>
 
@@ -27,6 +26,18 @@ TEST_CASE("getElements") {
     CHECK(solids.size() == 1);
   }
 
+  // SECTION("getSolids - cube") {
+  //   TopoDS_Builder builder = TopoDS_Builder();
+  //   BRepPrimAPI_MakeBox box = BRepPrimAPI_MakeBox(1., 1., 1.);
+  //   TopoDS_Shape solid = box.Solid();
+
+  //   Handle(TDocStd_Document) document = Handle(TDocStd_Document)();
+  //   std::vector<std::pair<bool, Quantity_Color>> color;
+
+  //   std::vector<TopoDS_Shape> solids = getSolids(solid, document, &color);
+  //   CHECK(solids.size() == 1);
+  // }
+
   SECTION("getFaces - empty") {
     TopoDS_Shape shape = TopoDS_Shape();
     std::vector<TopoDS_Shape> faces = getFaces(shape);
@@ -42,11 +53,11 @@ TEST_CASE("getElements") {
     CHECK(faces.size() == 1);
   }
 
-  // SECTION("getEdges - empty") {
-  //   TopoDS_Shape shape = TopoDS_Shape();
-  //   std::vector<TopoDS_Shape> edges = getEdges(shape);
-  //   CHECK(edges.size() == 0);
-  // }
+  SECTION("getEdges - empty") {
+    TopoDS_Shape shape = TopoDS_Shape();
+    std::vector<TopoDS_Shape> edges = getEdges(shape);
+    CHECK(edges.size() == 0);
+  }
 
   // SECTION("getEdges - one") {
   //   TopoDS_Builder builder = TopoDS_Builder();
