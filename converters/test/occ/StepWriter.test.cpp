@@ -1,6 +1,6 @@
 #include <catch2/catch.hpp>
 
-#include <BRepBuilderAPI_MakeSolid.hxx>
+#include <BRepPrimAPI_MakeBox.hxx>
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Solid.hxx>
 
@@ -26,21 +26,21 @@ TEST_CASE("StepWriter") {
 
   SECTION("write - with solid") {
     std::string fileName = "fileName.step";
-    BRepBuilderAPI_MakeSolid makeSolid = BRepBuilderAPI_MakeSolid();
-    TopoDS_Solid solid = makeSolid.Solid();
+    BRepPrimAPI_MakeBox box = BRepPrimAPI_MakeBox(1., 1., 1.);
+    TopoDS_Solid solid = box.Solid();
     StepWriter solidWriter = StepWriter(fileName, solid);
 
-    res = solidWriter.write();
+    bool res = solidWriter.write();
     CHECK(res);
   }
 
   SECTION("write - error") {
     std::string fileName = "/not_authorized.step";
-    BRepBuilderAPI_MakeSolid makeSolid = BRepBuilderAPI_MakeSolid();
-    TopoDS_Solid solid = makeSolid.Solid();
+    BRepPrimAPI_MakeBox box = BRepPrimAPI_MakeBox(1., 1., 1.);
+    TopoDS_Solid solid = box.Solid();
     StepWriter solidWriter = StepWriter(fileName, solid);
 
-    res = solidWriter.write();
+    bool res = solidWriter.write();
     CHECK(!res);
   }
 }

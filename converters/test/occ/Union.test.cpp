@@ -1,6 +1,6 @@
 #include <catch2/catch.hpp>
 
-#include <BRepBuilderAPI_MakeSolid.hxx>
+#include <BRepPrimAPI_MakeBox.hxx>
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Solid.hxx>
 #include <vector>
@@ -73,8 +73,8 @@ TEST_CASE("Union") {
     uint nObjects = 1;
     uint nTools = 1;
 
-    BRepBuilderAPI_MakeSolid makeSolid = BRepBuilderAPI_MakeSolid();
-    TopoDS_Solid solid = makeSolid.Solid();
+    BRepPrimAPI_MakeBox box = BRepPrimAPI_MakeBox(1., 1., 1.);
+    TopoDS_Solid solid = box.Solid();
     auto objects = std::vector<TopoDS_Shape>();
     objects.push_back(solid);
     auto tools = std::vector<TopoDS_Shape>();

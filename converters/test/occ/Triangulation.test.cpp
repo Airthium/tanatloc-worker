@@ -1,5 +1,6 @@
 #include <catch2/catch.hpp>
 
+#include <BRepPrimAPI_MakeBox.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Face.hxx>
 #include <TopoDS_Shape.hxx>
@@ -11,37 +12,45 @@ TEST_CASE("Triangulation") {
   SECTION("Constructor 1") { Triangulation triangulation = Triangulation(); }
 
   SECTION("Constructor 2") {
-    TopoDS_Shape shape = TopoDS_Shape();
-    Triangulation triangulation = Triangulation(shape);
+    BRepPrimAPI_MakeBox box = BRepPrimAPI_MakeBox(1., 1., 1.);
+    TopoDS_Solid solid = box.Solid();
+
+    Triangulation triangulation = Triangulation(solid);
 
     double min;
     double max;
     triangulation.getBb(&min, &max);
-    CHECK(min == 0);
-    CHECK(max == 0);
+    CHECK(min == 1.);
+    CHECK(max == 1.);
   }
 
-  SECTION("triangulate - no type") {
-    TopoDS_Shape shape = TopoDS_Shape();
-    Triangulation triangulation = Triangulation(shape);
-    triangulation.triangulate();
-  }
+  // SECTION("triangulate - no type") {
+  //   BRepBuilderAPI_MakeShape makeShape = BRepBuilderAPI_MakeShape();
+  //   TopoDS_Shape shape = makeShape.Shape();
+  //   Triangulation triangulation = Triangulation(shape);
+  //   triangulation.triangulate();
+  // }
 
   SECTION("triangulate - solid") {
-    TopoDS_Shape shape = TopoDS_Solid();
-    Triangulation triangulation = Triangulation(shape);
+    BRepPrimAPI_MakeBox box = BRepPrimAPI_MakeBox(1., 1., 1.);
+    TopoDS_Solid solid = box.Solid();
+
+    Triangulation triangulation = Triangulation(solid);
     triangulation.triangulate();
   }
 
   SECTION("triangulate - face") {
-    TopoDS_Shape shape = TopoDS_Face();
-    Triangulation triangulation = Triangulation(shape);
+    BRepPrimAPI_MakeBox box = BRepPrimAPI_MakeBox(1., 1., 1.);
+    TopoDS_Face face = box.FrontFace();
+
+    Triangulation triangulation = Triangulation(face);
     triangulation.triangulate();
   }
 
-  SECTION("triangulate - edge") {
-    TopoDS_Shape shape = TopoDS_Edge();
-    Triangulation triangulation = Triangulation(shape);
-    triangulation.triangulate();
-  }
+  // SECTION("triangulate - edge") {
+  //   BRepBuilderAPI_MakeEdge makeEdge = BRepBuilderAPI_MakeEdge();
+  //   TopoDS_Edge edge = makeEdge.Edge();
+  //   Triangulation triangulation = Triangulation(edge);
+  //   triangulation.triangulate();
+  // }
 }
