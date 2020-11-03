@@ -150,12 +150,12 @@ add_custom_target(coverage
   COMMAND make clean
   COMMAND make
   COMMAND make test
-  COMMAND ./BRepToThreeJS
-  COMMAND ./GmshToThreeJS
-  COMMAND ./StepToThreeJS
-  COMMAND ./StepToThreeJS ./test/cube.step
-  COMMAND ./StepToThreeJS ./test/cube.step ./cube
-  COMMAND ./StepUnion
+  COMMAND ./BRepToThreeJS || true
+  COMMAND ./GmshToThreeJS || true
+  COMMAND ./StepToThreeJS || true
+  COMMAND ./StepToThreeJS ./test/cube.step || true
+  COMMAND ./StepToThreeJS ./test/cube.step ./cube || true
+  COMMAND ./StepUnion || true
   COMMAND lcov --directory . -c -o report.info
   COMMAND genhtml -o ../coverage -t "Converters coverage" report.info
 )
