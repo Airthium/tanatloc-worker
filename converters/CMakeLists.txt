@@ -150,12 +150,24 @@ add_custom_target(coverage
   COMMAND make clean
   COMMAND make
   COMMAND make test
+  COMMAND ./DXFToBRep || true
+  COMMAND ./DXFToBRep ./test/assets/not_existing.dxf pipe.brep|| true
+  COMMAND ./DXFToBRep ./test/assets/pipe.dxf pipe.brep || true
   COMMAND ./BRepToThreeJS || true
+  COMMAND ./BRepToThreeJS ./test/assets/pipe.brep || true
+  COMMAND ./BRepToThreeJS ./test/assets/pipe.brep pipe || true
   COMMAND ./GmshToThreeJS || true
+  COMMAND ./GmshToThreeJS ./test/assets/not_existing.msh || true
+  COMMAND ./GmshToThreeJS ./test/assets/Cube.msh || true
+  COMMAND ./GmshToThreeJS ./test/assets/Cube.msh ./cube || true
   COMMAND ./StepToThreeJS || true
-  COMMAND ./StepToThreeJS ./test/cube.step || true
-  COMMAND ./StepToThreeJS ./test/cube.step ./cube || true
+  COMMAND ./StepToThreeJS ./test/assets/not_existing.step || true
+  COMMAND ./StepToThreeJS ./test/assets/cube.step || true
+  COMMAND ./StepToThreeJS ./test/assets/cube.step ./cube || true
   COMMAND ./StepUnion || true
+  COMMAND ./StepUnion ./test/assets/not_existing.step ./cube.step || true
+  COMMAND ./StepUnion ./test/assets/not_existing.step ./not_existing/cube.step || true
+  COMMAND ./StepUnion ./test/assets/cube.step ./cube.step || true
   COMMAND lcov --directory . -c -o report.info
   COMMAND genhtml -o ../coverage -t "Converters coverage" report.info
 )
