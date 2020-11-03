@@ -3,6 +3,7 @@
 #include <BRepPrimAPI_MakeBox.hxx>
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Solid.hxx>
+
 #include <vector>
 
 #include "../../src/occ/Union.hpp"
