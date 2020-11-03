@@ -15,24 +15,32 @@ TEST_CASE("StepWriter") {
     StepWriter stepWriter = StepWriter(fileName, shape);
   }
 
-  SECTION("write") {
-    std::string fileName = "fileName";
+  SECTION("write - empty") {
+    std::string fileName = "fileName.step";
     TopoDS_Shape shape = TopoDS_Shape();
     StepWriter stepWriter = StepWriter(fileName, shape);
 
     bool res = stepWriter.write();
     CHECK(!res);
+  }
 
+  SECTION("write - with solid") {
+    std::string fileName = "fileName.step";
     BRepBuilderAPI_MakeSolid makeSolid = BRepBuilderAPI_MakeSolid();
     TopoDS_Solid solid = makeSolid.Solid();
     StepWriter solidWriter = StepWriter(fileName, solid);
 
     res = solidWriter.write();
     CHECK(res);
+  }
 
-    // StepWriter failWriter = StepWriter("/", solid);
+  SECTION("write - error") {
+    std::string fileName = "/not_authorized.step";
+    BRepBuilderAPI_MakeSolid makeSolid = BRepBuilderAPI_MakeSolid();
+    TopoDS_Solid solid = makeSolid.Solid();
+    StepWriter solidWriter = StepWriter(fileName, solid);
 
-    // res = failWriter.write();
-    // CHECK(!res);
+    res = solidWriter.write();
+    CHECK(!res);
   }
 }

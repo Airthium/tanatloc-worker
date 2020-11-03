@@ -15,10 +15,19 @@ TEST_CASE("StepReader") {
   }
 
   SECTION("read - no file") {
-    std::string fileName = "fileName";
+    std::string fileName = "non_existing_file";
     auto stepReader = StepReader(fileName);
 
     bool res = stepReader.read();
+
+    CHECK(!res);
+  }
+
+  SECTION("read - empty") {
+    std::string fileName = "./test/assets/empty.step";
+    auto stepReader = StepReader(fileName);
+
+    bool res= stepReader.read();
 
     CHECK(!res);
   }
