@@ -8,7 +8,14 @@
 
 #include "../../src/occ/getElements.hpp"
 
+#include "../../src/occ/StepReader.hpp"
+
 TEST_CASE("getElements") {
+  auto reader = StepReader("./test/assets/cube.step");
+  reader.read();
+  std::vector<TopoDS_Shape> shapes = reader.getShapes();
+  Handle(TDocStd_Document) document = reader.getDocument();
+
   SECTION("getSolids - empty") {
     TopoDS_Shape shape = TopoDS_Shape();
     std::vector<TopoDS_Shape> solids = getSolids(shape);
@@ -22,6 +29,12 @@ TEST_CASE("getElements") {
 
     std::vector<TopoDS_Shape> solids = getSolids(solid);
     CHECK(solids.size() == 1);
+  }
+
+  SECTION("getSolids - document") {
+    std::vector<std::pair<bool, Quantity_Color>> color =
+        std::vector<std::pair<bool, Quantity_Color>>();
+    std::vector<TopoDS_Shape> solids = getSolids(shapes[0], document, &color);
   }
 
   SECTION("getFaces - empty") {
@@ -39,6 +52,12 @@ TEST_CASE("getElements") {
     CHECK(faces.size() == 6);
   }
 
+  SECTION("getFaces - document") {
+    std::vector<std::pair<bool, Quantity_Color>> color =
+        std::vector<std::pair<bool, Quantity_Color>>();
+    std::vector<TopoDS_Shape> faces = getFaces(shapes[0], document, &color);
+  }
+
   SECTION("getEdges - empty") {
     TopoDS_Shape shape = TopoDS_Shape();
     std::vector<TopoDS_Shape> edges = getEdges(shape);
@@ -52,5 +71,11 @@ TEST_CASE("getElements") {
 
     std::vector<TopoDS_Shape> edges = getEdges(solid);
     CHECK(edges.size() == 18);
+  }
+
+  SECTION("getEdges - document") {
+    std::vector<std::pair<bool, Quantity_Color>> color =
+        std::vector<std::pair<bool, Quantity_Color>>();
+    std::vector<TopoDS_Shape> edges = getEdges(shapes[0], document, &color);
   }
 }
