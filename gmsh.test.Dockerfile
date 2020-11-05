@@ -4,5 +4,6 @@ ENV GMSHPATH /root/gmsh
 
 WORKDIR $GMSHPATH
 
+# Test gmsh
 RUN cd gmsh/build \
   && make test

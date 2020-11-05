@@ -1,12 +1,10 @@
 # OpenCascade 7.4.0
-FROM ubuntu:18.04
+FROM ubuntu:20.10
 
 WORKDIR /usr/bin
 
 COPY ./converters .
 
-RUN mkdir build
-
-RUN cmake ..
-
-RUN make
+# Build converters
+RUN cmake . \
+  && make -j "$(nproc)"
