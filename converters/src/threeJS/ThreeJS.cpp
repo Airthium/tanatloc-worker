@@ -271,6 +271,7 @@ bool ThreeJS::writePartFile(const std::string &fileName,
 
   file << "{" << std::endl;
   file << "\t\"type\": \"" << type << "\"," << std::endl;
+  file << "\t\"uuid\": \"" << generateUUID() << "\"," << std::endl;
   file << "\t\"solids\": [" << std::endl;
 
   for (i = 0; i < numberOfVolumes; ++i) {
