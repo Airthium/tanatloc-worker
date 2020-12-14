@@ -3,11 +3,22 @@ cmake_minimum_required(VERSION 3.0)
 project(Tanatloc)
 
 ## LIBRARIES
+# VTK
+find_package(VTK COMPONENTS
+  vtkIOXML
+REQUIRED)
+if (VTK_FOUND)
+  message(${VTK_MAJOR_VERSION})
+  include_directories(${VTK_INCLUDE_DIRS})
+  set(LIBS ${LIBS} ${VTK_LIBRARY_DIRS})
+  set(VTK_LIBS ${VTK_LIBRARIES})
+endif (VTK_FOUND)
+
 # Catch2
 find_package(Catch2 REQUIRED)
 
 # OpenCASCADE
-find_package(OpenCASCADE)
+find_package(OpenCASCADE REQUIRED)
 if (OpenCASCADE_FOUND)
   include_directories(${OpenCASCADE_INCLUDE_DIR})
   set(LIBS ${LIBS} ${OpenCASCADE_LIBRARY_DIR})
@@ -25,6 +36,9 @@ AUX_SOURCE_DIRECTORY(src/gmsh GMSH_SOURCE)
 
 # OCC library
 AUX_SOURCE_DIRECTORY(src/occ OCC_SOURCE)
+
+# VTK library
+AUX_SOURCE_DIRECTORY(src/vtk VTK_SOURCE)
 
 # ThreeJS library
 AUX_SOURCE_DIRECTORY(src/threeJS THREEJS_SOURCE)
@@ -69,6 +83,14 @@ set(StepUnionSOURCE
   ${LOGGER_SOURCE}
 )
 
+# VTUToThreeJS
+set(VTUToThreeJSSOURCE
+  src/VTUToThreeJS.cpp
+  ${VTK_SOURCE}
+  ${THREEJS_SOURCE}
+  ${LOGGER_SOURCE}
+)
+
 ## Executables
 # DXFToBRep
 add_executable(DXFToBRep ${DXFToBRepSOURCE})
@@ -88,6 +110,10 @@ target_link_libraries(StepToThreeJS ${OCC_LIBS})
 # StepUnion
 add_executable(StepUnion ${StepUnionSOURCE})
 target_link_libraries(StepUnion ${OCC_LIBS})
+
+# VTUToThreeJS
+add_executable(VTUToThreeJS ${VTUToThreeJSSOURCE})
+target_link_libraries(VTUToThreeJS ${VTK_LIBS})
 
 ## Tests
 include(CTest)
@@ -138,7 +164,7 @@ set(SOURCE_TESTS
 add_executable(tests ${SOURCE_TESTS})
 target_link_libraries(tests ${OCC_LIBS})
 target_link_libraries(tests Catch2::Catch2)
-ParseAndAddCatchTests(tests)
+# ParseAndAddCatchTests(tests)
 
 ## Coverage
 option(COVERAGE "Enable coverage flags" OFF)
