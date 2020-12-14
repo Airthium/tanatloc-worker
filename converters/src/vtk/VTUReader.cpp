@@ -1,6 +1,7 @@
 #include <tuple>
 
 #include <vtkCellArray.h>
+#include <vtkIdList.h>
 #include <vtkUnstructuredGrid.h>
 
 #include "VTUReader.hpp"
@@ -45,7 +46,18 @@ bool VTUReader::read() const {
 
   vtkCellArray *connectivity = output->GetCells();
   for (int i = 0; i < connectivity->GetNumberOfCells(); ++i) {
-    std::cout << connectivity->GetCellSize(i) << std::endl;
+    int cellSize = connectivity->GetCellSize(i);
+
+    vtkSmartPointer<vtkIdList> indices = vtkSmartPointer<vtkIdList>::New();
+    connectivity->GetCellAtId(i, indices);
+
+    std::cout << "Cell " << i << endl;
+    for (int j = 0; j < cellSize; ++j) {
+      std::cout << indices->GetId(j);
+      if (j < cellSize - 1)
+        std::cout << ", ";
+    }
+    std::cout << std::endl << std::endl;
   }
   // TODO
 

@@ -5,10 +5,9 @@ project(Tanatloc)
 ## LIBRARIES
 # VTK
 find_package(VTK COMPONENTS
-  vtkIOXML
+  IOXML
 REQUIRED)
 if (VTK_FOUND)
-  message(${VTK_MAJOR_VERSION})
   include_directories(${VTK_INCLUDE_DIRS})
   set(LIBS ${LIBS} ${VTK_LIBRARY_DIRS})
   set(VTK_LIBS ${VTK_LIBRARIES})
