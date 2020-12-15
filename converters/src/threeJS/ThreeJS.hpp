@@ -22,6 +22,8 @@ private:
   // Dimension
   uint m_dimension = 3;
 
+  // Name
+  std::string m_name = "";
   // Label
   uint m_label = 0;
   // Vertices
@@ -32,6 +34,8 @@ private:
   std::vector<uint> m_indices = std::vector<uint>();
   // Colors
   std::vector<Color> m_colors;
+  // Data
+  std::vector<float> m_data = std::vector<float>();
 
   // Generate UUID
   std::string generateUUID() const;
@@ -44,6 +48,8 @@ public:
   ThreeJS(const std::vector<float> &, const std::vector<float> &,
           const std::vector<uint> &);
 
+  // Set name
+  void setName(std::string &);
   // Set label
   void setLabel(uint);
   // Set vertices
@@ -54,14 +60,17 @@ public:
   void setIndices(const std::vector<uint> &);
   // Set colors
   void setColors(const std::vector<Color> &);
+  // Set data
+  void setData(const std::vector<float> &);
 
   // Saver
   bool save(const std::string &) const;
-  void saveHeader(std::ofstream &file) const;
-  void saveVertices(std::ofstream &file) const;
-  void saveNormals(std::ofstream &file) const;
-  void saveColors(std::ofstream &file) const;
-  void saveFooter(std::ofstream &file) const;
+  void saveHeader(std::ofstream &) const;
+  void saveVertices(std::ofstream &) const;
+  void saveNormals(std::ofstream &) const;
+  void saveColors(std::ofstream &) const;
+  void saveData(std::ofstream &) const;
+  void saveFooter(std::ofstream &) const;
 
   // Write part file
   bool writePartFile(const std::string &, const std::string &, const uint,

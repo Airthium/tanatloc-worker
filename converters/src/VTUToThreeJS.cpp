@@ -1,7 +1,10 @@
+#include <sstream>
+
 #include <sys/stat.h>
 #include <sys/types.h>
 
 #include "logger/Logger.hpp"
+#include "threeJS/ThreeJS.hpp"
 #include "vtk/VTUReader.hpp"
 
 int main(int argc, char *argv[]) {
@@ -38,6 +41,31 @@ int main(int argc, char *argv[]) {
   res = reader.read();
   if (!res) {
     Logger::ERROR("Unable to read VTU file " + vtuFile);
+    return EXIT_FAILURE;
+  }
+  std::vector<RData> arrays = reader.getArrays();
+
+  // Write ThreeJS files
+  for (int i = 0; i < arrays.size(); ++i) {
+    ThreeJS part(arrays[i].vertices);
+    part.setName(arrays[i].name);
+    part.setData(arrays[i].values);
+
+    std::ostringstream oss;
+    oss << threeJSPath << "/" << SOLID << i + 1 << ".json";
+    if (!part.save(oss.str())) {
+      Logger::ERROR("Unable to write ThreeJS file " + oss.str());
+      return EXIT_FAILURE;
+    }
+  }
+
+  // Write ThreeJS part file
+  ThreeJS part;
+  std::ostringstream oss;
+  oss << threeJSPath << "/part.json";
+  res = part.writePartFile(oss.str(), "result", 2, 0, 0);
+  if (!res) {
+    Logger::ERROR("Unable to write ThreeJS part file " + oss.str());
     return EXIT_FAILURE;
   }
 

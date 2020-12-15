@@ -1,7 +1,9 @@
 #include <tuple>
 
 #include <vtkCellArray.h>
+#include <vtkCellData.h>
 #include <vtkIdList.h>
+#include <vtkPointData.h>
 #include <vtkUnstructuredGrid.h>
 
 #include "VTUReader.hpp"
@@ -21,7 +23,7 @@ VTUReader::VTUReader(const std::string &fileName) : m_fileName(fileName) {}
 /**
  * Read
  */
-bool VTUReader::read() const {
+bool VTUReader::read() {
   reader->SetFileName(m_fileName.c_str());
   reader->Update();
 
@@ -31,6 +33,57 @@ bool VTUReader::read() const {
   if (numberOfPieces != 1) {
     Logger::ERROR("Number of pieces != 1");
     return false;
+  }
+
+  // Data
+  // Point data
+  auto pointData = std::vector<RData>();
+  vtkSmartPointer<vtkPointData> pData = output->GetPointData();
+  const int numberOfPointData = pData->GetNumberOfArrays();
+
+  for (int i = 0; i < numberOfPointData; ++i) {
+    RData data;
+    data.name = pData->GetArrayName(i);
+
+    vtkSmartPointer<vtkDataArray> array = pData->GetArray(i);
+    const int numberOfValues = array->GetNumberOfValues();
+    const int numberOfComponents = array->GetNumberOfComponents();
+
+    data.size = numberOfComponents;
+
+    for (int j = 0; j < numberOfValues; ++j) {
+      double *tuple = array->GetTuple(j);
+
+      for (int k = 0; k < numberOfComponents; ++k)
+        data.values.push_back(tuple[k]);
+    }
+
+    pointData.push_back(data);
+  }
+
+  // Cell data
+  auto cellData = std::vector<RData>();
+  vtkSmartPointer<vtkCellData> cData = output->GetCellData();
+  const int numberOfCellData = cData->GetNumberOfArrays();
+
+  for (int i = 0; i < numberOfCellData; ++i) {
+    RData data;
+    data.name = cData->GetArrayName(i);
+
+    vtkSmartPointer<vtkDataArray> array = cData->GetArray(i);
+    const int numberOfValues = array->GetNumberOfValues();
+    const int numberOfComponents = array->GetNumberOfComponents();
+
+    data.size = numberOfComponents;
+
+    for (int j = 0; j < numberOfValues; ++j) {
+      double *tuple = array->GetTuple(j);
+
+      for (int k = 0; k < numberOfComponents; ++k)
+        data.values.push_back(tuple[k]);
+    }
+
+    cellData.push_back(data);
   }
 
   // Mesh
@@ -45,38 +98,70 @@ bool VTUReader::read() const {
   }
 
   vtkCellArray *connectivity = output->GetCells();
-  for (int i = 0; i < connectivity->GetNumberOfCells(); ++i) {
-    int cellSize = connectivity->GetCellSize(i);
 
-    vtkSmartPointer<vtkIdList> indices = vtkSmartPointer<vtkIdList>::New();
-    connectivity->GetCellAtId(i, indices);
+  // Point data
+  for (int i = 0; i < pointData.size(); ++i) {
+    RData data;
+    data.name = pointData[i].name;
 
-    std::cout << "Cell " << i << endl;
-    for (int j = 0; j < cellSize; ++j) {
-      std::cout << indices->GetId(j);
-      if (j < cellSize - 1)
-        std::cout << ", ";
+    for (int j = 0; j < connectivity->GetNumberOfCells(); ++j) {
+      int cellSize = connectivity->GetCellSize(j);
+
+      // Only cellSize == 3 needed (surface)
+      if (cellSize != 3)
+        continue;
+
+      vtkSmartPointer<vtkIdList> indices = vtkSmartPointer<vtkIdList>::New();
+      connectivity->GetCellAtId(j, indices);
+
+      for (int k = 0; k < cellSize; ++k) {
+        const int index = indices->GetId(k);
+
+        data.vertices.push_back(std::get<0>(points[index]));
+        data.vertices.push_back(std::get<1>(points[index]));
+        data.vertices.push_back(std::get<2>(points[index]));
+
+        data.size = pointData[i].size;
+        for (int l = 0; l < data.size; ++l)
+          data.values.push_back(pointData[i].values[data.size * index + l]);
+      }
     }
-    std::cout << std::endl << std::endl;
+
+    this->arrays.push_back(data);
   }
-  // TODO
 
-  // Data
+  // Cell data
+  for (int i = 0; i < cellData.size(); ++i) {
+    RData data;
+    data.name = cellData[i].name;
 
-  //   // Cell arrays
-  //   const int numberOfCellArrays = output->GetNumberOfCellArrays();
-  //   for (int i = 0; i < numberOfCellArrays; ++i) {
-  //     data newData;
-  //     newData.name = reader->GetCellArrayName(i);
+    for (int j = 0; j < connectivity->GetNumberOfCells(); ++j) {
+      int cellSize = connectivity->GetCellSize(j);
 
-  //     arrays.push_back(newData);
-  //   }
+      // Only cellSize == 3 needed (surface)
+      if (cellSize != 3)
+        continue;
 
-  //   std::cout << "nPointArrays: " << reader->GetNumberOfPointArrays()
-  //             << std::endl;
-  //   std::cout << reader->GetPointArrayName(0) << std::endl;
-  //   std::cout << "nCellArrays: " << reader->GetNumberOfCellArrays() <<
-  //   std::endl; std::cout << reader->GetCellArrayName(0) << std::endl;
+      vtkSmartPointer<vtkIdList> indices = vtkSmartPointer<vtkIdList>::New();
+      connectivity->GetCellAtId(j, indices);
+
+      for (int k = 0; k < cellSize; ++k) {
+        const int index = indices->GetId(k);
+
+        data.vertices.push_back(std::get<0>(points[index]));
+        data.vertices.push_back(std::get<1>(points[index]));
+        data.vertices.push_back(std::get<2>(points[index]));
+
+        data.size = pointData[i].size;
+        for (int l = 0; l < data.size; ++l)
+          data.values.push_back(cellData[i].values[data.size * index + l]);
+      }
+    }
+
+    this->arrays.push_back(data);
+  }
 
   return true;
 }
+
+std::vector<RData> VTUReader::getArrays() const { return this->arrays; }

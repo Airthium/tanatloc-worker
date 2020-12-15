@@ -7,9 +7,11 @@
 #include <vtkSmartPointer.h>
 #include <vtkXMLUnstructuredGridReader.h>
 
-struct data {
+struct RData {
+  int size;
   std::string name;
-  std::vector<float> value;
+  std::vector<float> vertices;
+  std::vector<float> values;
 };
 
 class VTUReader {
@@ -18,7 +20,7 @@ private:
   vtkSmartPointer<vtkXMLUnstructuredGridReader> reader =
       vtkSmartPointer<vtkXMLUnstructuredGridReader>::New();
 
-  std::vector<data> arrays = std::vector<data>();
+  std::vector<RData> arrays = std::vector<RData>();
 
 public:
   // Constructor
@@ -27,7 +29,10 @@ public:
   VTUReader(const std::string &);
 
   // Read
-  bool read() const;
+  bool read();
+
+  // Get arrays
+  std::vector<RData> getArrays() const;
 };
 
 #endif
