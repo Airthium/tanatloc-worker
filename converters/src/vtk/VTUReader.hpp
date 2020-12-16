@@ -10,6 +10,7 @@
 struct RData {
   int size;
   std::string name;
+  std::vector<uint> indices;
   std::vector<float> vertices;
   std::vector<float> values;
 };

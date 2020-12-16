@@ -43,7 +43,7 @@ ThreeJS::ThreeJS(const std::vector<float> &vertices,
  * Set name
  * @param name Name
  */
-void ThreeJS::setName(std::string &name) { this->m_name = name; }
+void ThreeJS::setName(const std::string &name) { this->m_name = name; }
 
 /**
  * Set label
@@ -273,6 +273,7 @@ void ThreeJS::saveColors(std::ofstream &file) const {
  * Save data
  */
 void ThreeJS::saveData(std::ofstream &file) const {
+  uint i;
   const auto numberOfData = this->m_data.size();
 
   int itemSize = numberOfData == this->m_vertices.size() ? 3 : 1;
@@ -282,10 +283,21 @@ void ThreeJS::saveData(std::ofstream &file) const {
   file << "\t\t\t\t\"type\": \"Float32Array\"," << std::endl;
   file << "\t\t\t\t\"array\": [";
 
-  for (uint i = 0; i < numberOfData; ++i) {
-    file << this->m_data[i];
-    if (i < (numberOfData - 1))
-      file << ",";
+  const auto numberOfIndices = this->m_indices.size();
+  if (numberOfIndices) {
+    // With indices
+    for (i = 0; i < numberOfIndices; ++i) {
+      file << this->m_data[this->m_indices[i]];
+      if (i < (numberOfIndices - 1))
+        file << ",";
+    }
+  } else {
+    // Without indices
+    for (i = 0; i < numberOfData; ++i) {
+      file << this->m_data[i];
+      if (i < (numberOfData - 1))
+        file << ",";
+    }
   }
 
   file << "]" << std::endl;

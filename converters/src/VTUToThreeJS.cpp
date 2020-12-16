@@ -48,11 +48,12 @@ int main(int argc, char *argv[]) {
   // Write ThreeJS files
   for (int i = 0; i < arrays.size(); ++i) {
     ThreeJS part(arrays[i].vertices);
+    part.setIndices(arrays[i].indices);
     part.setName(arrays[i].name);
     part.setData(arrays[i].values);
 
     std::ostringstream oss;
-    oss << threeJSPath << "/" << SOLID << i + 1 << ".json";
+    oss << threeJSPath << "/" << FACE << i + 1 << ".json";
     if (!part.save(oss.str())) {
       Logger::ERROR("Unable to write ThreeJS file " + oss.str());
       return EXIT_FAILURE;

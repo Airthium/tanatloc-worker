@@ -49,7 +49,7 @@ public:
           const std::vector<uint> &);
 
   // Set name
-  void setName(std::string &);
+  void setName(const std::string &);
   // Set label
   void setLabel(uint);
   // Set vertices
