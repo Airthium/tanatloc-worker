@@ -15,7 +15,7 @@
 /**
  * Constructor
  */
-VTUReader::VTUReader() {}
+VTUReader::VTUReader() = default;
 
 /**
  * Constructor
@@ -44,19 +44,19 @@ bool VTUReader::read() {
 
   // Vertices
   vtkSmartPointer<vtkPoints> points = output->GetPoints();
-  const int numberOfPoints = points->GetNumberOfPoints();
+  const auto numberOfPoints = (int)points->GetNumberOfPoints();
   for (int i = 0; i < numberOfPoints; ++i) {
     const double *point = points->GetPoint(i);
-    baseData.vertices.push_back(point[0]);
-    baseData.vertices.push_back(point[1]);
-    baseData.vertices.push_back(point[2]);
+    baseData.vertices.push_back((float)point[0]);
+    baseData.vertices.push_back((float)point[1]);
+    baseData.vertices.push_back((float)point[2]);
   }
 
   // Indices
   vtkSmartPointer<vtkCellArray> connectivity = output->GetCells();
-  const int numberOfCells = connectivity->GetNumberOfCells();
+  const auto numberOfCells = (int)connectivity->GetNumberOfCells();
   for (int i = 0; i < numberOfCells; ++i) {
-    int cellSize = connectivity->GetCellSize(i);
+    auto cellSize = connectivity->GetCellSize(i);
     if (cellSize != 3)
       continue;
 
@@ -64,7 +64,7 @@ bool VTUReader::read() {
     connectivity->GetCellAtId(i, indices);
 
     for (int j = 0; j < cellSize; ++j) {
-      const int index = indices->GetId(j);
+      const auto index = (int)indices->GetId(j);
       baseData.indices.push_back(index);
     }
   }
@@ -78,15 +78,15 @@ bool VTUReader::read() {
     data.name = pointData->GetArrayName(i);
 
     vtkSmartPointer<vtkDataArray> array = pointData->GetArray(i);
-    const int numberOfValues = array->GetNumberOfValues();
+    const auto numberOfValues = (int)array->GetNumberOfValues();
     const int numberOfComponents = array->GetNumberOfComponents();
     data.size = numberOfComponents;
 
     for (int j = 0; j < numberOfValues; ++j) {
-      double *values = array->GetTuple(j);
+      const double *values = array->GetTuple(j);
 
       for (int k = 0; k < numberOfComponents; ++k)
-        data.values.push_back(values[k]);
+        data.values.push_back((float)values[k]);
     }
 
     arrays.push_back(data);

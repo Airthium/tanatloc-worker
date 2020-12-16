@@ -27,7 +27,7 @@ public:
   // Constructor
   VTUReader();
   // Constructor
-  VTUReader(const std::string &);
+  explicit VTUReader(const std::string &);
 
   // Read
   bool read();
