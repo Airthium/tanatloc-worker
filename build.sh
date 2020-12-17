@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+# Check GITHUB_TOKEN
+if [ -z "$GITHUB_TOKEN" ]
+then
+  echo "GITHUB_TOKEN variable is empty"
+  exit 1
+fi
+
 declare -A ARCHIVES
 
 # Get the list of releases and associated assets:
