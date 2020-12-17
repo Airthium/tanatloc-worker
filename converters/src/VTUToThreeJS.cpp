@@ -29,13 +29,6 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  // Create path
-  int err = mkdir(threeJSPath.c_str(), S_IRWXU | S_IRWXG);
-  if (err && errno != EEXIST) {
-    Logger::ERROR("Unable to create threeJS path");
-    return EXIT_FAILURE;
-  }
-
   // Read VTU file
   auto reader = VTUReader(vtuFile);
   res = reader.read();
@@ -48,27 +41,46 @@ int main(int argc, char *argv[]) {
   // Write ThreeJS files
   const int numberOfArrays = arrays.size();
   for (int i = 0; i < numberOfArrays; ++i) {
-    ThreeJS part(arrays[i].vertices);
-    part.setIndices(arrays[i].indices);
-    part.setName(arrays[i].name);
-    part.setData(arrays[i].values);
+    RData result = arrays[i];
 
+    // Current path
     std::ostringstream oss;
-    oss << threeJSPath << "/" << FACE << i + 1 << ".json";
-    if (!part.save(oss.str())) {
+    oss << threeJSPath << "_" << result.name;
+    std::string currentPath = oss.str();
+
+    // Create path
+    int err = mkdir(currentPath.c_str(), S_IRWXU | S_IRWXG);
+    if (err && errno != EEXIST) {
+      Logger::ERROR("Unable to create threeJS path");
+      return EXIT_FAILURE;
+    }
+
+    // Result as a face
+    ThreeJS face(result.vertices);
+    face.setIndices(result.indices);
+    face.setName(result.name);
+    face.setData(result.values);
+
+    oss.str("");
+    oss.clear();
+    oss << currentPath << "/" << FACE << i + 1 << ".json";
+    if (!face.save(oss.str())) {
       Logger::ERROR("Unable to write ThreeJS file " + oss.str());
       return EXIT_FAILURE;
     }
-  }
 
-  // Write ThreeJS part file
-  ThreeJS part;
-  std::ostringstream oss;
-  oss << threeJSPath << "/part.json";
-  res = part.writePartFile(oss.str(), "result", 0, numberOfArrays, 0);
-  if (!res) {
-    Logger::ERROR("Unable to write ThreeJS part file " + oss.str());
-    return EXIT_FAILURE;
+    // Write ThreeJS part file
+    ThreeJS part;
+    oss.str("");
+    oss.clear();
+    oss << currentPath << "/part.json";
+    res = part.writePartFile(oss.str(), "result", 0, 1, 0);
+    if (!res) {
+      Logger::ERROR("Unable to write ThreeJS part file " + oss.str());
+      return EXIT_FAILURE;
+    }
+
+    Logger::DISP(threeJSPath + "_" + result.name);
   }
 
   return EXIT_SUCCESS;

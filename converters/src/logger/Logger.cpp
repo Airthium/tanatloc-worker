@@ -24,6 +24,7 @@ void Logger::LOG(const std::string &message) {
 void Logger::DISP(const std::string &message) {
   try {
     std::cout << message << std::endl;
+    std::cout.flush();
   } catch (const std::exception &e) {
     std::cerr << e.what() << std::endl;
   }
