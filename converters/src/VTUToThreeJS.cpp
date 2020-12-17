@@ -46,8 +46,8 @@ int main(int argc, char *argv[]) {
   std::vector<RData> arrays = reader.getArrays();
 
   // Write ThreeJS files
-  const int numberOfArrays =
-      arrays.size() for (int i = 0; i < numberOfArrays; ++i) {
+  const int numberOfArrays = arrays.size();
+  for (int i = 0; i < numberOfArrays; ++i) {
     ThreeJS part(arrays[i].vertices);
     part.setIndices(arrays[i].indices);
     part.setName(arrays[i].name);
