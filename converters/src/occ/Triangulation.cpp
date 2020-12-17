@@ -16,7 +16,7 @@
 /**
  * Constructor
  */
-Triangulation::Triangulation() {}
+Triangulation::Triangulation() = default;
 
 /**
  * Constructor

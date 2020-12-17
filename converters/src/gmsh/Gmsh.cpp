@@ -8,7 +8,7 @@
 /**
  * Constructor
  */
-Gmsh::Gmsh() {}
+Gmsh::Gmsh() = default;
 
 /**
  * Loader

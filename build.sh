@@ -5,15 +5,16 @@ declare -A ARCHIVES
 # Get the list of releases and associated assets:
 #> curl -u $GITHUB_TOKEN:x-oauth-basic "https://api.github.com/repos/Airthium/tanatloc-dockers/releases"
 ARCHIVES["opencascade-7.4.0.tar.gz"]="https://api.github.com/repos/Airthium/tanatloc-dockers/releases/assets/20660980"
-# ARCHIVES["gmsh.tar.gz"]="https://api.github.com/repos/Airthium/tanatloc-dockers/releases/assets/20664165"
 ARCHIVES["gmsh.tar.gz"]="https://api.github.com/repos/Airthium/tanatloc-dockers/releases/assets/27930881"
+ARCHIVES["VTK-9.0.1.tar.gz"]="https://api.github.com/repos/Airthium/tanatloc-dockers/releases/assets/29680338"
 
 declare -A TARGETS
 
 TARGETS["opencascade"]="pre opencascade.build"
 TARGETS["gmsh"]="pre opencascade.build gmsh.build"
 TARGETS["gmsh:test"]="pre opencascade.build gmsh.build gmsh.test"
-TARGETS["converters"]="pre opencascade.build gmsh.build converters.build"
+TARGETS["vtk"]="pre vtk.build"
+TARGETS["converters"]="pre opencascade.build gmsh.build vtk.build converters.build"
 
 DOCKERFILE_PATH="/tmp/Dockerfile";
 
@@ -22,7 +23,7 @@ GITHUB_TOKEN=${BUILD_TOKEN:-${GITHUB_TOKEN}}
 
 usage() {
   echo "Usage: ./build.sh [target]";
-  echo "target=[opencascade, gmsh or converters]"
+  echo "target=[opencascade, gmsh, vtk or converters]"
 }
 
 checkArchives() {

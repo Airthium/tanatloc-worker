@@ -3,7 +3,7 @@
 /**
  * Constructor
  */
-Tetrahedron::Tetrahedron() {}
+Tetrahedron::Tetrahedron() = default;
 
 /**
  * Constructor

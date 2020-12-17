@@ -3,7 +3,7 @@
 /**
  * Constructor
  */
-Vertex::Vertex() {}
+Vertex::Vertex() = default;
 
 /**
  * Constructor

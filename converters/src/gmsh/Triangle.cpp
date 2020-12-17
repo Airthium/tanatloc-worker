@@ -3,7 +3,7 @@
 /**
  * Constructor
  */
-Triangle::Triangle() {}
+Triangle::Triangle() = default;
 
 /**
  * Constructor

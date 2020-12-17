@@ -11,7 +11,7 @@
 /**
  * Constructor
  */
-ThreeJS::ThreeJS() {}
+ThreeJS::ThreeJS() = default;
 
 /**
  * Constructor
