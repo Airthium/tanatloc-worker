@@ -80,7 +80,8 @@ int main(int argc, char *argv[]) {
       return EXIT_FAILURE;
     }
 
-    Logger::DISP(threeJSPath + "_" + result.name);
+    Logger::DISP("{ \"path\": \"" + threeJSPath + "_" + result.name +
+                 "\", \"name\": \"" + result.name + "\"}");
   }
 
   return EXIT_SUCCESS;
