@@ -46,7 +46,8 @@ int main(int argc, char *argv[]) {
   std::vector<RData> arrays = reader.getArrays();
 
   // Write ThreeJS files
-  for (int i = 0; i < arrays.size(); ++i) {
+  const int numberOfArrays =
+      arrays.size() for (int i = 0; i < numberOfArrays; ++i) {
     ThreeJS part(arrays[i].vertices);
     part.setIndices(arrays[i].indices);
     part.setName(arrays[i].name);
@@ -64,7 +65,7 @@ int main(int argc, char *argv[]) {
   ThreeJS part;
   std::ostringstream oss;
   oss << threeJSPath << "/part.json";
-  res = part.writePartFile(oss.str(), "result", 2, 0, 0);
+  res = part.writePartFile(oss.str(), "result", 0, numberOfArrays, 0);
   if (!res) {
     Logger::ERROR("Unable to write ThreeJS part file " + oss.str());
     return EXIT_FAILURE;
