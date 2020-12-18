@@ -116,7 +116,7 @@ target_link_libraries(VTUToThreeJS ${VTK_LIBS})
 
 ## Tests
 include(CTest)
-include(ParseAndAddCatchTests)
+include(Catch)
 
 set(LOGGER_TESTS
   test/logger/Logger.test.cpp
@@ -163,6 +163,7 @@ set(SOURCE_TESTS
 add_executable(tests ${SOURCE_TESTS})
 target_link_libraries(tests ${OCC_LIBS})
 target_link_libraries(tests Catch2::Catch2)
+catch_discover_tests(tests)
 # ParseAndAddCatchTests(tests)
 
 ## Coverage

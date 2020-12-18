@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
   std::vector<RData> arrays = reader.getArrays();
 
   // Write ThreeJS files
-  const int numberOfArrays = arrays.size();
+  const int numberOfArrays = (int)arrays.size();
   for (int i = 0; i < numberOfArrays; ++i) {
     RData result = arrays[i];
 
