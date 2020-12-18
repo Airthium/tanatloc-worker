@@ -47,6 +47,11 @@ TEST_CASE("ThreeJS") {
     ThreeJS threejs = ThreeJS(vertices, normals, indices);
   }
 
+  SECTION("setName") {
+    ThreeJS threejs = ThreeJS();
+    threejs.setName("name");
+  }
+
   SECTION("setLabel") {
     ThreeJS threejs = ThreeJS();
     threejs.setLabel(0);
@@ -102,6 +107,19 @@ TEST_CASE("ThreeJS") {
     threejs.setColors(colors);
   }
 
+  SECTION("setData") {
+    ThreeJS threejs = ThreeJS();
+
+    uint dsize = 3;
+    auto data = std::vector<float>();
+    for (uint i = 0; i < dsize; ++i) {
+      data.push_back((float)i);
+    }
+    threejs.setData(data);
+
+    threejs.setData(data);
+  }
+
   SECTION("save") {
     ThreeJS threejs = ThreeJS();
 
@@ -139,6 +157,24 @@ TEST_CASE("ThreeJS") {
       colors.push_back(c);
     }
     threejs.setColors(colors);
+    threejs.save("mythreejstest.json");
+
+    // + With data
+    uint dsize = 1;
+    auto data = std::vector<float>();
+    for (uint i = 0; i < dsize; ++i) {
+      data.push_back((float)i);
+    }
+    threejs.setData(data);
+    threejs.save("mythreejstest.json");
+
+    // + With data (vertices size)
+    uint dsize2 = 3;
+    auto data2 = std::vector<float>();
+    for (uint i = 0; i < dsize2; ++i) {
+      data2.push_back((float)i);
+    }
+    threejs.setData(data2);
     threejs.save("mythreejstest.json");
 
     // + With indices

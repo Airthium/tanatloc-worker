@@ -141,6 +141,10 @@ set(THREEJS_TESTS
   test/threeJS/ThreeJS.test.cpp
 )
 
+set(VTK_TESTS
+  test/vtk/VTUReader.test.cpp
+)
+
 set(MAIN_TESTS
   test/DXFConverter.test.cpp
   src/DXFConverter.cpp
@@ -156,15 +160,17 @@ set(SOURCE_TESTS
   ${OCC_SOURCE}
   ${THREEJS_TESTS}
   ${THREEJS_SOURCE}
+  ${VTK_TESTS}
+  ${VTK_SOURCE}
   ${MAIN_TESTS}
   ${DXF_SOURCE}
 )
 
 add_executable(tests ${SOURCE_TESTS})
 target_link_libraries(tests ${OCC_LIBS})
+target_link_libraries(tests ${VTK_LIBS})
 target_link_libraries(tests Catch2::Catch2)
 catch_discover_tests(tests)
-# ParseAndAddCatchTests(tests)
 
 ## Coverage
 option(COVERAGE "Enable coverage flags" OFF)
@@ -180,7 +186,9 @@ add_custom_target(coverage
   COMMAND ./DXFToBRep ./test/assets/not_existing.dxf pipe.brep|| true
   COMMAND ./DXFToBRep ./test/assets/pipe.dxf pipe.brep || true
   COMMAND ./BRepToThreeJS || true
+  COMMAND ./BRepToThreeJS ./test/assets/not_existing.brep || true
   COMMAND ./BRepToThreeJS ./test/assets/pipe.brep || true
+  COMMAND ./BRepToThreeJS ./test/assets/cube.brep || true
   COMMAND ./BRepToThreeJS ./test/assets/pipe.brep pipe || true
   COMMAND ./GmshToThreeJS || true
   COMMAND ./GmshToThreeJS ./test/assets/not_existing.msh || true
@@ -194,6 +202,10 @@ add_custom_target(coverage
   COMMAND ./StepUnion ./test/assets/not_existing.step ./cube.step || true
   COMMAND ./StepUnion ./test/assets/not_existing.step ./not_existing/cube.step || true
   COMMAND ./StepUnion ./test/assets/cube.step ./cube.step || true
+  COMMAND ./VTUToThreeJS || true
+  COMMAND ./VTUToThreeJS ./test/assets/not_existing.vtu || true
+  COMMAND ./VTUToThreeJS ./test/assets/Result.vtu || true
+  COMMAND ./VTUToThreeJS ./test/assets/Result.vtu Result || true
   COMMAND lcov --directory . -c -o report.info
   COMMAND genhtml -o ../coverage -t "Converters coverage" report.info
 )

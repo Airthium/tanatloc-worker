@@ -1,8 +1,6 @@
 #include <tuple>
 
 #include <vtkCellArray.h>
-#include <vtkCellData.h>
-#include <vtkDataSetAttributes.h>
 #include <vtkIdList.h>
 #include <vtkPointData.h>
 #include <vtkPoints.h>
