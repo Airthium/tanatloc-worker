@@ -1,3 +1,5 @@
+#include <memory>
+
 #include "DXFConverter.hpp"
 
 #include "dxflib/dl_dxf.h"
@@ -34,12 +36,11 @@ void DXFConverter::setOutput(const std::string &output) {
 }
 
 bool DXFConverter::convert() {
-  auto *dxf = new DL_Dxf();
+  auto dxf = std::make_unique<DL_Dxf>();
   if (!dxf->in(this->m_input, this)) {
     Logger::ERROR("DXFConverter::Unable to open" + this->m_input);
     return false;
   }
-  delete dxf;
   return true;
 }
 

@@ -55,11 +55,11 @@ uint Triangle::getIndex(const uint i) const {
  * Get indices
  * @returns Indices
  */
-uint *Triangle::getIndices() const {
-  auto *indices = new uint[3];
-  indices[0] = this->m_index1;
-  indices[1] = this->m_index2;
-  indices[2] = this->m_index3;
+std::vector<uint> Triangle::getIndices() const {
+  auto indices = std::vector<uint>();
+  indices.push_back(this->m_index1);
+  indices.push_back(this->m_index2);
+  indices.push_back(this->m_index3);
   return indices;
 }
 

@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-typedef unsigned int uint;
+using uint = unsigned int;
 
 const std::string FACE = "face_";
 const std::string SOLID = "solid_";

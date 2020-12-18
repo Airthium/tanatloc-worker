@@ -12,11 +12,10 @@ TEST_CASE("Vertex") {
     // Out of range
     CHECK(vertex.getCoordinate(3) == 0);
 
-    double *coordinates = vertex.getCoordinates();
+    std::vector<double> coordinates = vertex.getCoordinates();
     CHECK(coordinates[0] == 0);
     CHECK(coordinates[1] == 0);
     CHECK(coordinates[2] == 0);
-    delete coordinates;
   }
 
   SECTION("Construtor 2") {
@@ -28,11 +27,10 @@ TEST_CASE("Vertex") {
     CHECK(vertex.getCoordinate(1) == y);
     CHECK(vertex.getCoordinate(2) == z);
 
-    double *coordinates = vertex.getCoordinates();
+    std::vector<double> coordinates = vertex.getCoordinates();
     CHECK(coordinates[0] == x);
     CHECK(coordinates[1] == y);
     CHECK(coordinates[2] == z);
-    delete coordinates;
   }
 
   SECTION("Vertex setCoordinates") {
@@ -45,10 +43,9 @@ TEST_CASE("Vertex") {
     CHECK(vertex.getCoordinate(1) == 2.);
     CHECK(vertex.getCoordinate(2) == 3.);
 
-    double *coordinates = vertex.getCoordinates();
+    std::vector<double> coordinates = vertex.getCoordinates();
     CHECK(coordinates[0] == 1.);
     CHECK(coordinates[1] == 2.);
     CHECK(coordinates[2] == 3.);
-    delete coordinates;
   }
 }

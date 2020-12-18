@@ -61,12 +61,12 @@ uint Tetrahedron::getIndex(const uint i) const {
  * Get indices
  * @returns Indices
  */
-uint *Tetrahedron::getIndices() const {
-  auto *indices = new uint[4];
-  indices[0] = this->m_index1;
-  indices[1] = this->m_index2;
-  indices[2] = this->m_index3;
-  indices[3] = this->m_index4;
+std::vector<uint> Tetrahedron::getIndices() const {
+  auto indices = std::vector<uint>();
+  indices.push_back(this->m_index1);
+  indices.push_back(this->m_index2);
+  indices.push_back(this->m_index3);
+  indices.push_back(this->m_index4);
   return indices;
 }
 

@@ -12,11 +12,10 @@ TEST_CASE("Triangle") {
     // Out of range
     CHECK(triangle.getIndex(3) == 0);
 
-    uint *indices = triangle.getIndices();
+    std::vector<uint> indices = triangle.getIndices();
     CHECK(indices[0] == 0);
     CHECK(indices[1] == 0);
     CHECK(indices[2] == 0);
-    delete indices;
 
     CHECK(triangle.getLabel() == 0);
   }
@@ -31,11 +30,10 @@ TEST_CASE("Triangle") {
     CHECK(triangle.getIndex(1) == 2);
     CHECK(triangle.getIndex(2) == 3);
 
-    uint *indices = triangle.getIndices();
+    std::vector<uint> indices = triangle.getIndices();
     CHECK(indices[0] == 1);
     CHECK(indices[1] == 2);
     CHECK(indices[2] == 3);
-    delete indices;
 
     CHECK(triangle.getLabel() == 4);
   }
@@ -50,11 +48,10 @@ TEST_CASE("Triangle") {
     CHECK(triangle.getIndex(1) == 2);
     CHECK(triangle.getIndex(2) == 3);
 
-    uint *indices = triangle.getIndices();
+    std::vector<uint> indices = triangle.getIndices();
     CHECK(indices[0] == 1);
     CHECK(indices[1] == 2);
     CHECK(indices[2] == 3);
-    delete indices;
 
     CHECK(triangle.getLabel() == 0);
   }
@@ -67,11 +64,10 @@ TEST_CASE("Triangle") {
     CHECK(triangle.getIndex(1) == 0);
     CHECK(triangle.getIndex(2) == 0);
 
-    uint *indices = triangle.getIndices();
+    std::vector<uint> indices = triangle.getIndices();
     CHECK(indices[0] == 0);
     CHECK(indices[1] == 0);
     CHECK(indices[2] == 0);
-    delete indices;
 
     CHECK(triangle.getLabel() == 4);
   }

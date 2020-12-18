@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <memory>
 
 #include "../logger/Logger.hpp"
 
@@ -196,14 +197,8 @@ uint Gmsh::getTriangleLabel(const uint i) const {
  */
 void Gmsh::copyVertices(const Tetrahedron &T,
                         std::vector<double> *vector) const {
-  uint *indices = T.getIndices();
-  std::for_each(indices, indices + 4, [this, vector](const uint &index) {
-    Vertex vertex = this->m_vertices[index];
-    double *coordinates = vertex.getCoordinates();
-    std::for_each(
-        coordinates, coordinates + 3,
-        [vector](const double &coordinate) { vector->push_back(coordinate); });
-  });
+  std::vector<uint> indices = T.getIndices();
+  copy(indices, vector);
 }
 
 /**
@@ -212,14 +207,21 @@ void Gmsh::copyVertices(const Tetrahedron &T,
  * @param {vector} Vector
  */
 void Gmsh::copyVertices(const Triangle &T, std::vector<double> *vector) const {
-  uint *indices = T.getIndices();
-  std::for_each(indices, indices + 3, [this, vector](const uint &index) {
-    Vertex vertex = this->m_vertices[index];
-    double *coordinates = vertex.getCoordinates();
-    std::for_each(
-        coordinates, coordinates + 3,
-        [vector](const double &coordinate) { vector->push_back(coordinate); });
-  });
+  std::vector<uint> indices = T.getIndices();
+  copy(indices, vector);
+}
+
+void Gmsh::copy(const std::vector<uint> indices,
+                std::vector<double> *vector) const {
+  std::for_each(indices.begin(), indices.end(),
+                [this, vector](const uint &index) {
+                  Vertex vertex = this->m_vertices[index];
+                  std::vector<double> coordinates = vertex.getCoordinates();
+                  std::for_each(coordinates.begin(), coordinates.end(),
+                                [vector](const double &coordinate) {
+                                  vector->push_back(coordinate);
+                                });
+                });
 }
 
 /**
@@ -231,7 +233,7 @@ std::vector<double> *Gmsh::getVolumesVertices() const {
     return nullptr;
 
   uint i = 0;
-  auto *vertices = new std::vector<double>[this->m_tetrahedronLabels.size()];
+  auto vertices = new std::vector<double>[this->m_tetrahedronLabels.size()];
   std::for_each(
       this->m_tetrahedronLabels.begin(), this->m_tetrahedronLabels.end(),
       [&i, this, vertices](const uint &label) {

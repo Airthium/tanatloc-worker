@@ -13,12 +13,11 @@ TEST_CASE("Tetrahedron") {
     // Out of range
     CHECK(tetrahedron.getIndex(4) == 0);
 
-    uint *indices = tetrahedron.getIndices();
+    std::vector<uint> indices = tetrahedron.getIndices();
     CHECK(indices[0] == 0);
     CHECK(indices[1] == 0);
     CHECK(indices[2] == 0);
     CHECK(indices[3] == 0);
-    delete indices;
 
     CHECK(tetrahedron.getLabel() == 0);
   }
@@ -36,12 +35,11 @@ TEST_CASE("Tetrahedron") {
     CHECK(tetrahedron.getIndex(2) == 3);
     CHECK(tetrahedron.getIndex(3) == 4);
 
-    uint *indices = tetrahedron.getIndices();
+    std::vector<uint> indices = tetrahedron.getIndices();
     CHECK(indices[0] == 1);
     CHECK(indices[1] == 2);
     CHECK(indices[2] == 3);
     CHECK(indices[3] == 4);
-    delete indices;
 
     CHECK(tetrahedron.getLabel() == 5);
   }
@@ -58,12 +56,11 @@ TEST_CASE("Tetrahedron") {
     CHECK(tetrahedron.getIndex(2) == 3);
     CHECK(tetrahedron.getIndex(3) == 4);
 
-    uint *indices = tetrahedron.getIndices();
+    std::vector<uint> indices = tetrahedron.getIndices();
     CHECK(indices[0] == 1);
     CHECK(indices[1] == 2);
     CHECK(indices[2] == 3);
     CHECK(indices[3] == 4);
-    delete indices;
 
     CHECK(tetrahedron.getLabel() == 0);
   }
@@ -77,12 +74,11 @@ TEST_CASE("Tetrahedron") {
     CHECK(tetrahedron.getIndex(2) == 0);
     CHECK(tetrahedron.getIndex(3) == 0);
 
-    uint *indices = tetrahedron.getIndices();
+    std::vector<uint> indices = tetrahedron.getIndices();
     CHECK(indices[0] == 0);
     CHECK(indices[1] == 0);
     CHECK(indices[2] == 0);
     CHECK(indices[3] == 0);
-    delete indices;
 
     CHECK(tetrahedron.getLabel() == 5);
   }

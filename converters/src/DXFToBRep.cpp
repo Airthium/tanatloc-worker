@@ -1,4 +1,5 @@
 #include <iostream>
+#include <memory>
 
 #include "DXFConverter.hpp"
 
@@ -20,7 +21,7 @@ int main(int argc, char **argv) {
   brepFile = argv[2];
 
   // Converter
-  auto *converter = new DXFConverter();
+  auto converter = std::make_unique<DXFConverter>();
 
   // Set input
   converter->setInput(dxfFile);
@@ -41,9 +42,6 @@ int main(int argc, char **argv) {
     Logger::ERROR("Unable to write " + brepFile);
     return EXIT_FAILURE;
   }
-
-  // Clean
-  delete converter;
 
   // Bye
   return EXIT_SUCCESS;
