@@ -88,7 +88,7 @@ RData getMagnitude(const RData &result) {
 }
 
 RData getComponent(const RData &result, const int index) {
-  RData component;
+  RData component = result;
   component.size = 1;
   component.name =
       result.name + " (component " + std::to_string(index + 1) + ")";
