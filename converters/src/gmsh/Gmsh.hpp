@@ -8,7 +8,7 @@
 #include "Triangle.hpp"
 #include "Vertex.hpp"
 
-typedef unsigned int uint;
+using uint = unsigned int;
 
 /**
  * Gmsh class
@@ -29,6 +29,7 @@ private:
   // Copy vertices
   void copyVertices(const Tetrahedron &, std::vector<double> *) const;
   void copyVertices(const Triangle &, std::vector<double> *) const;
+  void copy(const std::vector<uint>, std::vector<double> *) const;
 
 public:
   // Constructor

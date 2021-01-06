@@ -16,7 +16,7 @@
 /**
  * Constructor
  */
-Triangulation::Triangulation() {}
+Triangulation::Triangulation() = default;
 
 /**
  * Constructor
@@ -99,7 +99,7 @@ void Triangulation::triangulateEdge(const TopoDS_Shape &shape) {
       BRep_Tool::Polygon3D(TopoDS::Edge(shape), location);
 
   const TColgp_Array1OfPnt &nodes = polygon->Nodes();
-  for (uint i = nodes.Lower(); i <= nodes.Upper(); ++i) {
+  for (uint i = nodes.Lower(); i <= (uint)nodes.Upper(); ++i) {
     p = nodes(i).Transformed(location.Transformation());
     this->m_vertices.push_back(static_cast<float>(p.X()));
     this->m_vertices.push_back(static_cast<float>(p.Y()));
@@ -129,7 +129,7 @@ void Triangulation::triangulateLoop(const TopoDS_Face &face,
 
   // vertices
   const TColgp_Array1OfPnt &nodes = triangulation->Nodes();
-  for (i = nodes.Lower(); i <= nodes.Upper(); ++i) {
+  for (i = nodes.Lower(); i <= (uint)nodes.Upper(); ++i) {
     p = nodes(i).Transformed(location.Transformation());
     this->m_vertices.push_back(static_cast<float>(p.X()));
     this->m_vertices.push_back(static_cast<float>(p.Y()));
@@ -139,7 +139,7 @@ void Triangulation::triangulateLoop(const TopoDS_Face &face,
   // normal
   TColgp_Array1OfDir normals(nodes.Lower(), nodes.Upper());
   StdPrs_ToolTriangulatedShape::Normal(face, pc, normals);
-  for (i = normals.Lower(); i <= normals.Upper(); ++i) {
+  for (i = normals.Lower(); i <= (uint)normals.Upper(); ++i) {
     d = normals(i).Transformed(location.Transformation());
     this->m_normals.push_back(static_cast<float>(d.X()));
     this->m_normals.push_back(static_cast<float>(d.Y()));
@@ -152,7 +152,7 @@ void Triangulation::triangulateLoop(const TopoDS_Face &face,
   int n3;
   TopAbs_Orientation orient = face.Orientation();
   const Poly_Array1OfTriangle &triangles = triangulation->Triangles();
-  for (i = 1; i <= triangulation->NbTriangles(); ++i) {
+  for (i = 1; i <= (uint)triangulation->NbTriangles(); ++i) {
     triangles(i).Get(n1, n2, n3);
     if (orient != TopAbs_FORWARD) {
       int tmp = n1;

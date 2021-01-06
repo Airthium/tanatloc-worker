@@ -71,9 +71,6 @@ TEST_CASE("Union") {
     u.setTolerance(1.);
     u.compute();
 
-    uint nObjects = 1;
-    uint nTools = 1;
-
     BRepPrimAPI_MakeBox box = BRepPrimAPI_MakeBox(1., 1., 1.);
     TopoDS_Solid solid = box.Solid();
     auto objects = std::vector<TopoDS_Shape>();

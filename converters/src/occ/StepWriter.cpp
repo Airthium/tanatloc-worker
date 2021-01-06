@@ -8,7 +8,7 @@
 /**
  * Constructor
  */
-StepWriter::StepWriter() {}
+StepWriter::StepWriter() = default;
 
 /**
  * Constructor

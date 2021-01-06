@@ -3,7 +3,7 @@
 /**
  * Constructor
  */
-Vertex::Vertex() {}
+Vertex::Vertex() = default;
 
 /**
  * Constructor
@@ -46,10 +46,10 @@ double Vertex::getCoordinate(const uint i) const {
  * Get coordinates
  * @returns Coordinates
  */
-double *Vertex::getCoordinates() const {
-  auto *coordinates = new double[3];
-  coordinates[0] = this->m_x;
-  coordinates[1] = this->m_y;
-  coordinates[2] = this->m_z;
+std::vector<double> Vertex::getCoordinates() const {
+  auto coordinates = std::vector<double>();
+  coordinates.push_back(this->m_x);
+  coordinates.push_back(this->m_y);
+  coordinates.push_back(this->m_z);
   return coordinates;
 }

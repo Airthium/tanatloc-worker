@@ -11,7 +11,7 @@
 /**
  * Constructor
  */
-ThreeJS::ThreeJS() {}
+ThreeJS::ThreeJS() = default;
 
 /**
  * Constructor
@@ -38,6 +38,12 @@ ThreeJS::ThreeJS(const std::vector<float> &vertices,
                  const std::vector<float> &normals,
                  const std::vector<uint> &indices)
     : m_vertices(vertices), m_normals(normals), m_indices(indices) {}
+
+/**
+ * Set name
+ * @param name Name
+ */
+void ThreeJS::setName(const std::string &name) { this->m_name = name; }
 
 /**
  * Set label
@@ -78,11 +84,26 @@ void ThreeJS::setIndices(const std::vector<uint> &indices) {
   this->m_indices = indices;
 }
 
+/**
+ * Set color
+ * @param colors Colors
+ */
 void ThreeJS::setColors(const std::vector<Color> &colors) {
   if (this->m_colors.size())
     this->m_colors.clear();
 
   this->m_colors = colors;
+}
+
+/**
+ * Set data
+ * @param data Data
+ */
+void ThreeJS::setData(const std::vector<float> &data) {
+  if (this->m_data.size())
+    this->m_data.clear();
+
+  this->m_data = data;
 }
 
 /**
@@ -101,19 +122,20 @@ bool ThreeJS::save(const std::string &fileName) const {
   this->saveHeader(file);
 
   // Vertices
-  if (this->m_vertices.size()) {
+  if (this->m_vertices.size())
     this->saveVertices(file);
-  }
 
   // Normals
-  if (this->m_normals.size()) {
+  if (this->m_normals.size())
     this->saveNormals(file);
-  }
 
   // Colors
-  if (this->m_colors.size()) {
+  if (this->m_colors.size())
     this->saveColors(file);
-  }
+
+  // Data
+  if (this->m_data.size())
+    this->saveData(file);
 
   // Footer
   this->saveFooter(file);
@@ -132,6 +154,8 @@ void ThreeJS::saveHeader(std::ofstream &file) const {
   file << "\t\t\"generator\": \"Tanatloc\"" << std::endl;
   file << "\t}," << std::endl;
   file << "\t\"uuid\": \"" << this->generateUUID() << "\"," << std::endl;
+  if (this->m_name != "")
+    file << "\t\"name\": \"" << this->m_name << "\"," << std::endl;
   if (this->m_label)
     file << "\t\"label\": \"" << this->m_label << "\"," << std::endl;
   file << "\t\"type\": \"BufferGeometry\"," << std::endl;
@@ -173,7 +197,7 @@ void ThreeJS::saveVertices(std::ofstream &file) const {
   file << "]" << std::endl;
   file << "\t\t\t}";
 
-  if (this->m_normals.size() || this->m_colors.size())
+  if (this->m_normals.size() || this->m_colors.size() || this->m_data.size())
     file << "," << std::endl;
   else
     file << std::endl;
@@ -213,7 +237,7 @@ void ThreeJS::saveNormals(std::ofstream &file) const {
   file << "]" << std::endl;
   file << "\t\t\t}";
 
-  if (this->m_colors.size())
+  if (this->m_colors.size() || this->m_data.size())
     file << "," << std::endl;
   else
     file << std::endl;
@@ -234,6 +258,46 @@ void ThreeJS::saveColors(std::ofstream &file) const {
          << this->m_colors[i].blue;
     if (i < (numberOfColors - 1))
       file << ",";
+  }
+
+  file << "]" << std::endl;
+  file << "\t\t\t}" << std::endl;
+
+  if (this->m_data.size())
+    file << "," << std::endl;
+  else
+    file << std::endl;
+}
+
+/**
+ * Save data
+ */
+void ThreeJS::saveData(std::ofstream &file) const {
+  uint i;
+  const auto numberOfData = this->m_data.size();
+
+  int itemSize = 1; // TODO
+
+  file << "\t\t\t\"data\": {" << std::endl;
+  file << "\t\t\t\t\"itemSize\": " << itemSize << "," << std::endl;
+  file << "\t\t\t\t\"type\": \"Float32Array\"," << std::endl;
+  file << "\t\t\t\t\"array\": [";
+
+  const auto numberOfIndices = this->m_indices.size();
+  if (numberOfIndices) {
+    // With indices
+    for (i = 0; i < numberOfIndices; ++i) {
+      file << this->m_data[this->m_indices[i]];
+      if (i < (numberOfIndices - 1))
+        file << ",";
+    }
+  } else {
+    // Without indices
+    for (i = 0; i < numberOfData; ++i) {
+      file << this->m_data[i];
+      if (i < (numberOfData - 1))
+        file << ",";
+    }
   }
 
   file << "]" << std::endl;

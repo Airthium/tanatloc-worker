@@ -1,7 +1,9 @@
 #ifndef _TETRAHEDRON_
 #define _TETRAHEDRON_
 
-typedef unsigned int uint;
+#include <vector>
+
+using uint = unsigned int;
 
 /**
  * Tetrahedron class
@@ -33,7 +35,7 @@ public:
   // Get index
   uint getIndex(const uint) const;
   // Get indices
-  uint *getIndices() const;
+  std::vector<uint> getIndices() const;
   // Get label
   uint getLabel() const;
 };

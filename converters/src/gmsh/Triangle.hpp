@@ -1,7 +1,9 @@
 #ifndef _TRIANGLE_
 #define _TRIANGLE_
 
-typedef unsigned int uint;
+#include <vector>
+
+using uint = unsigned int;
 
 /**
  * Triangle class
@@ -31,7 +33,7 @@ public:
   // Get index
   uint getIndex(const uint) const;
   // Get indices
-  uint *getIndices() const;
+  std::vector<uint> getIndices() const;
   // Get label
   uint getLabel() const;
 };

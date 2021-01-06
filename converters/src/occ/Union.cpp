@@ -10,7 +10,7 @@
 /**
  * Constructor
  */
-Union::Union() {}
+Union::Union() = default;
 
 /**
  * Constructor

@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <iostream>
+#include <memory>
 #include <random>
 #include <sstream>
 #include <string>
@@ -21,7 +22,6 @@ int main(int argc, char *argv[]) {
   uint i;
   std::string meshFile;
   std::string threeJSPath;
-  Gmsh *mesh = nullptr;
 
   // Arguments
   if (argc < 2) {
@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
   }
 
   // Read & process mesh
-  mesh = new Gmsh();
+  auto mesh = std::make_unique<Gmsh>();
   res = mesh->load(meshFile);
   if (!res) {
     Logger::ERROR("Unable to load Gmsh file " + meshFile);
@@ -127,8 +127,6 @@ int main(int argc, char *argv[]) {
     Logger::ERROR("Unable to write ThreeJS part file " + oss.str());
     return EXIT_FAILURE;
   }
-
-  delete mesh;
 
   return EXIT_SUCCESS;
 }

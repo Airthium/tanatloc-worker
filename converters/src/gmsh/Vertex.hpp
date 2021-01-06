@@ -1,7 +1,9 @@
 #ifndef _VERTEX_
 #define _VERTEX_
 
-typedef unsigned int uint;
+#include <vector>
+
+using uint = unsigned int;
 
 /**
  * Vertex class
@@ -26,7 +28,7 @@ public:
   // Get coordinate
   double getCoordinate(const uint) const;
   // Get coordinates
-  double *getCoordinates() const;
+  std::vector<double> getCoordinates() const;
 };
 
 #endif

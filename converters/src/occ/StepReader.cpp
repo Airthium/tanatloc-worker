@@ -17,7 +17,7 @@
 /**
  * Constructor
  */
-StepReader::StepReader() {}
+StepReader::StepReader() = default;
 
 /**
  * Constructor
