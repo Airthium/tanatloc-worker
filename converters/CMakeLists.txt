@@ -175,7 +175,7 @@ catch_discover_tests(tests)
 ## Coverage
 option(COVERAGE "Enable coverage flags" OFF)
 if (COVERAGE)
-  SET(CMAKE_CXX_FLAGS "-O0 --coverage")
+  SET(CMAKE_CXX_FLAGS "-O0 --coverage -W")
 endif()
 
 add_custom_target(coverage
@@ -206,6 +206,7 @@ add_custom_target(coverage
   COMMAND ./VTUToThreeJS ./test/assets/not_existing.vtu || true
   COMMAND ./VTUToThreeJS ./test/assets/Result.vtu || true
   COMMAND ./VTUToThreeJS ./test/assets/Result.vtu Result || true
+  COMMAND ./VTUToThreeJS ./test/assets/Result_multi.vtu Result || true
   COMMAND lcov --directory . -c -o report.info
   COMMAND genhtml -o ../coverage -t "Converters coverage" report.info
 )

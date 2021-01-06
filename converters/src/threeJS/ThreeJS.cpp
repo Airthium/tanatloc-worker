@@ -276,7 +276,7 @@ void ThreeJS::saveData(std::ofstream &file) const {
   uint i;
   const auto numberOfData = this->m_data.size();
 
-  int itemSize = numberOfData == this->m_vertices.size() ? 3 : 1;
+  int itemSize = 1; // TODO
 
   file << "\t\t\t\"data\": {" << std::endl;
   file << "\t\t\t\t\"itemSize\": " << itemSize << "," << std::endl;

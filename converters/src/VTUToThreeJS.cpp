@@ -7,6 +7,10 @@
 #include "threeJS/ThreeJS.hpp"
 #include "vtk/VTUReader.hpp"
 
+RData getMagnitude(const RData &);
+RData getComponent(const RData &, const int);
+bool writeOne(const RData &, const std::string &);
+
 int main(int argc, char *argv[]) {
   bool res;
   std::string vtuFile;
@@ -44,153 +48,93 @@ int main(int argc, char *argv[]) {
     RData result = arrays[i];
 
     if (result.size == 1) { // Scalar
-      // Current path
-      std::ostringstream oss;
-      oss << threeJSPath << "_" << result.name;
-      std::string currentPath = oss.str();
-
-      // Create path
-      int err = mkdir(currentPath.c_str(), S_IRWXU | S_IRWXG);
-      if (err && errno != EEXIST) {
-        Logger::ERROR("Unable to create threeJS path");
+      if (!writeOne(result, threeJSPath + "_" + result.name))
         return EXIT_FAILURE;
-      }
-
-      // Result as a face
-      ThreeJS face(result.vertices);
-      face.setIndices(result.indices);
-      face.setName(result.name);
-      face.setData(result.values);
-
-      oss.str("");
-      oss.clear();
-      oss << currentPath << "/" << FACE << 1 << ".json";
-      if (!face.save(oss.str())) {
-        Logger::ERROR("Unable to write ThreeJS file " + oss.str());
-        return EXIT_FAILURE;
-      }
-
-      // Write ThreeJS part file
-      ThreeJS part;
-      oss.str("");
-      oss.clear();
-      oss << currentPath << "/part.json";
-      res = part.writePartFile(oss.str(), "result", 0, 1, 0);
-      if (!res) {
-        Logger::ERROR("Unable to write ThreeJS part file " + oss.str());
-        return EXIT_FAILURE;
-      }
     } else if (result.size == 3) {
-      // Base path
-      std::ostringstream oss;
-      oss << threeJSPath << "_" << result.name;
-      std::string basePath = oss.str();
-
-      // Create path
-      oss << "_magnitude";
-      std::string currentPath = oss.str();
-      int err = mkdir(currentPath.c_str(), S_IRWXU | S_IRWXG);
-      if (err && errno != EEXIST) {
-        Logger::ERROR("Unable to create threeJS path");
-        return EXIT_FAILURE;
-      }
-
       // Magnitude
-      RData magnitude = result;
-      magnitude.size = 1;
-      magnitude.name = result.name + " (magnitude)";
-
-      auto magnitudeValues = std::vector<float>();
-      for (int j = 0; j < magnitude.values.size() / 3; ++j) {
-        float v = sqrt(pow(magnitude.values[3 * j + 0], 2) +
-                       pow(magnitude.values[3 * j + 1], 2) +
-                       pow(magnitude.values[3 * j + 2], 2));
-        magnitudeValues.push_back(v);
-      }
-
-      magnitude.values = magnitudeValues;
-
-      ThreeJS face(magnitude.vertices);
-      face.setIndices(magnitude.indices);
-      face.setName(magnitude.name);
-      face.setData(magnitude.values);
-
-      oss.str("");
-      oss.clear();
-      oss << currentPath << "/" << FACE << 1 << ".json";
-      if (!face.save(oss.str())) {
-        Logger::ERROR("Unable to write ThreeJS file " + oss.str());
+      RData magnitude = getMagnitude(result);
+      if (!writeOne(magnitude, threeJSPath + "_" + result.name + "_magnitude"))
         return EXIT_FAILURE;
-      }
-
-      // Write ThreeJS part file
-      ThreeJS part;
-      oss.str("");
-      oss.clear();
-      oss << currentPath << "/part.json";
-      res = part.writePartFile(oss.str(), "result", 0, 1, 0);
-      if (!res) {
-        Logger::ERROR("Unable to write ThreeJS part file " + oss.str());
-        return EXIT_FAILURE;
-      }
 
       // Component 1, 2 & 3
-      for (int k = 0; k < 3; ++k) {
-        // Create path
-        oss.str("");
-        oss.clear();
-        oss << basePath << "_component" << k + 1;
-        std::string currentPath = oss.str();
-        int err = mkdir(currentPath.c_str(), S_IRWXU | S_IRWXG);
-        if (err && errno != EEXIST) {
-          Logger::ERROR("Unable to create threeJS path");
+      for (int j = 0; j < 3; ++j) {
+        RData component = getComponent(result, j);
+        if (!writeOne(component, threeJSPath + "_" + result.name +
+                                     "_component" + std::to_string(j + 1)))
           return EXIT_FAILURE;
-        }
-
-        RData component = result;
-        component.size = 1;
-        oss.str("");
-        oss.clear();
-        oss << result.name << " (component " << k + 1 << ")";
-        component.name = oss.str();
-
-        auto componentValues = std::vector<float>();
-        for (int j = 0; j < component.values.size() / 3; ++j) {
-          float v = component.values[3 * j + k];
-          componentValues.push_back(v);
-        }
-
-        component.values = componentValues;
-
-        ThreeJS face(component.vertices);
-        face.setIndices(component.indices);
-        face.setName(component.name);
-        face.setData(component.values);
-
-        oss.str("");
-        oss.clear();
-        oss << currentPath << "/" << FACE << 1 << ".json";
-        if (!face.save(oss.str())) {
-          Logger::ERROR("Unable to write ThreeJS file " + oss.str());
-          return EXIT_FAILURE;
-        }
-
-        // Write ThreeJS part file
-        ThreeJS part;
-        oss.str("");
-        oss.clear();
-        oss << currentPath << "/part.json";
-        res = part.writePartFile(oss.str(), "result", 0, 1, 0);
-        if (!res) {
-          Logger::ERROR("Unable to write ThreeJS part file " + oss.str());
-          return EXIT_FAILURE;
-        }
       }
     }
-
-    Logger::DISP("{ \"path\": \"" + threeJSPath + "_" + result.name +
-                 "\", \"name\": \"" + result.name + "\"}");
   }
 
   return EXIT_SUCCESS;
+}
+
+RData getMagnitude(const RData &result) {
+  RData magnitude = result;
+  magnitude.size = 1;
+  magnitude.name = result.name + " (magnitude)";
+
+  auto magnitudeValues = std::vector<float>();
+  for (int i = 0; i < (int)magnitude.values.size() / 3; ++i) {
+    auto v = (float)sqrt(pow(magnitude.values[3 * i + 0], 2) +
+                         pow(magnitude.values[3 * i + 1], 2) +
+                         pow(magnitude.values[3 * i + 2], 2));
+    magnitudeValues.push_back(v);
+  }
+
+  magnitude.values = magnitudeValues;
+
+  return magnitude;
+}
+
+RData getComponent(const RData &result, const int index) {
+  RData component;
+  component.size = 1;
+  component.name =
+      result.name + " (component " + std::to_string(index + 1) + ")";
+
+  auto componentValues = std::vector<float>();
+  for (int i = 0; i < (int)component.values.size() / 3; ++i) {
+    float v = component.values[3 * i + index];
+    componentValues.push_back(v);
+  }
+
+  component.values = componentValues;
+
+  return component;
+}
+
+bool writeOne(const RData &result, const std::string &path) {
+  // Create path
+  int err = mkdir(path.c_str(), S_IRWXU | S_IRWXG);
+  if (err && errno != EEXIST) {
+    Logger::ERROR("Unable to create threeJS path");
+    return false;
+  }
+
+  // Result as a face
+  ThreeJS face(result.vertices);
+  face.setIndices(result.indices);
+  face.setName(result.name);
+  face.setData(result.values);
+
+  std::string faceFile = path + "/" + FACE + std::to_string(1) + ".json";
+  if (!face.save(faceFile)) {
+    Logger::ERROR("Unable to write ThreeJS file " + faceFile);
+    return false;
+  }
+
+  // Write ThreeJS part file
+  ThreeJS part;
+  std::string partFile = path + "/part.json";
+  bool res = part.writePartFile(partFile, "result", 0, 1, 0);
+  if (!res) {
+    Logger::ERROR("Unable to write ThreeJS part file " + partFile);
+    return false;
+  }
+
+  Logger::DISP("{ \"path\": \"" + path + "\", \"name\": \"" + result.name +
+               "\"}");
+
+  return true;
 }

@@ -1,14 +1,12 @@
 #include <catch2/catch.hpp>
 
 #include <BRepPrimAPI_MakeBox.hxx>
-#include <TopoDS_Builder.hxx>
 #include <TopoDS_Shape.hxx>
 
 #include <vector>
 
-#include "../../src/occ/getElements.hpp"
-
 #include "../../src/occ/StepReader.hpp"
+#include "../../src/occ/getElements.hpp"
 
 TEST_CASE("getElements") {
   auto reader = StepReader("./test/assets/cube.step");
@@ -23,7 +21,6 @@ TEST_CASE("getElements") {
   }
 
   SECTION("getSolids - box") {
-    TopoDS_Builder builder = TopoDS_Builder();
     BRepPrimAPI_MakeBox box = BRepPrimAPI_MakeBox(1., 1., 1.);
     TopoDS_Shape solid = box.Solid();
 
@@ -44,7 +41,6 @@ TEST_CASE("getElements") {
   }
 
   SECTION("getFaces - box") {
-    TopoDS_Builder builder = TopoDS_Builder();
     BRepPrimAPI_MakeBox box = BRepPrimAPI_MakeBox(1., 1., 1.);
     TopoDS_Shape solid = box.Solid();
 
@@ -65,7 +61,6 @@ TEST_CASE("getElements") {
   }
 
   SECTION("getEdges - box") {
-    TopoDS_Builder builder = TopoDS_Builder();
     BRepPrimAPI_MakeBox box = BRepPrimAPI_MakeBox(1., 1., 1.);
     TopoDS_Shape solid = box.Solid();
 
