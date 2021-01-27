@@ -1,7 +1,7 @@
 # OpenCascade 7.4.0
 FROM ubuntu:20.10
 
-WORKDIR /usr/bin
+WORKDIR /root/converters
 
 COPY ./converters .
 

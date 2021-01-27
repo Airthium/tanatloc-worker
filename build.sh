@@ -70,9 +70,10 @@ buildDockerfile() {
 }
 
 build() {
+  target="$1"
   echo -e "Building Docker image..."
-  echo -e "> docker build $ARGS -f $DOCKERFILE_PATH ."
-  docker build $ARGS -f $DOCKERFILE_PATH .
+  echo -e "> docker build $ARGS -f $DOCKERFILE_PATH . -t tanatloc/$target"
+  docker build $ARGS -f $DOCKERFILE_PATH . -t tanatloc/$target
 }
 
 target=$1
@@ -91,4 +92,4 @@ echo "ARGS=\"$ARGS\""
 
 checkArchives
 buildDockerfile "$target"
-build
+build "$target"
