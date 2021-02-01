@@ -114,6 +114,9 @@ target_link_libraries(StepUnion ${OCC_LIBS})
 add_executable(VTUToThreeJS ${VTUToThreeJSSOURCE})
 target_link_libraries(VTUToThreeJS ${VTK_LIBS})
 
+## Install
+install(TARGETS DXFToBRep BRepToThreeJS GmshToThreeJS StepToThreeJS StepUnion VTUToThreeJS)
+
 ## Tests
 include(CTest)
 include(Catch)

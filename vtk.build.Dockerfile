@@ -1,17 +1,20 @@
+## VTK ##
 FROM ubuntu:20.10 as build
 
 ENV VTKPATH /root/vtk
+ENV VTKSOURCES /root/vtksources
 
-WORKDIR $VTKPATH
+WORKDIR /root
 
 # Copy VTK repository
 COPY VTK-9.0.1.tar.gz .
-RUN tar -zxvf VTK-9.0.1.tar.gz
+RUN mkdir $VTKSOURCES && tar -zxf VTK-9.0.1.tar.gz -C $VTKSOURCES --strip-components 1
+
+WORKDIR $VTKSOURCES
 
 # Configure and build VTK
-RUN cd VTK-9.0.1 \
-  && mkdir build \
+RUN mkdir build \
   && cd build \
-  && cmake .. \
+  && cmake .. -DCMAKE_INSTALL_PREFIX=$VTKPATH \
   && make -j "$(nproc)" \
   && make install

@@ -1,19 +1,20 @@
+## GMSH ##
 FROM ubuntu:20.10 as build
 
 ENV GMSHPATH /root/gmsh
+ENV GMSHSOURCES /root/gmshsources
 
-WORKDIR $GMSHPATH
+WORKDIR /root
 
 # Copy gmsh directory
 COPY gmsh.tar.gz .
-RUN tar -zxvf gmsh.tar.gz
+RUN mkdir $GMSHSOURCES && tar -zxf gmsh.tar.gz -C $GMSHSOURCES --strip-components 1
+
+WORKDIR $GMSHSOURCES
 
 # Configure and build Gmsh
-RUN cd gmsh \
-  && mkdir build \
+RUN mkdir build \
   && cd build \
-  && cmake .. -DENABLE_FLTK=OFF \
+  && cmake .. -DENABLE_FLTK=OFF -DCMAKE_INSTALL_PREFIX=$GMSHPATH \
   && make -j "$(nproc)" \
   && make install
-
-ENV LD_LIBRARY_PATH /usr/local/lib

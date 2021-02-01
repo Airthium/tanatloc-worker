@@ -1,17 +1,20 @@
+## OCC ##
 FROM ubuntu:20.10 as build
 
 ENV OCCPATH /root/occ
+ENV OCCSOURCES /root/occsources
 
-WORKDIR $OCCPATH
+WORKDIR /root
 
 # Copy OCC repository
 COPY opencascade-7.4.0.tar.gz .
-RUN tar -zxvf opencascade-7.4.0.tar.gz
+RUN mkdir $OCCSOURCES && tar -zxf opencascade-7.4.0.tar.gz -C $OCCSOURCES --strip-components 1
+
+WORKDIR $OCCSOURCES
 
 # Configure and build OCC
-RUN cd opencascade-7.4.0 \
-  && mkdir build \
+RUN mkdir build \
   && cd build \
-  && cmake .. \
+  && cmake .. -DINSTALL_DIR=$OCCPATH \
   && make -j "$(nproc)" \
   && make install

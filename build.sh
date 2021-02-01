@@ -13,6 +13,7 @@ declare -A ARCHIVES
 #> curl -u $GITHUB_TOKEN:x-oauth-basic "https://api.github.com/repos/Airthium/tanatloc-dockers/releases"
 ARCHIVES["opencascade-7.4.0.tar.gz"]="https://api.github.com/repos/Airthium/tanatloc-dockers/releases/assets/20660980"
 ARCHIVES["gmsh.tar.gz"]="https://api.github.com/repos/Airthium/tanatloc-dockers/releases/assets/27930881"
+ARCHIVES["FreeFem-sources-4.8.tar.gz"]="https://api.github.com/repos/Airthium/tanatloc-dockers/releases/assets/31462514"
 ARCHIVES["VTK-9.0.1.tar.gz"]="https://api.github.com/repos/Airthium/tanatloc-dockers/releases/assets/29680338"
 
 declare -A TARGETS
@@ -20,8 +21,9 @@ declare -A TARGETS
 TARGETS["opencascade"]="pre opencascade.build"
 TARGETS["gmsh"]="pre opencascade.build gmsh.build"
 TARGETS["gmsh:test"]="pre opencascade.build gmsh.build gmsh.test"
+TARGETS["freefem"]="pre freefem.build"
 TARGETS["vtk"]="pre vtk.build"
-TARGETS["converters"]="pre opencascade.build gmsh.build vtk.build converters.build"
+TARGETS["converters"]="pre opencascade.build gmsh.build freefem.build vtk.build converters.build"
 
 DOCKERFILE_PATH="/tmp/Dockerfile";
 
@@ -30,7 +32,7 @@ GITHUB_TOKEN=${BUILD_TOKEN:-${GITHUB_TOKEN}}
 
 usage() {
   echo "Usage: ./build.sh [target]";
-  echo "target=[opencascade, gmsh, vtk or converters]"
+  echo "target=[opencascade, gmsh, freefem, vtk or converters]"
 }
 
 checkArchives() {
@@ -64,7 +66,7 @@ buildDockerfile() {
     if [ ! -f $DOCKERFILE_PATH ]; then
       cat ./${fragment}.Dockerfile > $DOCKERFILE_PATH
     else
-      cat ./${fragment}.Dockerfile | sed s/FROM.*// >> $DOCKERFILE_PATH
+      cat ./${fragment}.Dockerfile | sed s/FROM.*as.*// >> $DOCKERFILE_PATH
     fi
   done
 }
