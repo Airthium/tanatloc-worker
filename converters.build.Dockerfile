@@ -1,47 +1,56 @@
+## CONVERTERS ##
+ENV CONVERTERSPATH /root/converters
+ENV CONVERTERSSOURCES /root/converterssources
+
+# Copy
+WORKDIR $CONVERTERSSOURCES
+COPY ./converters .
+
+# Build converters
+RUN mkdir build \
+  && cd build \
+  && cmake .. -DOpenCASCADE_DIR=/root/occ/lib/cmake/opencascade -DVTK_DIR=/root/vtk/lib/cmake/vtk-9.0 -DCMAKE_INSTALL_PREFIX=$CONVERTERSPATH \
+  && make -j "$(nproc)" \
+  && make install
+
+# Release
 FROM ubuntu:20.10
 
 LABEL maintainer="https://github.com/orgs/Airthium/people"
 
 ENV DEBIAN_FRONTEND noninteractive
 
-ENV CONVERTERSPATH /root/converters
-ENV CONVERTERSSOURCES /root/converterssources
+ENV BUILDER_OCCPATH /root/occ
+ENV BUILDER_GMSHPATH /root/gmsh
+ENV BUILDER_FREEFEMPATH /root/freefem
+ENV BUILDER_VTKPATH /root/vtk
+ENV BUILDER_CONVERTERSPATH /root/converters
+
+ENV OCCPATH $BUILDER_OCCPATH
+ENV GMSHPATH $BUILDER_GMSHPATH
+ENV FREEFEMPATH $BUILDER_FREEFEMPATH
+ENV VTKPATH $BUILDER_VTKPATH
+ENV CONVERTERSPATH $BUILDER_CONVERTERSPATH
 
 # Install packages
-RUN apt-get update \
-  && apt-get install -yq \
-  cmake \
-  g++ \
-  libfftw3-dev libgl1-mesa-dev libgsl-dev \
-  libhdf5-dev liblapack-dev libnlopt-dev \
-  libopenblas-dev \
-  mesa-common-dev \
-  pkg-config \
-  && apt-get autoremove \
-  && apt-get clean \
+RUN apt update \
+  && apt upgrade -yq
+
+RUN apt install -yq \
+  libfontconfig1 libgl1-mesa-dev libhdf5-dev liblapack-dev
+
+RUN apt autoremove \
+  && apt clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Copy
-WORKDIR $CONVERTERSSOURCES
-
-COPY ./converters .
-
 # Copy from builder
-COPY --from=builder $OCCPATH $OCCPATH
-COPY --from=builder $GMSHPATH $GMSHPATH
-COPY --from=builder $FREEFEMPATH $FREEFEMPATH
-COPY --from=builder $VTKPATH $VTKPATH
-
-# Build converters
-RUN mkdir build \
-  && cd build \
-  && cmake .. -DCMAKE_INSTALL_PREFIX=$CONVERTERSPATH \
-  && make -j "$(nproc)" \
-  && make install
-
-# Cleanup
-RUN rm -rf $CONVERTERSSOURCES
+COPY --from=builder $BUILDER_OCCPATH $OCCPATH
+COPY --from=builder $BUILDER_GMSHPATH $GMSHPATH
+COPY --from=builder $BUILDER_FREEFEMPATH $FREEFEMPATH
+COPY --from=builder $BUILDER_VTKPATH $VTKPATH
+COPY --from=builder $BUILDER_CONVERTERSPATH $CONVERTERSPATH
 
 # Environment
 WORKDIR /root
-RUN export PATH=$GMSHPATH/bin:$FREEFEMPATH/bin:$CONVERTERSPATH/bin:$PATH
+ENV PATH $GMSHPATH/bin:$FREEFEMPATH/bin:$CONVERTERSPATH/bin:$PATH
+ENV LD_LIBRARY_PATH $OCCPATH/lib:$GMSHPATH/lib:$FREEFEMPATH/lib:$VTKPATH/lib:$CONVERTERSPATH/lib:$LD_LIBRARY_PATH

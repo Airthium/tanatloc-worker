@@ -1,6 +1,4 @@
 ## FREEFEM ##
-FROM ubuntu:20.10 as builder
-
 ENV FREEFEMPATH /root/freefem
 ENV FREEFEMSOURCES /root/freefemsources
 
@@ -22,6 +20,5 @@ RUN cd 3rdparty/ff-petsc \
     && make petsc-slepc
 
 RUN ./reconfigure \
-    && make -j "$(nproc)"
-
-RUN make install
+    && make -j "$(nproc)" \
+    && make install

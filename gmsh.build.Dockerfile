@@ -1,6 +1,4 @@
 ## GMSH ##
-FROM ubuntu:20.10 as build
-
 ENV GMSHPATH /root/gmsh
 ENV GMSHSOURCES /root/gmshsources
 

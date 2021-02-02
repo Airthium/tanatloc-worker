@@ -1,10 +1,13 @@
+## PRE ##
 FROM ubuntu:20.10 as builder
 
 ENV DEBIAN_FRONTEND noninteractive
 
 # Install packages
-RUN apt-get update \
-  && apt-get install -yq \
+RUN apt update \
+  && apt upgrade -yq
+
+RUN apt install -yq \
   automake \
   bison \
   catch2 cmake \
@@ -17,7 +20,8 @@ RUN apt-get update \
   patch pkg-config python3-minimal python3-distutils \
   tcl-dev tk-dev \
   unzip \
-  wget \
-  && apt-get autoremove \
-  && apt-get clean \
+  wget
+
+RUN apt autoremove \
+  && apt clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*

@@ -1,6 +1,4 @@
 ## OCC ##
-FROM ubuntu:20.10 as build
-
 ENV OCCPATH /root/occ
 ENV OCCSOURCES /root/occsources
 

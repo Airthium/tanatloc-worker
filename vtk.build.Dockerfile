@@ -1,6 +1,4 @@
 ## VTK ##
-FROM ubuntu:20.10 as build
-
 ENV VTKPATH /root/vtk
 ENV VTKSOURCES /root/vtksources
 
