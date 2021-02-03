@@ -11,31 +11,40 @@ ENV BUILDER_FREEFEMPATH /root/freefem
 ENV BUILDER_VTKPATH /root/vtk
 ENV BUILDER_CONVERTERSPATH /root/converters
 
-ENV OCCPATH $BUILDER_OCCPATH
-ENV GMSHPATH $BUILDER_GMSHPATH
-ENV FREEFEMPATH $BUILDER_FREEFEMPATH
-ENV VTKPATH $BUILDER_VTKPATH
-ENV CONVERTERSPATH $BUILDER_CONVERTERSPATH
+ENV OCCPATH /home/docker/occ
+ENV GMSHPATH /home/docker/gmsh
+ENV FREEFEMPATH /home/docker/freefem
+ENV VTKPATH /home/docker/vtk
+ENV CONVERTERSPATH /home/docker/converters
 
 # Install packages
 RUN apt update \
   && apt upgrade -yq
 
 RUN apt install -yq \
-  libfontconfig1 libgl1-mesa-dev libhdf5-dev liblapack-dev
+  libfontconfig1 libgl1-mesa-dev \
+  libhdf5-dev liblapack-dev \
+  libumfpack5
 
 RUN apt autoremove \
   && apt clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+# User
+RUN getent group users || groupadd -r users \
+  && useradd -r -g users -d /home/user -s /sbin/nologin -c "Docker user" docker
+
 # Copy from builder
-COPY --from=builder $BUILDER_OCCPATH $OCCPATH
-COPY --from=builder $BUILDER_GMSHPATH $GMSHPATH
-COPY --from=builder $BUILDER_FREEFEMPATH $FREEFEMPATH
-COPY --from=builder $BUILDER_VTKPATH $VTKPATH
-COPY --from=builder $BUILDER_CONVERTERSPATH $CONVERTERSPATH
+COPY --from=builder --chown=docker:users $BUILDER_OCCPATH $OCCPATH
+COPY --from=builder --chown=docker:users $BUILDER_GMSHPATH $GMSHPATH
+COPY --from=builder --chown=docker:users $BUILDER_FREEFEMPATH $FREEFEMPATH
+COPY --from=builder --chown=docker:users $BUILDER_VTKPATH $VTKPATH
+COPY --from=builder --chown=docker:users $BUILDER_CONVERTERSPATH $CONVERTERSPATH
 
 # Environment
-WORKDIR /root
+USER docker
+
 ENV PATH $GMSHPATH/bin:$FREEFEMPATH/bin:$CONVERTERSPATH/bin:$PATH
 ENV LD_LIBRARY_PATH $OCCPATH/lib:$GMSHPATH/lib:$FREEFEMPATH/lib:$VTKPATH/lib:$CONVERTERSPATH/lib:$LD_LIBRARY_PATH
+
+WORKDIR /home/user
