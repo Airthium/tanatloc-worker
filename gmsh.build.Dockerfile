@@ -13,6 +13,6 @@ WORKDIR $GMSHSOURCES
 # Configure and build Gmsh
 RUN mkdir build \
   && cd build \
-  && cmake .. -DENABLE_FLTK=OFF -DCMAKE_INSTALL_PREFIX=$GMSHPATH \
+  && cmake .. -DENABLE_FLTK=OFF -DOCC_INC=$OCCPATH/include/opencascade -DCMAKE_INSTALL_PREFIX=$GMSHPATH \
   && make -j "$(nproc)" \
   && make install

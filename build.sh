@@ -23,7 +23,7 @@ TARGETS["gmsh"]="pre opencascade.build gmsh.build"
 TARGETS["gmsh:test"]="pre opencascade.build gmsh.build gmsh.test"
 TARGETS["freefem"]="pre freefem.build"
 TARGETS["vtk"]="pre vtk.build"
-TARGETS["converters"]="pre opencascade.build gmsh.build freefem.build vtk.build converters.build"
+TARGETS["converters"]="pre freefem.build vtk.build opencascade.build gmsh.build converters.build"
 
 DOCKERFILE_PATH="/tmp/Dockerfile";
 
@@ -66,7 +66,7 @@ buildDockerfile() {
     if [ ! -f $DOCKERFILE_PATH ]; then
       cat ./${fragment}.Dockerfile > $DOCKERFILE_PATH
     else
-      cat ./${fragment}.Dockerfile | sed s/FROM.*as.*// >> $DOCKERFILE_PATH
+      cat ./${fragment}.Dockerfile >> $DOCKERFILE_PATH
     fi
   done
 }
