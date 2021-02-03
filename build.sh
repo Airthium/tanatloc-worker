@@ -24,6 +24,7 @@ TARGETS["gmsh:test"]="pre opencascade.build gmsh.build gmsh.test"
 TARGETS["freefem"]="pre freefem.build"
 TARGETS["vtk"]="pre vtk.build"
 TARGETS["converters"]="pre freefem.build vtk.build opencascade.build gmsh.build converters.build"
+TARGETS["worker"]="pre freefem.build vtk.build opencascade.build gmsh.build converters.build release"
 
 DOCKERFILE_PATH="/tmp/Dockerfile";
 
@@ -32,7 +33,7 @@ GITHUB_TOKEN=${BUILD_TOKEN:-${GITHUB_TOKEN}}
 
 usage() {
   echo "Usage: ./build.sh [target]";
-  echo "target=[opencascade, gmsh, freefem, vtk or converters]"
+  echo "target=[opencascade, gmsh, freefem, vtk, converters or worker]"
 }
 
 checkArchives() {
