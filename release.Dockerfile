@@ -25,7 +25,7 @@ RUN apt install -yq \
   libfontconfig1 libgl1-mesa-dev \
   libopenblas-dev libhdf5-dev \
   libgsl-dev libfftw3-dev \
-  libnlopt-dev
+  libnlopt-dev libumfpack5
 
 RUN apt autoremove \
   && apt clean \

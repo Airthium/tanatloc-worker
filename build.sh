@@ -75,8 +75,8 @@ buildDockerfile() {
 build() {
   target="$1"
   echo -e "Building Docker image..."
-  echo -e "> docker build $ARGS -f $DOCKERFILE_PATH . -t tanatloc/$target"
-  docker build $ARGS -f $DOCKERFILE_PATH . -t tanatloc/$target
+  echo -e "> docker build $ARGS -f $DOCKERFILE_PATH . -t tanatloc/$target:latest"
+  docker build $ARGS -f $DOCKERFILE_PATH . -t tanatloc/$target:latest
 }
 
 target=$1
