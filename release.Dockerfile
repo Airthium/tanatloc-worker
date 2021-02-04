@@ -23,6 +23,7 @@ RUN apt update \
 
 RUN apt install -yq \
   libfontconfig1 libgl1-mesa-dev \
+  libarpack2-dev \
   libopenblas-dev libhdf5-dev \
   libgsl-dev libfftw3-dev \
   libnlopt-dev libumfpack5
@@ -47,5 +48,7 @@ USER docker
 
 ENV PATH $GMSHPATH/bin:$FREEFEMPATH/bin:$CONVERTERSPATH/bin:$PATH
 ENV LD_LIBRARY_PATH $OCCPATH/lib:$GMSHPATH/lib:$FREEFEMPATH/lib:$VTKPATH/lib:$CONVERTERSPATH/lib:$LD_LIBRARY_PATH
+ENV FF_INCLUDEPATH $FREEFEMPATH/lib/ff++/4.8/idp
+ENV FF_LOADPATH ./;;$FREEFEMPATH/lib/ff++/4.8/lib
 
 WORKDIR /home/user
