@@ -5,11 +5,11 @@ LABEL maintainer="https://github.com/orgs/Airthium/people"
 
 ENV DEBIAN_FRONTEND noninteractive
 
-ENV BUILDER_OCCPATH /root/occ
-ENV BUILDER_GMSHPATH /root/gmsh
-ENV BUILDER_FREEFEMPATH /root/freefem
-ENV BUILDER_VTKPATH /root/vtk
-ENV BUILDER_CONVERTERSPATH /root/converters
+ENV BUILDER_OCCPATH /home/docker/occ
+ENV BUILDER_GMSHPATH /home/docker/gmsh
+ENV BUILDER_FREEFEMPATH /home/docker/freefem
+ENV BUILDER_VTKPATH /home/docker/vtk
+ENV BUILDER_CONVERTERSPATH /home/docker/converters
 
 ENV OCCPATH /home/docker/occ
 ENV GMSHPATH /home/docker/gmsh

@@ -1,8 +1,8 @@
 ## VTK ##
-ENV VTKPATH /root/vtk
-ENV VTKSOURCES /root/vtksources
+ENV VTKPATH /home/docker/vtk
+ENV VTKSOURCES /home/docker/vtksources
 
-WORKDIR /root
+WORKDIR /home/docker
 
 # Copy VTK repository
 COPY VTK-9.0.1.tar.gz .

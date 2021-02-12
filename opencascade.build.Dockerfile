@@ -1,8 +1,8 @@
 ## OCC ##
-ENV OCCPATH /root/occ
-ENV OCCSOURCES /root/occsources
+ENV OCCPATH /home/docker/occ
+ENV OCCSOURCES /home/docker/occsources
 
-WORKDIR /root
+WORKDIR /home/docker
 
 # Copy OCC repository
 COPY opencascade-7.4.0.tar.gz .

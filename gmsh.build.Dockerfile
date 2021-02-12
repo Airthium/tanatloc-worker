@@ -1,8 +1,8 @@
 ## GMSH ##
-ENV GMSHPATH /root/gmsh
-ENV GMSHSOURCES /root/gmshsources
+ENV GMSHPATH /home/docker/gmsh
+ENV GMSHSOURCES /home/docker/gmshsources
 
-WORKDIR /root
+WORKDIR /home/docker
 
 # Copy gmsh directory
 COPY gmsh.tar.gz .
