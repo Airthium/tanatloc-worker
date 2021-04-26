@@ -26,7 +26,7 @@ TARGETS["vtk"]="pre vtk.build"
 TARGETS["converters"]="pre freefem.build vtk.build opencascade.build gmsh.build converters.build"
 TARGETS["worker"]="pre freefem.build vtk.build opencascade.build gmsh.build converters.build release"
 
-DOCKERFILE_PATH="/tmp/Dockerfile";
+DOCKERFILE_PATH="./Dockerfile";
 
 # Read Github Token from 2 different env variables for CI:
 GITHUB_TOKEN=${BUILD_TOKEN:-${GITHUB_TOKEN}}
@@ -95,4 +95,4 @@ echo "ARGS=\"$ARGS\""
 
 checkArchives
 buildDockerfile "$target"
-build "$target"
+# build "$target"
