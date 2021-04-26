@@ -62,7 +62,7 @@ buildDockerfile() {
   declare -A fragments
   fragments="${TARGETS[$target]}"
 
-  rm $DOCKERFILE_PATH;
+  rm -f $DOCKERFILE_PATH;
   for fragment in $fragments; do
     if [ ! -f $DOCKERFILE_PATH ]; then
       cat ./${fragment}.Dockerfile > $DOCKERFILE_PATH
