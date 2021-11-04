@@ -1,5 +1,5 @@
 ## RELEASE ##
-FROM ubuntu:21.04
+FROM ubuntu:22.04
 
 LABEL maintainer="https://github.com/orgs/Airthium/people"
 

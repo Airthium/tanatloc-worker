@@ -1,4 +1,4 @@
-FROM ubuntu:21.04 as build
+FROM ubuntu:22.04 as build
 
 WORKDIR $GMSHSOURCES
 
