@@ -1,5 +1,6 @@
 # Archives
 **/*.tar.gz
+**/*.tgz
 
 # CMake
 converters
