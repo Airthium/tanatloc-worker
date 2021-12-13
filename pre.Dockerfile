@@ -1,5 +1,5 @@
 ## PRE ##
-FROM ubuntu:21.04 as builder
+FROM ubuntu:20.04 as builder
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -10,7 +10,7 @@ RUN apt update \
 RUN apt install -yq \
   automake \
   bison \
-  catch2 cmake \
+  catch cmake \
   file flex \
   g++ gfortran git \
   libfftw3-dev libgl1-mesa-dev libgsl-dev \

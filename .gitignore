@@ -13,3 +13,5 @@ converters/test/assets/Cube
 # Coverage
 coverage
 
+# Dockerfile
+Dockerfile
