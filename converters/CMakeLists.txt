@@ -13,8 +13,8 @@ if (VTK_FOUND)
   set(VTK_LIBS ${VTK_LIBRARIES})
 endif (VTK_FOUND)
 
-# # Catch2
-# find_package(Catch2 REQUIRED)
+# Catch2
+find_package(Catch2 REQUIRED)
 
 # OpenCASCADE
 find_package(OpenCASCADE REQUIRED)
@@ -117,99 +117,99 @@ target_link_libraries(VTUToThreeJS ${VTK_LIBS})
 ## Install
 install(TARGETS DXFToBRep BRepToThreeJS GmshToThreeJS StepToThreeJS StepUnion VTUToThreeJS)
 
-# ## Tests
-# include(CTest)
-# include(Catch)
+## Tests
+include(CTest)
+include(Catch)
 
-# set(LOGGER_TESTS
-#   test/logger/Logger.test.cpp
-# )
+set(LOGGER_TESTS
+  test/logger/Logger.test.cpp
+)
 
-# set(GMSH_TESTS
-#   test/gmsh/Gmsh.test.cpp
-#   test/gmsh/Tetrahedron.test.cpp
-#   test/gmsh/Triangle.test.cpp
-#   test/gmsh/Vertex.test.cpp
-# )
+set(GMSH_TESTS
+  test/gmsh/Gmsh.test.cpp
+  test/gmsh/Tetrahedron.test.cpp
+  test/gmsh/Triangle.test.cpp
+  test/gmsh/Vertex.test.cpp
+)
 
-# set(OCC_TESTS
-#   test/occ/getElements.test.cpp
-#   test/occ/StepReader.test.cpp
-#   test/occ/StepWriter.test.cpp
-#   test/occ/Triangulation.test.cpp
-#   test/occ/Union.test.cpp
-# )
+set(OCC_TESTS
+  test/occ/getElements.test.cpp
+  test/occ/StepReader.test.cpp
+  test/occ/StepWriter.test.cpp
+  test/occ/Triangulation.test.cpp
+  test/occ/Union.test.cpp
+)
 
-# set(THREEJS_TESTS
-#   test/threeJS/ThreeJS.test.cpp
-# )
+set(THREEJS_TESTS
+  test/threeJS/ThreeJS.test.cpp
+)
 
-# set(VTK_TESTS
-#   test/vtk/VTUReader.test.cpp
-# )
+set(VTK_TESTS
+  test/vtk/VTUReader.test.cpp
+)
 
-# set(MAIN_TESTS
-#   test/DXFConverter.test.cpp
-#   src/DXFConverter.cpp
-# )
+set(MAIN_TESTS
+  test/DXFConverter.test.cpp
+  src/DXFConverter.cpp
+)
 
-# set(SOURCE_TESTS
-#   test/main.cpp
-#   ${LOGGER_TESTS}
-#   ${LOGGER_SOURCE}
-#   ${GMSH_TESTS}
-#   ${GMSH_SOURCE}
-#   ${OCC_TESTS}
-#   ${OCC_SOURCE}
-#   ${THREEJS_TESTS}
-#   ${THREEJS_SOURCE}
-#   ${VTK_TESTS}
-#   ${VTK_SOURCE}
-#   ${MAIN_TESTS}
-#   ${DXF_SOURCE}
-# )
+set(SOURCE_TESTS
+  test/main.cpp
+  ${LOGGER_TESTS}
+  ${LOGGER_SOURCE}
+  ${GMSH_TESTS}
+  ${GMSH_SOURCE}
+  ${OCC_TESTS}
+  ${OCC_SOURCE}
+  ${THREEJS_TESTS}
+  ${THREEJS_SOURCE}
+  ${VTK_TESTS}
+  ${VTK_SOURCE}
+  ${MAIN_TESTS}
+  ${DXF_SOURCE}
+)
 
-# add_executable(tests ${SOURCE_TESTS})
-# target_link_libraries(tests ${OCC_LIBS})
-# target_link_libraries(tests ${VTK_LIBS})
-# target_link_libraries(tests Catch2::Catch2)
-# catch_discover_tests(tests)
+add_executable(tests ${SOURCE_TESTS})
+target_link_libraries(tests ${OCC_LIBS})
+target_link_libraries(tests ${VTK_LIBS})
+target_link_libraries(tests Catch2::Catch2)
+catch_discover_tests(tests)
 
-# ## Coverage
-# option(COVERAGE "Enable coverage flags" OFF)
-# if (COVERAGE)
-#   SET(CMAKE_CXX_FLAGS "-O0 --coverage -W")
-# endif()
+## Coverage
+option(COVERAGE "Enable coverage flags" OFF)
+if (COVERAGE)
+  SET(CMAKE_CXX_FLAGS "-O0 --coverage -W")
+endif()
 
-# add_custom_target(coverage
-#   COMMAND make clean
-#   COMMAND make
-#   COMMAND make test
-#   COMMAND ./DXFToBRep || true
-#   COMMAND ./DXFToBRep ./test/assets/not_existing.dxf pipe.brep|| true
-#   COMMAND ./DXFToBRep ./test/assets/pipe.dxf pipe.brep || true
-#   COMMAND ./BRepToThreeJS || true
-#   COMMAND ./BRepToThreeJS ./test/assets/not_existing.brep || true
-#   COMMAND ./BRepToThreeJS ./test/assets/pipe.brep || true
-#   COMMAND ./BRepToThreeJS ./test/assets/cube.brep || true
-#   COMMAND ./BRepToThreeJS ./test/assets/pipe.brep pipe || true
-#   COMMAND ./GmshToThreeJS || true
-#   COMMAND ./GmshToThreeJS ./test/assets/not_existing.msh || true
-#   COMMAND ./GmshToThreeJS ./test/assets/Cube.msh || true
-#   COMMAND ./GmshToThreeJS ./test/assets/Cube.msh ./cube || true
-#   COMMAND ./StepToThreeJS || true
-#   COMMAND ./StepToThreeJS ./test/assets/not_existing.step || true
-#   COMMAND ./StepToThreeJS ./test/assets/cube.step || true
-#   COMMAND ./StepToThreeJS ./test/assets/cube.step ./cube || true
-#   COMMAND ./StepUnion || true
-#   COMMAND ./StepUnion ./test/assets/not_existing.step ./cube.step || true
-#   COMMAND ./StepUnion ./test/assets/not_existing.step ./not_existing/cube.step || true
-#   COMMAND ./StepUnion ./test/assets/cube.step ./cube.step || true
-#   COMMAND ./VTUToThreeJS || true
-#   COMMAND ./VTUToThreeJS ./test/assets/not_existing.vtu || true
-#   COMMAND ./VTUToThreeJS ./test/assets/Result.vtu || true
-#   COMMAND ./VTUToThreeJS ./test/assets/Result.vtu Result || true
-#   COMMAND ./VTUToThreeJS ./test/assets/Result_multi.vtu Result || true
-#   COMMAND lcov --directory . -c -o report.info
-#   COMMAND genhtml -o ../coverage -t "Converters coverage" report.info
-# )
+add_custom_target(coverage
+  COMMAND make clean
+  COMMAND make
+  COMMAND make test
+  COMMAND ./DXFToBRep || true
+  COMMAND ./DXFToBRep ./test/assets/not_existing.dxf pipe.brep|| true
+  COMMAND ./DXFToBRep ./test/assets/pipe.dxf pipe.brep || true
+  COMMAND ./BRepToThreeJS || true
+  COMMAND ./BRepToThreeJS ./test/assets/not_existing.brep || true
+  COMMAND ./BRepToThreeJS ./test/assets/pipe.brep || true
+  COMMAND ./BRepToThreeJS ./test/assets/cube.brep || true
+  COMMAND ./BRepToThreeJS ./test/assets/pipe.brep pipe || true
+  COMMAND ./GmshToThreeJS || true
+  COMMAND ./GmshToThreeJS ./test/assets/not_existing.msh || true
+  COMMAND ./GmshToThreeJS ./test/assets/Cube.msh || true
+  COMMAND ./GmshToThreeJS ./test/assets/Cube.msh ./cube || true
+  COMMAND ./StepToThreeJS || true
+  COMMAND ./StepToThreeJS ./test/assets/not_existing.step || true
+  COMMAND ./StepToThreeJS ./test/assets/cube.step || true
+  COMMAND ./StepToThreeJS ./test/assets/cube.step ./cube || true
+  COMMAND ./StepUnion || true
+  COMMAND ./StepUnion ./test/assets/not_existing.step ./cube.step || true
+  COMMAND ./StepUnion ./test/assets/not_existing.step ./not_existing/cube.step || true
+  COMMAND ./StepUnion ./test/assets/cube.step ./cube.step || true
+  COMMAND ./VTUToThreeJS || true
+  COMMAND ./VTUToThreeJS ./test/assets/not_existing.vtu || true
+  COMMAND ./VTUToThreeJS ./test/assets/Result.vtu || true
+  COMMAND ./VTUToThreeJS ./test/assets/Result.vtu Result || true
+  COMMAND ./VTUToThreeJS ./test/assets/Result_multi.vtu Result || true
+  COMMAND lcov --directory . -c -o report.info
+  COMMAND genhtml -o ../coverage -t "Converters coverage" report.info
+)

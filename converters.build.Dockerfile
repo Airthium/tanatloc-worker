@@ -1,3 +1,17 @@
+##Catch2
+ENV CATCH2SOURCE /home/docker/catch2
+
+# Copy
+RUN git clone https://github.com/catchorg/Catch2.git -b v2.x $CATCH2SOURCE
+WORKDIR $CATCH2SOURCE
+
+# Build
+RUN mkdir build \
+  && cd build \
+  && cmake .. -DBUILD_TESTING=OFF -DCATCH_BUILD_TESTING=OFF -DCATCH_INSTALL_DOCS=OFF -DCATCH_ENABLE_WERROR=OFF \ 
+  && make -j "$(nproc)" \
+  && make install
+
 ## CONVERTERS ##
 ENV CONVERTERSPATH /home/docker/converters
 ENV CONVERTERSSOURCES /home/docker/converterssources
