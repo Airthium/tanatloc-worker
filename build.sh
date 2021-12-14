@@ -48,9 +48,9 @@ downloadArchive() {
   archive="$1"
 
   # Download target if not already present
-  if [ ! -f $archive ]; then
+  if [ ! -f "$archive" ]; then
     echo "File $archive not found. Downloading..."
-    curl -LJO -u $GITHUB_TOKEN:x-oauth-basic -H 'Accept: application/octet-stream' ${ARCHIVES[$archive]}
+    curl -LJO -u "$GITHUB_TOKEN:x-oauth-basic" -H 'Accept: application/octet-stream' ${ARCHIVES[$archive]}
   fi
 }
 
@@ -59,15 +59,14 @@ buildDockerfile() {
   echo -e "Building Dockerfile..."
   echo -e "> ${DOCKERFILE_PATH}"
 
-  declare -A fragments
   fragments="${TARGETS[$target]}"
 
   rm -f $DOCKERFILE_PATH;
   for fragment in $fragments; do
     if [ ! -f $DOCKERFILE_PATH ]; then
-      cat ./${fragment}.Dockerfile > $DOCKERFILE_PATH
+      cat "./${fragment}.Dockerfile" > $DOCKERFILE_PATH
     else
-      cat ./${fragment}.Dockerfile >> $DOCKERFILE_PATH
+      cat "./${fragment}.Dockerfile" >> $DOCKERFILE_PATH
     fi
   done
 }
@@ -76,7 +75,7 @@ build() {
   target="$1"
   echo -e "Building Docker image..."
   echo -e "> docker build $ARGS -f $DOCKERFILE_PATH . -t tanatloc/$target:latest"
-  docker build $ARGS -f $DOCKERFILE_PATH . -t tanatloc/$target:latest
+  docker build "$ARGS" -f $DOCKERFILE_PATH . -t "tanatloc/$target:latest"
 }
 
 target=$1
@@ -88,7 +87,7 @@ if [ "${TARGETS[$target]}" == "" ]; then
   exit 1;
 fi
 
-ARGS="$@";
+ARGS="$*";
 echo "Building started..."
 echo "TARGET=\"$target\""
 echo "ARGS=\"$ARGS\""

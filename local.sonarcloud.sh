@@ -15,10 +15,10 @@ gcov CMakeFiles/GmshToThreeJS.dir/src/GmshToThreeJS.cpp.gcda
 gcov CMakeFiles/StepToThreeJS.dir/src/StepToThreeJS.cpp.gcda
 gcov CMakeFiles/StepUnion.dir/src/StepUnion.cpp.gcda
 gcov CMakeFiles/VTUToThreeJS.dir/src/VTUToThreeJS.cpp.gcda
-gcovFiles=`find CMakeFiles/tests.dir -name "*.gcda" `
+gcovFiles=$(find CMakeFiles/tests.dir -name "*.gcda")
 for file in $gcovFiles
 do
-  gcov $file
+  gcov "$file"
 done
 
 echo "Scanner"
