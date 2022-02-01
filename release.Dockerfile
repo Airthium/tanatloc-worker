@@ -32,10 +32,6 @@ RUN apt autoremove \
   && apt clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# # User
-# RUN getent group users || groupadd -r users \
-#   && useradd -r -g users -d /home/user -s /sbin/nologin -c "Docker user" docker
-
 # Copy from builder
 COPY --from=builder $BUILDER_OCCPATH $OCCPATH
 COPY --from=builder $BUILDER_GMSHPATH $GMSHPATH
@@ -48,5 +44,3 @@ ENV PATH $GMSHPATH/bin:$FREEFEMPATH/bin:$CONVERTERSPATH/bin:$PATH
 ENV LD_LIBRARY_PATH $OCCPATH/lib:$GMSHPATH/lib:$FREEFEMPATH/lib:$VTKPATH/lib:$CONVERTERSPATH/lib:$LD_LIBRARY_PATH
 ENV FF_INCLUDEPATH $FREEFEMPATH/lib/ff++/4.9/idp
 ENV FF_LOADPATH ./;;$FREEFEMPATH/lib/ff++/4.9/lib
-
-# WORKDIR /home/user
