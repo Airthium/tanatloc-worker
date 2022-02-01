@@ -1,5 +1,5 @@
 ##Catch2
-ENV CATCH2SOURCE /home/docker/catch2
+ENV CATCH2SOURCE /home/programs/catch2
 
 # Copy
 RUN git clone https://github.com/catchorg/Catch2.git -b v2.x $CATCH2SOURCE
@@ -13,8 +13,8 @@ RUN mkdir build \
   && make install
 
 ## CONVERTERS ##
-ENV CONVERTERSPATH /home/docker/converters
-ENV CONVERTERSSOURCES /home/docker/converterssources
+ENV CONVERTERSPATH /home/programs/converters
+ENV CONVERTERSSOURCES /home/programs/converterssources
 
 # Copy
 WORKDIR $CONVERTERSSOURCES

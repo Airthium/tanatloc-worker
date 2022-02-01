@@ -1,8 +1,8 @@
 ## FREEFEM ##
-ENV FREEFEMPATH /home/docker/freefem
-ENV FREEFEMSOURCES /home/docker/freefemsources
+ENV FREEFEMPATH /home/programs/freefem
+ENV FREEFEMSOURCES /home/programs/freefemsources
 
-WORKDIR /home/docker
+WORKDIR /home/programs
 
 # Copy FreeFEM repository
 COPY FreeFem-sources-4.9.tar.gz .

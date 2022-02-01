@@ -5,9 +5,8 @@ ENV DEBIAN_FRONTEND noninteractive
 
 # Install packages
 RUN apt update \
-  && apt upgrade -yq
-
-RUN apt install -yq \
+  && apt upgrade -yq \
+  && apt install -yq \
   automake \
   bison \
   catch cmake \
@@ -20,8 +19,7 @@ RUN apt install -yq \
   patch pkg-config python3-minimal python3-distutils \
   tcl-dev tk-dev \
   unzip \
-  wget
-
-RUN apt autoremove \
+  wget \
+  && apt autoremove \
   && apt clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
