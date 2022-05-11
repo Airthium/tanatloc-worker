@@ -128,18 +128,25 @@ void Triangulation::triangulateLoop(const TopoDS_Face &face,
   Poly_Connect pc(triangulation);
 
   // vertices
-  const TColgp_Array1OfPnt &nodes = triangulation->Nodes();
-  for (i = nodes.Lower(); i <= (uint)nodes.Upper(); ++i) {
-    p = nodes(i).Transformed(location.Transformation());
+  const uint nbNodes = triangulation->NbNodes();
+  TColgp_Array1OfPnt nodes(1, nbNodes);
+  for (i = 1; i <= nbNodes; ++i) {
+    const gp_Pnt &node = triangulation->Node(i);
+    nodes.SetValue(i, node);
+  }
+
+  for (i = 1; i <= nbNodes; ++i) {
+    const gp_Pnt node = nodes.Value(i);
+    p = node.Transformed(location.Transformation());
     this->m_vertices.push_back(static_cast<float>(p.X()));
     this->m_vertices.push_back(static_cast<float>(p.Y()));
     this->m_vertices.push_back(static_cast<float>(p.Z()));
   }
 
   // normal
-  TColgp_Array1OfDir normals(nodes.Lower(), nodes.Upper());
+  TColgp_Array1OfDir normals(1, triangulation->NbNodes());
   StdPrs_ToolTriangulatedShape::Normal(face, pc, normals);
-  for (i = normals.Lower(); i <= (uint)normals.Upper(); ++i) {
+  for (i = 1; i <= nbNodes; ++i) {
     d = normals(i).Transformed(location.Transformation());
     this->m_normals.push_back(static_cast<float>(d.X()));
     this->m_normals.push_back(static_cast<float>(d.Y()));
@@ -151,15 +158,15 @@ void Triangulation::triangulateLoop(const TopoDS_Face &face,
   int n2;
   int n3;
   TopAbs_Orientation orient = face.Orientation();
-  const Poly_Array1OfTriangle &triangles = triangulation->Triangles();
   for (i = 1; i <= (uint)triangulation->NbTriangles(); ++i) {
-    triangles(i).Get(n1, n2, n3);
+    const Poly_Triangle &triangle = triangulation->Triangle(i);
+    triangle.Get(n1, n2, n3);
     if (orient != TopAbs_FORWARD) {
       int tmp = n1;
       n1 = n2;
       n2 = tmp;
     }
-    if (this->isValid(nodes(n1), nodes(n2), nodes(n3))) {
+    if (this->isValid(nodes.Value(n1), nodes.Value(n2), nodes.Value(n3))) {
       this->m_indices.push_back(--n1 + iDelta);
       this->m_indices.push_back(--n2 + iDelta);
       this->m_indices.push_back(--n3 + iDelta);

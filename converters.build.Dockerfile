@@ -23,6 +23,6 @@ COPY ./converters .
 # Build converters
 RUN mkdir build \
   && cd build \
-  && cmake .. -DOpenCASCADE_DIR=$OCCPATH/lib/cmake/opencascade -DVTK_DIR=$VTKPATH/lib/cmake/vtk-9.0 -DCMAKE_INSTALL_PREFIX=$CONVERTERSPATH \
+  && cmake .. -DOpenCASCADE_DIR=$OCCPATH/lib/cmake/opencascade -DVTK_DIR=$VTKPATH/lib/cmake/vtk-9.1 -DCMAKE_INSTALL_PREFIX=$CONVERTERSPATH \
   && make -j "$(nproc)" \
   && make install

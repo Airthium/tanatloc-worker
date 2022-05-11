@@ -1,5 +1,5 @@
 ## RELEASE ##
-FROM ubuntu:22.04
+FROM ubuntu:20.04
 
 LABEL maintainer="https://github.com/orgs/Airthium/people"
 
@@ -26,7 +26,8 @@ RUN apt install -yq \
   libarpack2-dev \
   libopenblas-dev libhdf5-dev \
   libgsl-dev libfftw3-dev \
-  libnlopt-dev libumfpack5
+  libnlopt-dev libumfpack5 \
+  python3-paraview
 
 RUN apt autoremove \
   && apt clean \

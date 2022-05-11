@@ -5,8 +5,8 @@ ENV OCCSOURCES /home/programs/occsources
 WORKDIR /home/programs
 
 # Copy OCC repository
-COPY opencascade-7.4.0.tar.gz .
-RUN mkdir $OCCSOURCES && tar -zxf opencascade-7.4.0.tar.gz -C $OCCSOURCES --strip-components 1
+COPY opencascade-7.6.0.tgz .
+RUN mkdir $OCCSOURCES && tar -zxf opencascade-7.6.0.tgz -C $OCCSOURCES --strip-components 1
 
 WORKDIR $OCCSOURCES
 

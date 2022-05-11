@@ -5,8 +5,8 @@ ENV GMSHSOURCES /home/programs/gmshsources
 WORKDIR /home/programs
 
 # Copy gmsh directory
-COPY gmsh.tar.gz .
-RUN mkdir $GMSHSOURCES && tar -zxf gmsh.tar.gz -C $GMSHSOURCES --strip-components 1
+COPY gmsh-4.10.1-source.tgz .
+RUN mkdir $GMSHSOURCES && tar -zxf gmsh-4.10.1-source.tgz -C $GMSHSOURCES --strip-components 1
 
 WORKDIR $GMSHSOURCES
 

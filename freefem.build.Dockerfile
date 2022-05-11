@@ -5,8 +5,8 @@ ENV FREEFEMSOURCES /home/programs/freefemsources
 WORKDIR /home/programs
 
 # Copy FreeFEM repository
-COPY FreeFem-sources-4.9.tar.gz .
-RUN mkdir $FREEFEMSOURCES && tar -zxf FreeFem-sources-4.9.tar.gz -C $FREEFEMSOURCES --strip-components 1
+COPY FreeFem-sources-4.11.tar.gz .
+RUN mkdir $FREEFEMSOURCES && tar -zxf FreeFem-sources-4.11.tar.gz -C $FREEFEMSOURCES --strip-components 1
 
 WORKDIR $FREEFEMSOURCES
 

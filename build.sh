@@ -11,10 +11,10 @@ declare -A ARCHIVES
 
 # Get the list of releases and associated assets:
 #> curl -u $GITHUB_TOKEN:x-oauth-basic "https://api.github.com/repos/Airthium/tanatloc-dockers/releases"
-ARCHIVES["opencascade-7.4.0.tar.gz"]="https://api.github.com/repos/Airthium/tanatloc-dockers/releases/assets/20660980"
-ARCHIVES["gmsh.tar.gz"]="https://api.github.com/repos/Airthium/tanatloc-dockers/releases/assets/27930881"
-ARCHIVES["FreeFem-sources-4.9.tar.gz"]="https://api.github.com/repos/Airthium/tanatloc-dockers/releases/assets/43330733"
-ARCHIVES["VTK-9.0.1.tar.gz"]="https://api.github.com/repos/Airthium/tanatloc-dockers/releases/assets/29680338"
+ARCHIVES["opencascade-7.6.0.tgz"]="https://api.github.com/repos/Airthium/tanatloc-dockers/releases/assets/65069748"
+ARCHIVES["gmsh-4.10.1-source.tgz"]="https://api.github.com/repos/Airthium/tanatloc-dockers/releases/assets/65069747"
+ARCHIVES["FreeFem-sources-4.11.tar.gz"]="https://api.github.com/repos/Airthium/tanatloc-dockers/releases/assets/65069742"
+ARCHIVES["VTK-9.1.0.tar.gz"]="https://api.github.com/repos/Airthium/tanatloc-dockers/releases/assets/65069731"
 
 declare -A TARGETS
 

@@ -5,8 +5,8 @@ ENV VTKSOURCES /home/programs/vtksources
 WORKDIR /home/programs
 
 # Copy VTK repository
-COPY VTK-9.0.1.tar.gz .
-RUN mkdir $VTKSOURCES && tar -zxf VTK-9.0.1.tar.gz -C $VTKSOURCES --strip-components 1
+COPY VTK-9.1.0.tar.gz .
+RUN mkdir $VTKSOURCES && tar -zxf VTK-9.1.0.tar.gz -C $VTKSOURCES --strip-components 1
 
 WORKDIR $VTKSOURCES
 

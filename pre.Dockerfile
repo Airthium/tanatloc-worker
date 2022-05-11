@@ -1,5 +1,5 @@
 ## PRE ##
-FROM ubuntu:22.04 as builder
+FROM ubuntu:20.04 as builder
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -15,7 +15,7 @@ RUN apt update \
   libfftw3-dev libgl1-mesa-dev libgsl-dev \
   libhdf5-dev liblapack-dev libnlopt-dev \
   libopenblas-dev libxi-dev libxmu-dev \
-  make mesa-common-dev \
+  make mesa-common-dev mpich \
   patch pkg-config python3-minimal python3-distutils \
   tcl-dev tk-dev \
   unzip \
