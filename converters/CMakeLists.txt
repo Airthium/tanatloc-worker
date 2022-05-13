@@ -75,6 +75,14 @@ set(StepToThreeJSSOURCE
   ${LOGGER_SOURCE}
 )
 
+# StepToGLTF (TODO to remove)
+set(StepToGLTFSOURCE
+  src/StepToGLTF.cpp
+  ${OCC_SOURCE}
+  ${THREEJS_SOURCE}
+  ${LOGGER_SOURCE}
+)
+
 # StepUnion (TODO to replace by BRepUnion)
 set(StepUnionSOURCE
   src/StepUnion.cpp
@@ -106,6 +114,10 @@ add_executable(GmshToThreeJS ${GmshToThreeJSSOURCE})
 add_executable(StepToThreeJS ${StepToThreeJSSOURCE})
 target_link_libraries(StepToThreeJS ${OCC_LIBS})
 
+# StepToGLTF
+add_executable(StepToGLTF ${StepToGLTFSOURCE})
+target_link_libraries(StepToGLTF ${OCC_LIBS})
+
 # StepUnion
 add_executable(StepUnion ${StepUnionSOURCE})
 target_link_libraries(StepUnion ${OCC_LIBS})
@@ -115,7 +127,7 @@ add_executable(VTUToThreeJS ${VTUToThreeJSSOURCE})
 target_link_libraries(VTUToThreeJS ${VTK_LIBS})
 
 ## Install
-install(TARGETS DXFToBRep BRepToThreeJS GmshToThreeJS StepToThreeJS StepUnion VTUToThreeJS)
+install(TARGETS DXFToBRep BRepToThreeJS GmshToThreeJS StepToThreeJS StepToGLTF StepUnion VTUToThreeJS)
 
 ## Tests
 include(CTest)

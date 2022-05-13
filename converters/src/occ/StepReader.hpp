@@ -3,6 +3,8 @@
 
 #include <vector>
 
+#include <NCollection_Sequence.hxx>
+#include <TDF_LabelSequence.hxx>
 #include <TDocStd_Document.hxx>
 #include <TopoDS_Shape.hxx>
 
@@ -11,6 +13,8 @@ private:
   std::string m_fileName = "";
   std::vector<TopoDS_Shape> m_shapes;
   Handle(TDocStd_Document) m_document;
+  TDF_LabelSequence m_labels;
+  TopoDS_Shape m_shape;
 
 public:
   // Constructor
@@ -21,11 +25,17 @@ public:
   // Read
   bool read();
 
-  // Get shape
+  // Get shapes
   std::vector<TopoDS_Shape> getShapes() const;
+
+  // Get shape
+  TopoDS_Shape getShape() const;
 
   // Get document
   Handle(TDocStd_Document) getDocument() const;
+
+  // Get label sequence
+  TDF_LabelSequence getLabels() const;
 };
 
 #endif
