@@ -2,13 +2,13 @@
 
 #include <fstream>
 
-#include <BRep_Builder.hxx>
 #include <IFSelect_ReturnStatus.hxx>
+#include <Quantity_Color.hxx>
 #include <STEPCAFControl_Reader.hxx>
 #include <TDataStd_Name.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS_Compound.hxx>
-#include <XCAFApp_Application.hxx>
+#include <XCAFDoc_ColorTool.hxx>
 #include <XCAFDoc_DocumentTool.hxx>
 #include <XCAFDoc_ShapeTool.hxx>
 
@@ -30,19 +30,12 @@ StepReader::StepReader(const std::string &fileName) : m_fileName(fileName) {}
  * @returns Status
  */
 bool StepReader::read() {
-  IFSelect_ReturnStatus status;
-
-  // Application
-  Handle(XCAFApp_Application) app = XCAFApp_Application::GetApplication();
-
-  if (app->NbDocuments() > 0) {
-    app->GetDocument(1, this->m_document);
-    app->Close(this->m_document);
-  }
-
-  app->NewDocument("STEP-XCAF", this->m_document);
+  /// READ
+  // Document
+  MainDocument originalMainDocument;
 
   // Reader
+  IFSelect_ReturnStatus status;
   STEPCAFControl_Reader caf_reader = STEPCAFControl_Reader();
   status = caf_reader.ReadFile(this->m_fileName.c_str());
   if (status != IFSelect_RetDone) {
@@ -50,68 +43,42 @@ bool StepReader::read() {
     return false;
   }
 
-  // Document
-  if (!caf_reader.Transfer(this->m_document)) {
+  // Transfer
+  if (!caf_reader.Transfer(originalMainDocument.document)) {
     Logger::ERROR("Unable to transfert root");
     return false;
   }
 
-  // Shape
-  Handle(XCAFDoc_ShapeTool) shapeContent =
-      XCAFDoc_DocumentTool::ShapeTool(this->m_document->Main());
-  shapeContent->GetFreeShapes(this->m_labels);
+  // Compound
+  TopoDS_Compound originalCompound = originalMainDocument.getCompound();
 
-  TopoDS_Compound compound;
-  BRep_Builder builder;
-  builder.MakeCompound(compound);
-  for (TDF_LabelSequence::Iterator iter(this->m_labels); iter.More();
-       iter.Next()) {
-    const TDF_Label &label = iter.Value();
-    TopoDS_Shape shape;
-    if (XCAFDoc_ShapeTool::GetShape(label, shape)) {
-      builder.Add(compound, shape);
+  /// CLEAN DOCUMENT
+  // Solids & faces loop
+  TopExp_Explorer explorer;
+  for (explorer.Init(originalCompound, TopAbs_SOLID); explorer.More();
+       explorer.Next()) {
+    // Solid
+    TopoDS_Shape solid = explorer.Current();
+    Quantity_Color originalColor = originalMainDocument.getShapeColor(solid);
+
+    // New solid
+    TDF_Label solidLabel = this->m_mainDocument.addShape(solid, originalColor);
+
+    TopExp_Explorer subExplorer;
+    for (subExplorer.Init(solid, TopAbs_FACE); subExplorer.More();
+         subExplorer.Next()) {
+      // Face
+      TopoDS_Shape face = subExplorer.Current();
+      Quantity_Color originalColor = originalMainDocument.getShapeColor(face);
+
+      // New face
+      this->m_mainDocument.addComponent(solidLabel, face);
     }
-  }
-  this->m_shape = compound;
-
-  for (int i = 1; i <= this->m_labels.Size(); ++i) {
-    if (XCAFDoc_ShapeTool::IsFree(this->m_labels.Value(i)))
-      this->m_shapes.push_back(
-          XCAFDoc_ShapeTool::GetShape(this->m_labels.Value(i)));
-  }
-
-  // Names
-  std::cout << this->m_labels.Size() << std::endl;
-  for (int i = 1; i <= this->m_labels.Size(); ++i) {
-    TDF_Label label = this->m_labels.Value(i);
-    Handle(TDataStd_Name) name;
-    if (label.FindAttribute(TDataStd_Name::GetID(), name)) {
-      TDataStd_Name::Set(label, "Solid_1"); // TODO correct string with i
-    }
-    // TODO remove non solid or faces or edges ?
-    std::cout << label.NbChildren() << std::endl;
-    // TDF_Label child = aLabel.FindChild(i);
   }
 
   return true;
 }
 
-std::vector<TopoDS_Shape> StepReader::getShapes() const {
-  return this->m_shapes;
+MainDocument StepReader::getMainDocument() const {
+  return this->m_mainDocument;
 }
-
-TopoDS_Shape StepReader::getShape() const { return this->m_shape; }
-
-/**
- * Get document
- * @returns Document
- */
-Handle(TDocStd_Document) StepReader::getDocument() const {
-  return this->m_document;
-}
-
-/**
- * Get labels
- * @return Labels
- */
-TDF_LabelSequence StepReader::getLabels() const { return this->m_labels; }
