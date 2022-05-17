@@ -12,22 +12,9 @@ private:
   MainDocument m_mainDocument;
   double m_minBb = 0;
   double m_maxBb = 0;
-  // std::vector<float> m_vertices;
-  // std::vector<float> m_normals;
-  // std::vector<uint> m_indices;
 
   // Compute max bounding box
   void computeBb();
-  // // Triangulate solid
-  // void triangulateSolid(const TopoDS_Shape &);
-  // // Triangulate face
-  // void triangulateFace(const TopoDS_Shape &);
-  // // Triangulate edge
-  // void triangulateEdge(const TopoDS_Shape &);
-  // Triangulate loop (solid & face)
-  // void triangulateLoop(const TopoDS_Face &, const uint iDelta = 0);
-  // Is valid
-  // bool isValid(const gp_Pnt &, const gp_Pnt &, const gp_Pnt &) const;
 
 public:
   // Constructor
@@ -37,6 +24,12 @@ public:
 
   // Triangulate
   void triangulate();
+
+  // Triangulate face
+  void triangulateFace(const TopoDS_Shape &) const;
+
+  // Triangulate edge
+  void triangulateEdge(const TopoDS_Shape &) const;
 };
 
 #endif //_TRIANGULATION_

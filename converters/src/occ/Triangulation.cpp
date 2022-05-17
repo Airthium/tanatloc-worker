@@ -2,6 +2,7 @@
 
 #include <BRepBndLib.hxx>
 #include <BRepMesh_IncrementalMesh.hxx>
+#include <BRepPrimAPI_MakeCylinder.hxx>
 #include <BRep_Tool.hxx>
 #include <Bnd_Box.hxx>
 #include <Poly_Connect.hxx>
@@ -10,6 +11,7 @@
 #include <TopAbs_ShapeEnum.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
+#include <gp_Ax2.hxx>
 
 #include "../logger/Logger.hpp"
 
@@ -28,8 +30,7 @@ Triangulation::Triangulation(MainDocument &mainDocument)
 }
 
 /**
- * Compute max bounding box dimension
- * @returns Max bounding box dimension
+ * Compute bounding box and max dimensions
  */
 void Triangulation::computeBb() {
   TopoDS_Compound compound = this->m_mainDocument.getCompound();
@@ -57,179 +58,73 @@ void Triangulation::computeBb() {
  * Triangulate
  */
 void Triangulation::triangulate() {
-  TopoDS_Compound compound = this->m_mainDocument.getCompound();
-  BRepMesh_IncrementalMesh mesh(compound, this->m_maxBb * meshQuality);
 
-  // TopAbs_ShapeEnum type = this->m_shape.ShapeType();
-  // if (type == TopAbs_SOLID)
-  //   this->triangulateSolid(this->m_shape);
-  // else if (type == TopAbs_FACE)
-  //   this->triangulateFace(this->m_shape);
-  // else if (type == TopAbs_EDGE)
-  //   this->triangulateEdge(this->m_shape);
+  // TopoDS_Compound compound = this->m_mainDocument.getCompound();
+  TDF_LabelSequence labels = this->m_mainDocument.getLabels();
+
+  for (uint i = 1; i <= labels.Size(); ++i) {
+    // Shape
+    TDF_Label label = labels.Value(i);
+    TopoDS_Shape shape = this->m_mainDocument.getShape(label);
+    BRepMesh_IncrementalMesh mesh(shape, this->m_maxBb * meshQuality);
+
+    // SubShapes
+    TDF_LabelSequence subLabels;
+    this->m_mainDocument.getSubShapes(label, subLabels);
+    std::cout << subLabels.Size() << std::endl;
+    for (uint j = 1; j <= subLabels.Size(); ++j) {
+      // Shape
+      TDF_Label subLabel = subLabels.Value(j);
+      TopoDS_Shape subShape = this->m_mainDocument.getShape(subLabel);
+      BRepMesh_IncrementalMesh subMesh(subShape, this->m_maxBb * meshQuality);
+    }
+  }
+
+  // BRepMesh_IncrementalMesh mesh(compound, this->m_maxBb * meshQuality);
+
+  // if (dimension == 2) {
+  //   TopExp_Explorer faceExplorer;
+  //   for (faceExplorer.Init(compound, TopAbs_FACE); faceExplorer.More();
+  //        faceExplorer.Next()) {
+  //     TopoDS_Shape face = faceExplorer.Current();
+  //     // this->triangulateFace(face);
+
+  //     TopExp_Explorer edgeExplorer;
+  //     for (edgeExplorer.Init(face, TopAbs_EDGE); edgeExplorer.More();
+  //          edgeExplorer.Next()) {
+  //       TopoDS_Shape edge = edgeExplorer.Current();
+  //       this->triangulateEdge(edge);
+  //     }
+  //   }
+  // } else {
+  //   // 3D
+  //   TopExp_Explorer solidExplorer;
+  //   for (solidExplorer.Init(compound, TopAbs_SOLID); solidExplorer.More();
+  //        solidExplorer.Next()) {
+  //     TopoDS_Shape solid = solidExplorer.Current();
+
+  //     TopExp_Explorer faceExplorer;
+  //     for (faceExplorer.Init(solid, TopAbs_FACE); faceExplorer.More();
+  //          faceExplorer.Next()) {
+  //       TopoDS_Shape face = faceExplorer.Current();
+  //       this->triangulateFace(face);
+  //     }
+  //   }
+  // }
 }
 
-// /**
-//  * Triangulate solid [private]
-//  * @param shape Shape
-//  */
-// void Triangulation::triangulateSolid(const TopoDS_Shape &shape) {
-//   TopExp_Explorer explorer;
-//   BRepMesh_IncrementalMesh mesh(shape, this->m_maxBb * meshQuality);
-//   for (explorer.Init(shape, TopAbs_FACE); explorer.More(); explorer.Next()) {
-//     TopoDS_Face face = TopoDS::Face(explorer.Current());
-//     this->triangulateLoop(face, (uint)this->m_vertices.size() / 3);
-//   }
-// }
+/**
+ * Triangulate face
+ * @param shape Shape
+ */
+void Triangulation::triangulateFace(const TopoDS_Shape &face) const {
+  BRepMesh_IncrementalMesh mesh(face, this->m_maxBb * meshQuality);
+}
 
-// /**
-//  * Triangulate face [private]
-//  * @param shape Shape
-//  */
-// void Triangulation::triangulateFace(const TopoDS_Shape &shape) {
-//   BRepMesh_IncrementalMesh mesh(shape, this->m_maxBb * meshQuality);
-//   this->triangulateLoop(TopoDS::Face(shape));
-// }
-
-// /**
-//  * Triangulate edge [private]
-//  * @param shape Shape
-//  */
-// void Triangulation::triangulateEdge(const TopoDS_Shape &shape) {
-//   gp_Pnt p;
-
-//   BRepMesh_IncrementalMesh mesh(shape, this->m_maxBb * 2.e-2 * meshQuality,
-//                                 false, 0.5 * meshQuality, false);
-//   TopLoc_Location location;
-//   Handle(Poly_Polygon3D) polygon =
-//       BRep_Tool::Polygon3D(TopoDS::Edge(shape), location);
-
-//   const TColgp_Array1OfPnt &nodes = polygon->Nodes();
-//   for (uint i = nodes.Lower(); i <= (uint)nodes.Upper(); ++i) {
-//     p = nodes(i).Transformed(location.Transformation());
-//     this->m_vertices.push_back(static_cast<float>(p.X()));
-//     this->m_vertices.push_back(static_cast<float>(p.Y()));
-//     this->m_vertices.push_back(static_cast<float>(p.Z()));
-//   }
-// }
-
-// /**
-//  * Triangulate loop [private]
-//  * @param face Face
-//  */
-// void Triangulation::triangulateLoop(const TopoDS_Face &face,
-//                                     const uint iDelta) {
-//   uint i;
-//   gp_Pnt p;
-//   gp_Dir d;
-
-//   TopLoc_Location location;
-//   Handle(Poly_Triangulation) triangulation =
-//       BRep_Tool::Triangulation(face, location);
-
-//   if (triangulation.IsNull()) {
-//     Logger::ERROR("Null triangulation");
-//     return;
-//   }
-//   Poly_Connect pc(triangulation);
-
-//   // vertices
-//   const uint nbNodes = triangulation->NbNodes();
-//   TColgp_Array1OfPnt nodes(1, nbNodes);
-//   for (i = 1; i <= nbNodes; ++i) {
-//     const gp_Pnt &node = triangulation->Node(i);
-//     nodes.SetValue(i, node);
-//   }
-
-//   for (i = 1; i <= nbNodes; ++i) {
-//     const gp_Pnt node = nodes.Value(i);
-//     p = node.Transformed(location.Transformation());
-//     this->m_vertices.push_back(static_cast<float>(p.X()));
-//     this->m_vertices.push_back(static_cast<float>(p.Y()));
-//     this->m_vertices.push_back(static_cast<float>(p.Z()));
-//   }
-
-//   // normal
-//   TColgp_Array1OfDir normals(1, triangulation->NbNodes());
-//   StdPrs_ToolTriangulatedShape::Normal(face, pc, normals);
-//   for (i = 1; i <= nbNodes; ++i) {
-//     d = normals(i).Transformed(location.Transformation());
-//     this->m_normals.push_back(static_cast<float>(d.X()));
-//     this->m_normals.push_back(static_cast<float>(d.Y()));
-//     this->m_normals.push_back(static_cast<float>(d.Z()));
-//   }
-
-//   // indices
-//   int n1;
-//   int n2;
-//   int n3;
-//   TopAbs_Orientation orient = face.Orientation();
-//   for (i = 1; i <= (uint)triangulation->NbTriangles(); ++i) {
-//     const Poly_Triangle &triangle = triangulation->Triangle(i);
-//     triangle.Get(n1, n2, n3);
-//     if (orient != TopAbs_FORWARD) {
-//       int tmp = n1;
-//       n1 = n2;
-//       n2 = tmp;
-//     }
-//     if (this->isValid(nodes.Value(n1), nodes.Value(n2), nodes.Value(n3))) {
-//       this->m_indices.push_back(--n1 + iDelta);
-//       this->m_indices.push_back(--n2 + iDelta);
-//       this->m_indices.push_back(--n3 + iDelta);
-//     }
-//   }
-// }
-
-// /**
-//  * Get Bb
-//  */
-// void Triangulation::getBb(double *min, double *max) const {
-//   *min = this->m_minBb;
-//   *max = this->m_maxBb;
-// }
-
-// /**
-//  * Get vertices
-//  * @returns Vertices
-//  */
-// std::vector<float> Triangulation::getVertices() const {
-//   return this->m_vertices;
-// }
-
-// /**
-//  * Get normals
-//  * @returns normals
-//  */
-// std::vector<float> Triangulation::getNormals() const { return
-// this->m_normals; }
-
-// /**
-//  * Get indices
-//  * @returns indices
-//  */
-// std::vector<uint> Triangulation::getIndices() const { return this->m_indices;
-// }
-
-// /**
-//  * Is valid
-//  * @param p1 Point 1
-//  * @param p2 Point 2
-//  * @param p3 Point 3
-//  * @returns Is valid
-//  */
-// bool Triangulation::isValid(const gp_Pnt &p1, const gp_Pnt &p2,
-//                             const gp_Pnt &p3) const {
-//   gp_Vec v1(p1, p2);
-//   gp_Vec v2(p2, p3);
-//   gp_Vec v3(p3, p1);
-
-//   if ((v1.SquareMagnitude() > 1.e-10) && (v2.SquareMagnitude() > 1.e-10) &&
-//       (v3.SquareMagnitude() > 1.e-10)) {
-//     v1.Cross(v2);
-//     if (v1.SquareMagnitude() > 1.e-10)
-//       return true;
-//     else
-//       return false;
-//   }
-//   return false;
-// }
+/**
+ * Triangulate edge
+ * @param shape Shape
+ */
+void Triangulation::triangulateEdge(const TopoDS_Shape &edge) const {
+  BRepMesh_IncrementalMesh mesh(edge, this->m_maxBb * meshQuality);
+}
