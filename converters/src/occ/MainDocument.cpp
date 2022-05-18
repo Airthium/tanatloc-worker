@@ -109,7 +109,7 @@ TDF_Label MainDocument::addShape(const TopoDS_Shape &shape,
  */
 TDF_Label MainDocument::addComponent(const TDF_Label &label,
                                      const TopoDS_Shape &shape) const {
-  return this->m_shapeTool->AddComponent(label, shape);
+  return this->m_shapeTool->AddComponent(label, shape, true);
 }
 
 /**
@@ -121,7 +121,7 @@ TDF_Label MainDocument::addComponent(const TDF_Label &label,
 TDF_Label MainDocument::addComponent(const TDF_Label &label,
                                      const TopoDS_Shape &shape,
                                      const Quantity_Color &color) const {
-  TDF_Label subLabel = this->m_shapeTool->AddComponent(label, shape);
+  TDF_Label subLabel = this->m_shapeTool->AddComponent(label, shape, true);
   this->m_colorTool->SetColor(subLabel, color, XCAFDoc_ColorSurf);
 
   return subLabel;
