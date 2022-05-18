@@ -1,11 +1,3 @@
-#include <algorithm>
-#include <iostream>
-#include <sstream>
-#include <string>
-
-#include <sys/stat.h>
-#include <sys/types.h>
-
 #include "logger/Logger.hpp"
 #include "occ/GLTFWriter.hpp"
 #include "occ/StepReader.hpp"
@@ -16,14 +8,13 @@
  */
 int main(int argc, char *argv[]) {
   bool res;
-  uint i;
   std::string stepFile;
   std::string gltfFile;
 
   // Arguments
   if (argc < 3) {
     Logger::ERROR("USAGE:");
-    Logger::ERROR("./StepToGLTF stepFile gltfFile");
+    Logger::ERROR("StepToGLTF stepFile gltfFile");
     return EXIT_FAILURE;
   }
   stepFile = argv[1];

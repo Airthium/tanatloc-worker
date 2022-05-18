@@ -1,56 +1,11 @@
-#include <iostream>
-#include <memory>
-
 #include "dxf/DXFConverter.hpp"
 #include "logger/Logger.hpp"
 #include "occ/GLTFWriter.hpp"
 #include "occ/MainDocument.hpp"
 #include "occ/Triangulation.hpp"
-#include <BRepBuilderAPI_Copy.hxx>
-#include <BRepPrimAPI_MakeCylinder.hxx>
-#include <BRep_Tool.hxx>
-#include <ShapeAnalysis_Edge.hxx>
-#include <ShapeBuild_ReShape.hxx>
+#include "occ/makeCylinder.hpp"
 #include <TopExp_Explorer.hxx>
-#include <TopoDS.hxx>
 #include <TopoDS_Builder.hxx>
-#include <TopoDS_Edge.hxx>
-#include <gp_Ax2.hxx>
-#include <gp_Dir.hxx>
-#include <gp_Pnt.hxx>
-
-TopoDS_Shape makeCylinder(const TopoDS_Shape edge) {
-
-  // Analysis
-  ShapeAnalysis_Edge analysis;
-
-  // Vertices
-  TopoDS_Vertex firstV = analysis.FirstVertex(TopoDS::Edge(edge));
-  TopoDS_Vertex lastV = analysis.LastVertex(TopoDS::Edge(edge));
-
-  // Points
-  gp_Pnt first = BRep_Tool::Pnt(firstV);
-  gp_Pnt last = BRep_Tool::Pnt(lastV);
-
-  // Direction
-  gp_Dir dir(last.X() - first.X(), last.Y() - first.Y(), last.Z() - first.Z());
-
-  // Axe
-  gp_Ax2 axe(first, dir);
-
-  // Radius
-  // float radius = minBb / 50.;
-  float radius = 0.1;
-
-  // Length
-  float length = first.Distance(last);
-
-  // Cylinder
-  BRepPrimAPI_MakeCylinder makeCylinder(axe, radius, length);
-
-  // Face
-  return makeCylinder.Face();
-}
 
 int main(int argc, char **argv) {
   bool res;
@@ -60,7 +15,7 @@ int main(int argc, char **argv) {
   // Input arguments
   if (argc < 3) {
     Logger::ERROR("USAGE:");
-    Logger::ERROR("DXFToBRep dxfFile glftFile");
+    Logger::ERROR("DXFToGLTF dxfFile glftFile");
     return EXIT_FAILURE;
   }
   dxfFile = argv[1];
@@ -76,7 +31,7 @@ int main(int argc, char **argv) {
   }
   TopoDS_Shape shape = converter->getShape();
 
-  // Create OCC document
+  // Create document
   MainDocument mainDocument;
 
   TopoDS_Compound faces;
@@ -105,12 +60,10 @@ int main(int argc, char **argv) {
       TopoDS_Shape edge = edgeExplorer.Current();
 
       // Edge to pipe
-      TopoDS_Shape pipe = makeCylinder(edge);
+      TopoDS_Shape pipe = makeCylinder(shape, edge);
       edgesBuilder.Add(edges, pipe);
     }
   }
-
-  // New edges
   mainDocument.addComponent(facesLabel, edges);
 
   // Triangulate

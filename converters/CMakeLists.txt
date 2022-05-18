@@ -2,6 +2,14 @@ cmake_minimum_required(VERSION 3.0)
 
 project(Tanatloc)
 
+## Debug
+option(DEBUG "Print debug informations" OFF)
+if (DEBUG)
+  add_definitions(-DDEBUG_MODE)
+else()
+  remove_definitions(-DDEBUG_MODE)
+endif()
+
 ## LIBRARIES
 # VTK
 find_package(VTK COMPONENTS
