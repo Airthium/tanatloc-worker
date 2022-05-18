@@ -68,10 +68,9 @@ void Triangulation::triangulate() {
     TopoDS_Shape shape = this->m_mainDocument.getShape(label);
     BRepMesh_IncrementalMesh mesh(shape, this->m_maxBb * meshQuality);
 
-    // SubShapes
+    // Components
     TDF_LabelSequence subLabels;
-    this->m_mainDocument.getSubShapes(label, subLabels);
-    std::cout << subLabels.Size() << std::endl;
+    this->m_mainDocument.getComponents(label, subLabels);
     for (uint j = 1; j <= subLabels.Size(); ++j) {
       // Shape
       TDF_Label subLabel = subLabels.Value(j);

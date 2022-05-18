@@ -72,7 +72,7 @@ bool StepReader::read() {
       Quantity_Color faceColor = originalMainDocument.getShapeColor(face);
 
       // New face
-      this->m_mainDocument.addSubShape(solidLabel, face, faceColor);
+      this->m_mainDocument.addComponent(solidLabel, face, faceColor);
     }
   }
 
