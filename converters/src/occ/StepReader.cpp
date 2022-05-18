@@ -54,21 +54,21 @@ bool StepReader::read() {
 
   /// CLEAN DOCUMENT
   // Solids & faces loop
-  TopExp_Explorer explorer;
-  for (explorer.Init(originalCompound, TopAbs_SOLID); explorer.More();
-       explorer.Next()) {
+  TopExp_Explorer solidExplorer;
+  for (solidExplorer.Init(originalCompound, TopAbs_SOLID); solidExplorer.More();
+       solidExplorer.Next()) {
     // Solid
-    TopoDS_Shape solid = explorer.Current();
+    TopoDS_Shape solid = solidExplorer.Current();
     Quantity_Color solidColor = originalMainDocument.getShapeColor(solid);
 
     // New solid
     TDF_Label solidLabel = this->m_mainDocument.addShape(solid, solidColor);
 
-    TopExp_Explorer subExplorer;
-    for (subExplorer.Init(solid, TopAbs_FACE); subExplorer.More();
-         subExplorer.Next()) {
+    TopExp_Explorer faceExplorer;
+    for (faceExplorer.Init(solid, TopAbs_FACE); faceExplorer.More();
+         faceExplorer.Next()) {
       // Face
-      TopoDS_Shape face = subExplorer.Current();
+      TopoDS_Shape face = faceExplorer.Current();
       Quantity_Color faceColor = originalMainDocument.getShapeColor(face);
 
       // New face

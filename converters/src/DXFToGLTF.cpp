@@ -7,10 +7,50 @@
 #include "occ/MainDocument.hpp"
 #include "occ/Triangulation.hpp"
 #include <BRepBuilderAPI_Copy.hxx>
-#include <BRep_Builder.hxx>
+#include <BRepPrimAPI_MakeCylinder.hxx>
+#include <BRep_Tool.hxx>
+#include <ShapeAnalysis_Edge.hxx>
+#include <ShapeBuild_ReShape.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
+#include <TopoDS_Builder.hxx>
 #include <TopoDS_Edge.hxx>
+#include <gp_Ax2.hxx>
+#include <gp_Dir.hxx>
+#include <gp_Pnt.hxx>
+
+TopoDS_Shape makeCylinder(const TopoDS_Shape edge) {
+
+  // Analysis
+  ShapeAnalysis_Edge analysis;
+
+  // Vertices
+  TopoDS_Vertex firstV = analysis.FirstVertex(TopoDS::Edge(edge));
+  TopoDS_Vertex lastV = analysis.LastVertex(TopoDS::Edge(edge));
+
+  // Points
+  gp_Pnt first = BRep_Tool::Pnt(firstV);
+  gp_Pnt last = BRep_Tool::Pnt(lastV);
+
+  // Direction
+  gp_Dir dir(last.X() - first.X(), last.Y() - first.Y(), last.Z() - first.Z());
+
+  // Axe
+  gp_Ax2 axe(first, dir);
+
+  // Radius
+  // float radius = minBb / 50.;
+  float radius = 0.1;
+
+  // Length
+  float length = first.Distance(last);
+
+  // Cylinder
+  BRepPrimAPI_MakeCylinder makeCylinder(axe, radius, length);
+
+  // Face
+  return makeCylinder.Face();
+}
 
 int main(int argc, char **argv) {
   bool res;
@@ -34,9 +74,9 @@ int main(int argc, char **argv) {
     Logger::ERROR("Unable to convert " + dxfFile);
     return EXIT_FAILURE;
   }
+  TopoDS_Shape shape = converter->getShape();
 
   // Create OCC document
-  TopoDS_Shape shape = converter->getShape();
   MainDocument mainDocument;
 
   TopExp_Explorer faceExplorer;
@@ -49,7 +89,7 @@ int main(int argc, char **argv) {
     for (edgeExplorer.Init(face, TopAbs_EDGE); edgeExplorer.More();
          edgeExplorer.Next()) {
       TopoDS_Shape edge = edgeExplorer.Current();
-      mainDocument.addComponent(faceLabel, edge);
+      TDF_Label test = mainDocument.addComponent(faceLabel, edge);
     }
   }
 

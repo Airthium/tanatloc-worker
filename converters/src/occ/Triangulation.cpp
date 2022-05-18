@@ -58,58 +58,23 @@ void Triangulation::computeBb() {
  * Triangulate
  */
 void Triangulation::triangulate() {
-
-  // TopoDS_Compound compound = this->m_mainDocument.getCompound();
   TDF_LabelSequence labels = this->m_mainDocument.getLabels();
 
+  // Shapes
   for (uint i = 1; i <= labels.Size(); ++i) {
-    // Shape
     TDF_Label label = labels.Value(i);
     TopoDS_Shape shape = this->m_mainDocument.getShape(label);
     BRepMesh_IncrementalMesh mesh(shape, this->m_maxBb * meshQuality);
 
-    // Components
+    // Sub Shapes
     TDF_LabelSequence subLabels;
     this->m_mainDocument.getComponents(label, subLabels);
     for (uint j = 1; j <= subLabels.Size(); ++j) {
-      // Shape
       TDF_Label subLabel = subLabels.Value(j);
       TopoDS_Shape subShape = this->m_mainDocument.getShape(subLabel);
       BRepMesh_IncrementalMesh subMesh(subShape, this->m_maxBb * meshQuality);
     }
   }
-
-  // BRepMesh_IncrementalMesh mesh(compound, this->m_maxBb * meshQuality);
-
-  // if (dimension == 2) {
-  //   TopExp_Explorer faceExplorer;
-  //   for (faceExplorer.Init(compound, TopAbs_FACE); faceExplorer.More();
-  //        faceExplorer.Next()) {
-  //     TopoDS_Shape face = faceExplorer.Current();
-  //     // this->triangulateFace(face);
-
-  //     TopExp_Explorer edgeExplorer;
-  //     for (edgeExplorer.Init(face, TopAbs_EDGE); edgeExplorer.More();
-  //          edgeExplorer.Next()) {
-  //       TopoDS_Shape edge = edgeExplorer.Current();
-  //       this->triangulateEdge(edge);
-  //     }
-  //   }
-  // } else {
-  //   // 3D
-  //   TopExp_Explorer solidExplorer;
-  //   for (solidExplorer.Init(compound, TopAbs_SOLID); solidExplorer.More();
-  //        solidExplorer.Next()) {
-  //     TopoDS_Shape solid = solidExplorer.Current();
-
-  //     TopExp_Explorer faceExplorer;
-  //     for (faceExplorer.Init(solid, TopAbs_FACE); faceExplorer.More();
-  //          faceExplorer.Next()) {
-  //       TopoDS_Shape face = faceExplorer.Current();
-  //       this->triangulateFace(face);
-  //     }
-  //   }
-  // }
 }
 
 /**

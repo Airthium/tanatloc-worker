@@ -6,6 +6,7 @@
 #include <BRep_Tool.hxx>
 #include <Bnd_Box.hxx>
 #include <ShapeAnalysis_Edge.hxx>
+#include <ShapeBuild_ReShape.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Builder.hxx>
 #include <XCAFDoc_DocumentTool.hxx>
@@ -13,57 +14,58 @@
 #include <gp_Dir.hxx>
 #include <gp_Pnt.hxx>
 
-TopoDS_Shape MainDocument::makeCylinder(const TDF_Label &label,
-                                        const TopoDS_Shape edge) const {
-  // Parent shape
-  TopoDS_Shape parent = this->getShape(label);
-  Bnd_Box boundingBox;
-  double xMin;
-  double yMin;
-  double zMin;
-  double xMax;
-  double yMax;
-  double zMax;
+// TopoDS_Shape MainDocument::makeCylinder(const TDF_Label &label,
+//                                         const TopoDS_Shape edge) const {
+//   // Parent shape
+//   TopoDS_Shape parent = this->getShape(label);
+//   Bnd_Box boundingBox;
+//   double xMin;
+//   double yMin;
+//   double zMin;
+//   double xMax;
+//   double yMax;
+//   double zMax;
 
-  BRepBndLib::Add(parent, boundingBox);
-  boundingBox.Get(xMin, yMin, zMin, xMax, yMax, zMax);
+//   BRepBndLib::Add(parent, boundingBox);
+//   boundingBox.Get(xMin, yMin, zMin, xMax, yMax, zMax);
 
-  double xDim = std::abs(xMax - xMin);
-  double yDim = std::abs(yMax - yMin);
-  double zDim = std::abs(zMax - zMin);
+//   double xDim = std::abs(xMax - xMin);
+//   double yDim = std::abs(yMax - yMin);
+//   double zDim = std::abs(zMax - zMin);
 
-  double maxBb = std::max(xDim, std::max(yDim, zDim));
+//   double maxBb = std::max(xDim, std::max(yDim, zDim));
 
-  // Analysis
-  ShapeAnalysis_Edge analysis;
+//   // Analysis
+//   ShapeAnalysis_Edge analysis;
 
-  // Vertices
-  TopoDS_Vertex firstV = analysis.FirstVertex(TopoDS::Edge(edge));
-  TopoDS_Vertex lastV = analysis.LastVertex(TopoDS::Edge(edge));
+//   // Vertices
+//   TopoDS_Vertex firstV = analysis.FirstVertex(TopoDS::Edge(edge));
+//   TopoDS_Vertex lastV = analysis.LastVertex(TopoDS::Edge(edge));
 
-  // Points
-  gp_Pnt first = BRep_Tool::Pnt(firstV);
-  gp_Pnt last = BRep_Tool::Pnt(lastV);
+//   // Points
+//   gp_Pnt first = BRep_Tool::Pnt(firstV);
+//   gp_Pnt last = BRep_Tool::Pnt(lastV);
 
-  // Direction
-  gp_Dir dir(last.X() - first.X(), last.Y() - first.Y(), last.Z() - first.Z());
+//   // Direction
+//   gp_Dir dir(last.X() - first.X(), last.Y() - first.Y(), last.Z() -
+//   first.Z());
 
-  // Axe
-  gp_Ax2 axe(first, dir);
+//   // Axe
+//   gp_Ax2 axe(first, dir);
 
-  // Radius
-  // float radius = minBb / 50.;
-  float radius = maxBb / 250.;
+//   // Radius
+//   // float radius = minBb / 50.;
+//   float radius = maxBb / 250.;
 
-  // Length
-  float length = first.Distance(last);
+//   // Length
+//   float length = first.Distance(last);
 
-  // Cylinder
-  BRepPrimAPI_MakeCylinder makeCylinder(axe, radius, length);
+//   // Cylinder
+//   BRepPrimAPI_MakeCylinder makeCylinder(axe, radius, length);
 
-  // Face
-  return makeCylinder.Face();
-}
+//   // Face
+//   return makeCylinder.Face();
+// }
 
 /**
  * Constructor
@@ -107,12 +109,7 @@ TDF_Label MainDocument::addShape(const TopoDS_Shape &shape,
  */
 TDF_Label MainDocument::addComponent(const TDF_Label &label,
                                      const TopoDS_Shape &shape) const {
-  if (shape.ShapeType() == TopAbs_EDGE) {
-    TopoDS_Shape cylinder = makeCylinder(label, shape);
-    return this->m_shapeTool->AddComponent(label, cylinder);
-  } else {
-    return this->m_shapeTool->AddComponent(label, shape);
-  }
+  return this->m_shapeTool->AddComponent(label, shape);
 }
 
 /**

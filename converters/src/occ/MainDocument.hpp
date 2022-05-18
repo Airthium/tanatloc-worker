@@ -24,9 +24,6 @@ public:
   // Constructor
   MainDocument();
 
-  // Make cylinder
-  TopoDS_Shape makeCylinder(const TDF_Label &, const TopoDS_Shape) const;
-
   // Add shape
   TDF_Label addShape(const TopoDS_Shape &) const;
   TDF_Label addShape(const TopoDS_Shape &, const Quantity_Color &) const;

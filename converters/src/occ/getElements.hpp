@@ -1,5 +1,5 @@
-#ifndef _GETELEMENTS_
-#define _GETELEMENTS_
+#ifndef _GET_ELEMENTS_
+#define _GET_ELEMENTS_
 
 #include <TDocStd_Document.hxx>
 #include <TopAbs_ShapeEnum.hxx>
@@ -125,4 +125,4 @@ getEdges(TopoDS_Shape shape, Handle(TDocStd_Document) document,
   return getElements(shape, document, color, TopAbs_EDGE);
 }
 
-#endif //_GETELEMENTS_
+#endif //_GET_ELEMENTS_
