@@ -27,9 +27,9 @@ private:
   std::vector<uint> m_tetrahedronLabels = std::vector<uint>();
 
   // Copy vertices
-  void copyVertices(const Tetrahedron &, std::vector<double> *) const;
-  void copyVertices(const Triangle &, std::vector<double> *) const;
-  void copy(const std::vector<uint>, std::vector<double> *) const;
+  void copyVertices(const Tetrahedron &, std::vector<Vertex> *) const;
+  void copyVertices(const Triangle &, std::vector<Vertex> *) const;
+  void copy(const std::vector<uint>, std::vector<Vertex> *) const;
 
 public:
   // Constructor
@@ -41,26 +41,26 @@ public:
   // Compute number of different labels
   void computeLabels();
 
-  // Get number of vertices
-  uint getNumberOfVertices() const;
-  // Get number of triangles
-  uint getNumberOfTriangles() const;
+  // Get max
+  double getMax() const;
+
   // Get number of triangle labels
   uint getNumberOfTriangleLabels() const;
-  // Get number of tetrahedra
-  uint getNumberOfTetrahedra() const;
+
   // Get number of tetrahedron labels
   uint getNumberOfTetrahedronLabels() const;
 
   // Get tetrahedron label
   uint getTetrahedronLabel(const uint) const;
+
   // Get triangle label
   uint getTriangleLabel(const uint) const;
 
   // Get volume vertices
-  std::vector<double> *getVolumesVertices() const;
+  std::vector<Vertex> *getVolumesVertices() const;
+
   // Get surface vertices
-  std::vector<double> *getSurfacesVertices() const;
+  std::vector<Vertex> *getSurfacesVertices() const;
 };
 
 #endif

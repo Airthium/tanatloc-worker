@@ -42,6 +42,12 @@ double Vertex::getCoordinate(const uint i) const {
     return 0.;
 }
 
+double Vertex::X() const { return this->m_x; }
+
+double Vertex::Y() const { return this->m_y; }
+
+double Vertex::Z() const { return this->m_z; }
+
 /**
  * Get coordinates
  * @returns Coordinates

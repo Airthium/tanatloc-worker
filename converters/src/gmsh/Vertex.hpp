@@ -27,6 +27,16 @@ public:
 
   // Get coordinate
   double getCoordinate(const uint) const;
+
+  // X
+  double X() const;
+
+  // Y
+  double Y() const;
+
+  // Z
+  double Z() const;
+
   // Get coordinates
   std::vector<double> getCoordinates() const;
 };

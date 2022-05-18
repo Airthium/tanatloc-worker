@@ -135,17 +135,35 @@ void Gmsh::computeLabels() {
 }
 
 /**
- * Get number of vertices
- * @returns Number of vertices
+ * Get max dimension
+ * @return Max
  */
-uint Gmsh::getNumberOfVertices() const { return (uint)this->m_vertices.size(); }
+double Gmsh::getMax() const {
+  Vertex Min(this->m_vertices.at(0));
+  Vertex Max(this->m_vertices.at(0));
 
-/**
- * Get number of triangles
- * @returns Number of triangles
- */
-uint Gmsh::getNumberOfTriangles() const {
-  return (uint)this->m_triangles.size();
+  for (uint i = 1; i < this->m_vertices.size(); ++i) {
+    double minX = Min.X();
+    double minY = Min.Y();
+    double minZ = Min.Z();
+
+    double maxX = Max.X();
+    double maxY = Max.Y();
+    double maxZ = Max.Z();
+
+    Vertex Current = this->m_vertices.at(i);
+    double currentX = Current.X();
+    double currentY = Current.Y();
+    double currentZ = Current.Z();
+
+    Min.setCoordinates(std::min(minX, currentX), std::min(minY, currentY),
+                       std::min(minZ, currentZ));
+    Max.setCoordinates(std::max(maxX, currentX), std::max(maxY, currentY),
+                       std::max(maxZ, currentZ));
+  }
+
+  return std::max(Max.X() - Min.X(),
+                  std::max(Max.Y() - Min.Y(), Max.Z() - Min.Z()));
 }
 
 /**
@@ -154,14 +172,6 @@ uint Gmsh::getNumberOfTriangles() const {
  */
 uint Gmsh::getNumberOfTriangleLabels() const {
   return (uint)this->m_triangleLabels.size();
-}
-
-/**
- * Get number of tetrahedra
- * @returns Number of tetrahedra
- */
-uint Gmsh::getNumberOfTetrahedra() const {
-  return (uint)this->m_tetrahedra.size();
 }
 
 /**
@@ -196,7 +206,7 @@ uint Gmsh::getTriangleLabel(const uint i) const {
  * @param {vector} Vector
  */
 void Gmsh::copyVertices(const Tetrahedron &T,
-                        std::vector<double> *vector) const {
+                        std::vector<Vertex> *vector) const {
   std::vector<uint> indices = T.getIndices();
   copy(indices, vector);
 }
@@ -206,21 +216,17 @@ void Gmsh::copyVertices(const Tetrahedron &T,
  * @param {Triangle} Triangle
  * @param {vector} Vector
  */
-void Gmsh::copyVertices(const Triangle &T, std::vector<double> *vector) const {
+void Gmsh::copyVertices(const Triangle &T, std::vector<Vertex> *vector) const {
   std::vector<uint> indices = T.getIndices();
   copy(indices, vector);
 }
 
 void Gmsh::copy(const std::vector<uint> indices,
-                std::vector<double> *vector) const {
+                std::vector<Vertex> *vector) const {
   std::for_each(indices.begin(), indices.end(),
                 [this, vector](const uint &index) {
                   Vertex vertex = this->m_vertices[index];
-                  std::vector<double> coordinates = vertex.getCoordinates();
-                  std::for_each(coordinates.begin(), coordinates.end(),
-                                [vector](const double &coordinate) {
-                                  vector->push_back(coordinate);
-                                });
+                  vector->push_back(vertex);
                 });
 }
 
@@ -228,12 +234,12 @@ void Gmsh::copy(const std::vector<uint> indices,
  * Get volume vertices
  * @returns Vertices
  */
-std::vector<double> *Gmsh::getVolumesVertices() const {
+std::vector<Vertex> *Gmsh::getVolumesVertices() const {
   if (!this->m_tetrahedronLabels.size())
     return nullptr;
 
   uint i = 0;
-  auto vertices = new std::vector<double>[this->m_tetrahedronLabels.size()];
+  auto vertices = new std::vector<Vertex>[this->m_tetrahedronLabels.size()];
   std::for_each(
       this->m_tetrahedronLabels.begin(), this->m_tetrahedronLabels.end(),
       [&i, this, vertices](const uint &label) {
@@ -253,12 +259,12 @@ std::vector<double> *Gmsh::getVolumesVertices() const {
  * Get surface vertices
  * @returns Vertices
  */
-std::vector<double> *Gmsh::getSurfacesVertices() const {
+std::vector<Vertex> *Gmsh::getSurfacesVertices() const {
   if (!this->m_triangleLabels.size())
     return nullptr;
 
   uint i = 0;
-  auto *vertices = new std::vector<double>[this->m_triangleLabels.size()];
+  auto *vertices = new std::vector<Vertex>[this->m_triangleLabels.size()];
   std::for_each(this->m_triangleLabels.begin(), this->m_triangleLabels.end(),
                 [&i, this, vertices](const uint &label) {
                   std::for_each(this->m_triangles.begin(),

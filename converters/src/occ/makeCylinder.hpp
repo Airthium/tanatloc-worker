@@ -13,7 +13,7 @@
 #include <gp_Dir.hxx>
 #include <gp_Pnt.hxx>
 
-TopoDS_Shape makeCylinder(const TopoDS_Shape parent, const TopoDS_Shape edge) {
+double computeMax(const TopoDS_Shape shape) {
   Bnd_Box boundingBox;
   double xMin;
   double yMin;
@@ -22,15 +22,17 @@ TopoDS_Shape makeCylinder(const TopoDS_Shape parent, const TopoDS_Shape edge) {
   double yMax;
   double zMax;
 
-  BRepBndLib::Add(parent, boundingBox);
+  BRepBndLib::Add(shape, boundingBox);
   boundingBox.Get(xMin, yMin, zMin, xMax, yMax, zMax);
 
   double xDim = std::abs(xMax - xMin);
   double yDim = std::abs(yMax - yMin);
   double zDim = std::abs(zMax - zMin);
 
-  double maxBb = std::max(xDim, std::max(yDim, zDim));
+  return std::max(xDim, std::max(yDim, zDim));
+}
 
+TopoDS_Shape makeCylinder(const double radius, const TopoDS_Shape edge) {
   // Analysis
   ShapeAnalysis_Edge analysis;
 
@@ -48,9 +50,6 @@ TopoDS_Shape makeCylinder(const TopoDS_Shape parent, const TopoDS_Shape edge) {
   // Axe
   gp_Ax2 axe(first, dir);
 
-  // Radius
-  float radius = maxBb / 250.;
-
   // Length
   float length = first.Distance(last);
 
@@ -59,6 +58,11 @@ TopoDS_Shape makeCylinder(const TopoDS_Shape parent, const TopoDS_Shape edge) {
 
   // Face
   return makeCylinder.Face();
+}
+
+TopoDS_Shape makeCylinder(const TopoDS_Shape parent, const TopoDS_Shape edge) {
+  double maxBb = computeMax(parent);
+  return makeCylinder(maxBb / 250., edge);
 }
 
 #endif //_MAKE_CYLINDER_

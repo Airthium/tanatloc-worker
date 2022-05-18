@@ -87,6 +87,14 @@ set(DXFToGLTFSOURCE
 #   ${LOGGER_SOURCE}
 # )
 
+# GmshToGLTF
+set(GmshToGLTFSOURCE
+  src/GmshToGLTF.cpp
+  ${GMSH_SOURCE}
+  ${OCC_SOURCE}
+  ${LOGGER_SOURCE}
+)
+
 # # StepToThreeJS (TODO to remove)
 # set(StepToThreeJSSOURCE
 #   src/StepToThreeJS.cpp
@@ -99,7 +107,6 @@ set(DXFToGLTFSOURCE
 set(StepToGLTFSOURCE
   src/StepToGLTF.cpp
   ${OCC_SOURCE}
-  ${THREEJS_SOURCE}
   ${LOGGER_SOURCE}
 )
 
@@ -131,8 +138,9 @@ target_link_libraries(DXFToGLTF ${OCC_LIBS})
 # add_executable(BRepToThreeJS ${BRepToThreeJSSOURCE})
 # target_link_libraries(BRepToThreeJS ${OCC_LIBS})
 
-# # GmshToThreeJS
-# add_executable(GmshToThreeJS ${GmshToThreeJSSOURCE})
+# GmshToGLTF
+add_executable(GmshToGLTF ${GmshToGLTFSOURCE})
+target_link_libraries(GmshToGLTF ${OCC_LIBS})
 
 # # StepToThreeJS
 # add_executable(StepToThreeJS ${StepToThreeJSSOURCE})
