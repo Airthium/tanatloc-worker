@@ -10,6 +10,7 @@ converters/build
 
 # Tests
 converters/test/assets/Cube
+converters/test/assets/*.glb
 
 # Coverage
 coverage
