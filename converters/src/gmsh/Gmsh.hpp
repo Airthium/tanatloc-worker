@@ -29,7 +29,7 @@ private:
   // Copy vertices
   void copyVertices(const Tetrahedron &, std::vector<Vertex> *) const;
   void copyVertices(const Triangle &, std::vector<Vertex> *) const;
-  void copy(const std::vector<uint>, std::vector<Vertex> *) const;
+  void copy(const std::vector<uint> &, std::vector<Vertex> *) const;
 
 public:
   // Constructor

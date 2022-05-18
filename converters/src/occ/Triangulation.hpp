@@ -20,7 +20,7 @@ public:
   // Constructor
   Triangulation();
   // Constructor
-  explicit Triangulation(MainDocument &);
+  explicit Triangulation(const MainDocument &);
 
   // Triangulate
   void triangulate();

@@ -221,7 +221,7 @@ void Gmsh::copyVertices(const Triangle &T, std::vector<Vertex> *vector) const {
   copy(indices, vector);
 }
 
-void Gmsh::copy(const std::vector<uint> indices,
+void Gmsh::copy(const std::vector<uint> &indices,
                 std::vector<Vertex> *vector) const {
   std::for_each(indices.begin(), indices.end(),
                 [this, vector](const uint &index) {

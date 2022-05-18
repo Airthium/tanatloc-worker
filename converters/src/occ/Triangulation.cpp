@@ -24,7 +24,7 @@ Triangulation::Triangulation() = default;
  * Constructor
  * @param shape Shape
  */
-Triangulation::Triangulation(MainDocument &mainDocument)
+Triangulation::Triangulation(const MainDocument &mainDocument)
     : m_mainDocument(mainDocument) {
   this->computeBb();
 }
