@@ -79,17 +79,34 @@ int main(int argc, char **argv) {
   // Create OCC document
   MainDocument mainDocument;
 
+  TopoDS_Compound solid;
+  TopoDS_Builder solidBuilder;
+  solidBuilder.MakeCompound(solid);
+  TDF_Label solidLabel = mainDocument.addShape(solid);
+
   TopExp_Explorer faceExplorer;
   for (faceExplorer.Init(shape, TopAbs_FACE); faceExplorer.More();
        faceExplorer.Next()) {
+    // Face
     TopoDS_Shape face = faceExplorer.Current();
-    TDF_Label faceLabel = mainDocument.addShape(face);
+    solidBuilder.Add(solid, face);
+
+    // New face
+    TDF_Label faceLabel = mainDocument.addComponent(solidLabel, face);
+
+    TopoDS_Compound edges;
+    TopoDS_Builder edgesBuilder;
+    edgesBuilder.MakeCompound(edges);
+    TDF_Label edgesLabel = mainDocument.addComponent(solidLabel, edges);
 
     TopExp_Explorer edgeExplorer;
     for (edgeExplorer.Init(face, TopAbs_EDGE); edgeExplorer.More();
          edgeExplorer.Next()) {
+      // Edge
       TopoDS_Shape edge = edgeExplorer.Current();
-      TDF_Label test = mainDocument.addComponent(faceLabel, edge);
+
+      TopoDS_Shape pipe = makeCylinder(edge);
+      edgesBuilder.Add(edges, pipe);
     }
   }
 
