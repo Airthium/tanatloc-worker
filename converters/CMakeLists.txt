@@ -10,6 +10,13 @@ else()
   remove_definitions(-DDEBUG_MODE)
 endif()
 
+## Build type
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+
 ## LIBRARIES
 # VTK
 find_package(VTK COMPONENTS
@@ -177,7 +184,7 @@ add_custom_target(coverage
   COMMAND ./VTUToGLTF || true
   COMMAND ./VTUToGLTF ../test/assets/not_existing.vtu not_existing || true
   COMMAND ./VTUToGLTF ../test/assets/Result.vtu Result || true
-  COMMAND ./VTUToGLTF ../test/assets/Result_multi.vtu Result || true
+  COMMAND ./VTUToGLTF ../test/assets/Result2Pieces.vtu Result || true
   COMMAND lcov --directory . -c -o report0.info
   COMMAND lcov --remove report0.info '/usr/include/*' '/usr/local/include/*' '*/dxflib/*' -o report.info
   COMMAND genhtml -o ../coverage -t "Converters coverage" report.info
