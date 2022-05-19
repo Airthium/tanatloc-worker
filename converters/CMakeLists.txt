@@ -166,26 +166,27 @@ catch_discover_tests(tests)
 option(COVERAGE "Enable coverage flags" OFF)
 if (COVERAGE)
   SET(CMAKE_CXX_FLAGS "-O0 --coverage -W")
+  
+  add_custom_target(coverage
+    COMMAND make clean
+    COMMAND make -j"$(nproc)"
+    COMMAND make test
+    COMMAND ./DXFToGLTF || true
+    COMMAND ./DXFToGLTF ../test/assets/not_existing.dxf pipe.glb|| true
+    COMMAND ./DXFToGLTF ../test/assets/pipe.dxf pipe.glb || true
+    COMMAND ./GmshToGLTF || true
+    COMMAND ./GmshToGLTF ../test/assets/not_existing.msh not_existing.glb || true
+    COMMAND ./GmshToGLTF ../test/assets/Cube.msh Cube.glb || true
+    COMMAND ./StepToGLTF || true
+    COMMAND ./StepToGLTF ../test/assets/not_existing.step not_existing.glb || true
+    COMMAND ./StepToGLTF ../test/assets/cube.step cube.glb || true
+    COMMAND ./VTUToGLTF || true
+    COMMAND ./VTUToGLTF ../test/assets/not_existing.vtu not_existing || true
+    COMMAND ./VTUToGLTF ../test/assets/Result.vtu Result || true
+    COMMAND ./VTUToGLTF ../test/assets/Result2Pieces.vtu Result || true
+    COMMAND lcov --directory . -c -o report0.info
+    COMMAND lcov --remove report0.info '/usr/include/*' '/usr/local/include/*' '*/dxflib/*' -o report.info
+    COMMAND genhtml -o ../coverage -t "Converters coverage" report.info
+  )
 endif()
 
-add_custom_target(coverage
-  COMMAND make clean
-  COMMAND make -j"$(nproc)"
-  COMMAND make test
-  COMMAND ./DXFToGLTF || true
-  COMMAND ./DXFToGLTF ../test/assets/not_existing.dxf pipe.glb|| true
-  COMMAND ./DXFToGLTF ../test/assets/pipe.dxf pipe.glb || true
-  COMMAND ./GmshToGLTF || true
-  COMMAND ./GmshToGLTF ../test/assets/not_existing.msh not_existing.glb || true
-  COMMAND ./GmshToGLTF ../test/assets/Cube.msh Cube.glb || true
-  COMMAND ./StepToGLTF || true
-  COMMAND ./StepToGLTF ../test/assets/not_existing.step not_existing.glb || true
-  COMMAND ./StepToGLTF ../test/assets/cube.step cube.glb || true
-  COMMAND ./VTUToGLTF || true
-  COMMAND ./VTUToGLTF ../test/assets/not_existing.vtu not_existing || true
-  COMMAND ./VTUToGLTF ../test/assets/Result.vtu Result || true
-  COMMAND ./VTUToGLTF ../test/assets/Result2Pieces.vtu Result || true
-  COMMAND lcov --directory . -c -o report0.info
-  COMMAND lcov --remove report0.info '/usr/include/*' '/usr/local/include/*' '*/dxflib/*' -o report.info
-  COMMAND genhtml -o ../coverage -t "Converters coverage" report.info
-)
