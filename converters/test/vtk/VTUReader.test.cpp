@@ -15,18 +15,18 @@ TEST_CASE("VTUReader") {
   }
 
   SECTION("read") {
-    VTUReader reader = VTUReader("./test/assets/Result.vtu");
+    VTUReader reader = VTUReader("../test/assets/Result.vtu");
+    reader.read();
+
+    std::vector<RData> arrays = reader.getArrays();
+    CHECK(arrays.size() == 2);
+  }
+
+  SECTION("read 2 pieces") {
+    VTUReader reader = VTUReader("../test/assets/Result2Pieces.vtu");
     reader.read();
 
     std::vector<RData> arrays = reader.getArrays();
     CHECK(arrays.size() == 1);
-  }
-
-  SECTION("read 2 pieces") {
-    VTUReader reader = VTUReader("./test/assets/Result2Pieces.vtu");
-    reader.read();
-
-    std::vector<RData> arrays = reader.getArrays();
-    CHECK(arrays.size() == 0);
   }
 }

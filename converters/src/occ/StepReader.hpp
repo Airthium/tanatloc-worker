@@ -1,8 +1,6 @@
 #ifndef _STEPREADER_
 #define _STEPREADER_
 
-#include <vector>
-
 #include "MainDocument.hpp"
 
 class StepReader {

@@ -1,8 +1,6 @@
 #ifndef _TRIANGULATION_
 #define _TRIANGULATION_
 
-#include <vector>
-
 #include "MainDocument.hpp"
 
 constexpr double meshQuality = 0.01;
@@ -16,6 +14,12 @@ private:
   // Compute max bounding box
   void computeBb();
 
+  // Triangulate face
+  void triangulateFace(const TopoDS_Shape &) const;
+
+  // Triangulate edge
+  void triangulateEdge(const TopoDS_Shape &) const;
+
 public:
   // Constructor
   Triangulation();
@@ -24,12 +28,6 @@ public:
 
   // Triangulate
   void triangulate();
-
-  // Triangulate face
-  void triangulateFace(const TopoDS_Shape &) const;
-
-  // Triangulate edge
-  void triangulateEdge(const TopoDS_Shape &) const;
 };
 
 #endif //_TRIANGULATION_

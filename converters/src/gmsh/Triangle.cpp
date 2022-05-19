@@ -17,22 +17,21 @@ Triangle::Triangle(const uint index1, const uint index2, const uint index3,
     : m_index1(index1), m_index2(index2), m_index3(index3), m_label(label) {}
 
 /**
- * Set indices
+ * Set index 1
  * @param index1 Index 1
- * @param index1 Index 2
- * @param index1 Index 3
  */
-void Triangle::setIndices(const uint index1, const uint index2,
-                          const uint index3) {
-  this->m_index1 = index1;
-  this->m_index2 = index2;
-  this->m_index3 = index3;
-}
-
 void Triangle::setI1(const uint index1) { this->m_index1 = index1; }
 
+/**
+ * Set index 2
+ * @param index2 Index 2
+ */
 void Triangle::setI2(const uint index2) { this->m_index2 = index2; }
 
+/**
+ * Set index 3
+ * @param index3 Index 3
+ */
 void Triangle::setI3(const uint index3) { this->m_index3 = index3; }
 
 /**
@@ -42,25 +41,21 @@ void Triangle::setI3(const uint index3) { this->m_index3 = index3; }
 void Triangle::setLabel(const uint label) { this->m_label = label; }
 
 /**
- * Get index
- * @param i Index
- * @returns Index i
+ * Get index 1
+ * @returns Index 1
  */
-uint Triangle::getIndex(const uint i) const {
-  if (i == 0)
-    return this->m_index1;
-  else if (i == 1)
-    return this->m_index2;
-  else if (i == 2)
-    return this->m_index3;
-  else
-    return 0;
-}
-
 uint Triangle::getI1() const { return this->m_index1; }
 
+/**
+ * Get index 2
+ * @returns Index 2
+ */
 uint Triangle::getI2() const { return this->m_index2; }
 
+/**
+ * Get index 3
+ * @returns Index 3
+ */
 uint Triangle::getI3() const { return this->m_index3; }
 
 /**

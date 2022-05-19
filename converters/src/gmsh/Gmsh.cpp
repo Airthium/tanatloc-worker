@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <fstream>
-#include <memory>
 
 #include "../logger/Logger.hpp"
 

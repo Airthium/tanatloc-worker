@@ -27,21 +27,22 @@ public:
   // Constructor
   Tetrahedron(const uint, const uint, const uint, const uint, const uint);
 
-  // Set indices
-  void setIndices(const uint, const uint, const uint, const uint);
+  // Set index
   void setI1(const uint);
   void setI2(const uint);
   void setI3(const uint);
   void setI4(const uint);
+
   // Set label
   void setLabel(const uint);
 
   // Get index
-  uint getIndex(const uint) const;
+
   uint getI1() const;
   uint getI2() const;
   uint getI3() const;
   uint getI4() const;
+
   // Get indices
   std::vector<uint> getIndices() const;
   // Get label

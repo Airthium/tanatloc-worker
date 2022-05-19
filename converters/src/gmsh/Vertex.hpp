@@ -29,10 +29,7 @@ public:
   // Set z
   void setZ(const double);
 
-  // Get coordinate
-  double getCoordinate(const uint) const;
-
-  // X
+    // X
   double X() const;
 
   // Y

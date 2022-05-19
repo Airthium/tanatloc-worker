@@ -24,16 +24,16 @@ TEST_CASE("StepReader") {
   }
 
   SECTION("read - empty") {
-    std::string fileName = "./test/assets/empty.step";
+    std::string fileName = "../test/assets/empty.step";
     auto stepReader = StepReader(fileName);
 
-    bool res= stepReader.read();
+    bool res = stepReader.read();
 
     CHECK(!res);
   }
 
   SECTION("read - file") {
-    std::string fileName = "./test/assets/cube.step";
+    std::string fileName = "../test/assets/cube.step";
     auto stepReader = StepReader(fileName);
 
     bool res = stepReader.read();
@@ -41,15 +41,9 @@ TEST_CASE("StepReader") {
     CHECK(res);
   }
 
-  SECTION("getShapes") {
-    auto stepReader = StepReader();
-
-    std::vector<TopoDS_Shape> shapes = stepReader.getShapes();
-  }
-
   SECTION("getDocument") {
     auto stepReader = StepReader();
 
-    Handle(TDocStd_Document) document = stepReader.getDocument();
+    stepReader.getMainDocument();
   }
 }

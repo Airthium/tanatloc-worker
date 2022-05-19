@@ -1,19 +1,8 @@
 #include "MainDocument.hpp"
 
-#include <BRepBndLib.hxx>
-#include <BRepMesh_IncrementalMesh.hxx>
-#include <BRepPrimAPI_MakeCylinder.hxx>
-#include <BRep_Tool.hxx>
-#include <Bnd_Box.hxx>
-#include <ShapeAnalysis_Edge.hxx>
-#include <ShapeBuild_ReShape.hxx>
 #include <TDataStd_Name.hxx>
-#include <TopoDS.hxx>
 #include <TopoDS_Builder.hxx>
 #include <XCAFDoc_DocumentTool.hxx>
-#include <gp_Ax2.hxx>
-#include <gp_Dir.hxx>
-#include <gp_Pnt.hxx>
 
 /**
  * Constructor

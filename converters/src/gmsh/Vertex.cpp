@@ -30,7 +30,7 @@ void Vertex::setY(const double y) { this->m_y = y; }
  * Set z
  * @param z Z
  */
-void Vertex::setZ(const double z) { this->m_y = z; }
+void Vertex::setZ(const double z) { this->m_z = z; }
 
 /**
  * Get x

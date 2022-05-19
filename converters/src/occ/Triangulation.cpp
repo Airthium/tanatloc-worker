@@ -1,19 +1,9 @@
 #include "Triangulation.hpp"
 
+#include "../logger/Logger.hpp"
 #include <BRepBndLib.hxx>
 #include <BRepMesh_IncrementalMesh.hxx>
-#include <BRepPrimAPI_MakeCylinder.hxx>
-#include <BRep_Tool.hxx>
 #include <Bnd_Box.hxx>
-#include <Poly_Connect.hxx>
-#include <ShapeAnalysis_Edge.hxx>
-#include <StdPrs_ToolTriangulatedShape.hxx>
-#include <TopAbs_ShapeEnum.hxx>
-#include <TopExp_Explorer.hxx>
-#include <TopoDS.hxx>
-#include <gp_Ax2.hxx>
-
-#include "../logger/Logger.hpp"
 
 /**
  * Constructor
@@ -75,20 +65,4 @@ void Triangulation::triangulate() {
       BRepMesh_IncrementalMesh subMesh(subShape, this->m_maxBb * meshQuality);
     }
   }
-}
-
-/**
- * Triangulate face
- * @param shape Shape
- */
-void Triangulation::triangulateFace(const TopoDS_Shape &face) const {
-  BRepMesh_IncrementalMesh mesh(face, this->m_maxBb * meshQuality);
-}
-
-/**
- * Triangulate edge
- * @param shape Shape
- */
-void Triangulation::triangulateEdge(const TopoDS_Shape &edge) const {
-  BRepMesh_IncrementalMesh mesh(edge, this->m_maxBb * meshQuality);
 }

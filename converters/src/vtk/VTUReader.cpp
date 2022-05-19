@@ -1,14 +1,10 @@
-#include <tuple>
-
+#include "VTUReader.hpp"
+#include "../logger/Logger.hpp"
 #include <vtkCellArray.h>
 #include <vtkIdList.h>
 #include <vtkPointData.h>
 #include <vtkPoints.h>
 #include <vtkUnstructuredGrid.h>
-
-#include "VTUReader.hpp"
-
-#include "../logger/Logger.hpp"
 
 /**
  * Constructor
@@ -25,6 +21,11 @@ VTUReader::VTUReader(const std::string &fileName) : m_fileName(fileName) {}
  * @return Status
  */
 bool VTUReader::read() {
+  // Check
+  if (!this->m_reader->CanReadFile(m_fileName.c_str()))
+    return false;
+
+  // Read
   this->m_reader->SetFileName(m_fileName.c_str());
   this->m_reader->Update();
 

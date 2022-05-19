@@ -19,23 +19,27 @@ Tetrahedron::Tetrahedron(const uint index1, const uint index2,
       m_label(label) {}
 
 /**
- * Set indices
+ * Set index 1
  * @param index1 Index 1
+ */
+void Tetrahedron::setI1(const uint index1) { this->m_index1 = index1; }
+
+/**
+ * Set index 2
  * @param index2 Index 2
+ */
+void Tetrahedron::setI2(const uint index2) { this->m_index2 = index2; }
+
+/**
+ * Set index 3
  * @param index3 Index 3
+ */
+void Tetrahedron::setI3(const uint index3) { this->m_index3 = index3; }
+
+/**
+ * Set index 4
  * @param index4 Index 4
  */
-void Tetrahedron::setIndices(const uint index1, const uint index2,
-                             const uint index3, const uint index4) {
-  this->m_index1 = index1;
-  this->m_index2 = index2;
-  this->m_index3 = index3;
-  this->m_index4 = index4;
-}
-
-void Tetrahedron::setI1(const uint index1) { this->m_index1 = index1; }
-void Tetrahedron::setI2(const uint index2) { this->m_index2 = index2; }
-void Tetrahedron::setI3(const uint index3) { this->m_index3 = index3; }
 void Tetrahedron::setI4(const uint index4) { this->m_index4 = index4; }
 
 /**
@@ -45,29 +49,27 @@ void Tetrahedron::setI4(const uint index4) { this->m_index4 = index4; }
 void Tetrahedron::setLabel(const uint label) { this->m_label = label; }
 
 /**
- * Get index
- * @param i index
- * @returns Index i
+ * Get index 1
+ * @returns Index 1
  */
-uint Tetrahedron::getIndex(const uint i) const {
-  if (i == 0)
-    return this->m_index1;
-  else if (i == 1)
-    return this->m_index2;
-  else if (i == 2)
-    return this->m_index3;
-  else if (i == 3)
-    return this->m_index4;
-  else
-    return 0;
-}
-
 uint Tetrahedron::getI1() const { return this->m_index1; }
 
+/**
+ * Get index 2
+ * @returns Index 2
+ */
 uint Tetrahedron::getI2() const { return this->m_index2; }
 
+/**
+ * Get index 3
+ * @returns Index 3
+ */
 uint Tetrahedron::getI3() const { return this->m_index3; }
 
+/**
+ * Get index 4
+ * @returns Index 4
+ */
 uint Tetrahedron::getI4() const { return this->m_index4; }
 
 /**

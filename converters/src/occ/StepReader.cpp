@@ -1,14 +1,11 @@
 #include "StepReader.hpp"
 
-#include <fstream>
-
+#include "../logger/Logger.hpp"
 #include <IFSelect_ReturnStatus.hxx>
 #include <Quantity_Color.hxx>
 #include <STEPCAFControl_Reader.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS_Compound.hxx>
-
-#include "../logger/Logger.hpp"
 
 /**
  * Constructor

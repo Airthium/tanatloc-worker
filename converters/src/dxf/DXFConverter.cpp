@@ -4,26 +4,19 @@
 
 #include "../dxflib/dl_dxf.h"
 
-#include <gp_Circ.hxx>
-#include <gp_Pnt.hxx>
-
-#include <TopoDS_Compound.hxx>
-#include <TopoDS_Edge.hxx>
-#include <TopoDS_Vertex.hxx>
-
-#include <GC_MakeArcOfCircle.hxx>
-#include <Geom_TrimmedCurve.hxx>
-
+#include "../logger/Logger.hpp"
 #include <BRepBuilderAPI_MakeEdge.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
 #include <BRepBuilderAPI_MakeVertex.hxx>
 #include <BRepBuilderAPI_MakeWire.hxx>
-
-#include <BRepTools.hxx>
-
 #include <BRep_Builder.hxx>
-
-#include "../logger/Logger.hpp"
+#include <GC_MakeArcOfCircle.hxx>
+#include <Geom_TrimmedCurve.hxx>
+#include <TopoDS_Compound.hxx>
+#include <TopoDS_Edge.hxx>
+#include <TopoDS_Vertex.hxx>
+#include <gp_Circ.hxx>
+#include <gp_Pnt.hxx>
 
 /**
  * Constructor
