@@ -117,13 +117,14 @@ set(StepToGLTFSOURCE
 #   ${LOGGER_SOURCE}
 # )
 
-# # VTUToThreeJS
-# set(VTUToThreeJSSOURCE
-#   src/VTUToThreeJS.cpp
-#   ${VTK_SOURCE}
-#   ${THREEJS_SOURCE}
-#   ${LOGGER_SOURCE}
-# )
+# VTUToGLTF
+set(VTUToGLTFSOURCE
+  src/VTUToGLTF.cpp
+  ${GMSH_SOURCE}
+  ${VTK_SOURCE}
+  ${OCC_SOURCE}
+  ${LOGGER_SOURCE}
+)
 
 ## Executables
 # DXFToBRep
@@ -154,9 +155,9 @@ target_link_libraries(StepToGLTF ${OCC_LIBS})
 # add_executable(StepUnion ${StepUnionSOURCE})
 # target_link_libraries(StepUnion ${OCC_LIBS})
 
-# # VTUToThreeJS
-# add_executable(VTUToThreeJS ${VTUToThreeJSSOURCE})
-# target_link_libraries(VTUToThreeJS ${VTK_LIBS})
+# VTUToGLTF
+add_executable(VTUToGLTF ${VTUToGLTFSOURCE})
+target_link_libraries(VTUToGLTF ${VTK_LIBS} ${OCC_LIBS})
 
 ## Install
 install(TARGETS DXFToGLTF StepToGLTF)

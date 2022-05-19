@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
   TopoDS_Builder solidsBuilder;
   solidsBuilder.MakeCompound(solids);
 
-  TDF_Label solidsLabel = mainDocument.addShape(solids);
+  TDF_Label solidsLabel = mainDocument.addShape(solids, "Solids");
 
   for (i = 0; i < mesh->getNumberOfTetrahedronLabels(); ++i) {
     // Vertices
@@ -108,12 +108,14 @@ int main(int argc, char *argv[]) {
       solidsBuilder.Add(solids, cylinder5);
       solidsBuilder.Add(solids, cylinder6);
 
-      mainDocument.addComponent(solidsLabel, cylinder1, color);
-      mainDocument.addComponent(solidsLabel, cylinder2, color);
-      mainDocument.addComponent(solidsLabel, cylinder3, color);
-      mainDocument.addComponent(solidsLabel, cylinder4, color);
-      mainDocument.addComponent(solidsLabel, cylinder5, color);
-      mainDocument.addComponent(solidsLabel, cylinder6, color);
+      std::string name = "Solid " + std::to_string(i);
+
+      mainDocument.addComponent(solidsLabel, cylinder1, color, name + " 1");
+      mainDocument.addComponent(solidsLabel, cylinder2, color, name + " 2");
+      mainDocument.addComponent(solidsLabel, cylinder3, color, name + " 3");
+      mainDocument.addComponent(solidsLabel, cylinder4, color, name + " 4");
+      mainDocument.addComponent(solidsLabel, cylinder5, color, name + " 5");
+      mainDocument.addComponent(solidsLabel, cylinder6, color, name + " 6");
     }
   }
 
@@ -122,7 +124,7 @@ int main(int argc, char *argv[]) {
   TopoDS_Builder facesBuilder;
   facesBuilder.MakeCompound(faces);
 
-  TDF_Label facesLabel = mainDocument.addShape(faces);
+  TDF_Label facesLabel = mainDocument.addShape(faces, "Faces");
 
   for (i = 0; i < mesh->getNumberOfTriangleLabels(); ++i) {
     // Vertices
@@ -158,9 +160,11 @@ int main(int argc, char *argv[]) {
       facesBuilder.Add(faces, cylinder2);
       facesBuilder.Add(faces, cylinder3);
 
-      mainDocument.addComponent(facesLabel, cylinder1, color);
-      mainDocument.addComponent(facesLabel, cylinder2, color);
-      mainDocument.addComponent(facesLabel, cylinder3, color);
+      std::string name = "Face " + std::to_string(i);
+
+      mainDocument.addComponent(facesLabel, cylinder1, color, name + " 1");
+      mainDocument.addComponent(facesLabel, cylinder2, color, name + " 2");
+      mainDocument.addComponent(facesLabel, cylinder3, color, name + " 3");
     }
   }
 

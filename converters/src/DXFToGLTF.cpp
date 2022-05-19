@@ -37,12 +37,14 @@ int main(int argc, char **argv) {
   TopoDS_Compound faces;
   TopoDS_Builder facesBuilder;
   facesBuilder.MakeCompound(faces);
-  TDF_Label facesLabel = mainDocument.addShape(faces);
+  TDF_Label facesLabel = mainDocument.addShape(faces, "Faces");
 
   TopoDS_Compound edges;
   TopoDS_Builder edgesBuilder;
   edgesBuilder.MakeCompound(edges);
 
+  uint nbFaces = 0;
+  uint nbEdges = 0;
   TopExp_Explorer faceExplorer;
   for (faceExplorer.Init(shape, TopAbs_FACE); faceExplorer.More();
        faceExplorer.Next()) {
@@ -51,7 +53,9 @@ int main(int argc, char **argv) {
     facesBuilder.Add(faces, face);
 
     // New face
-    TDF_Label faceLabel = mainDocument.addComponent(facesLabel, face);
+    nbFaces++;
+    TDF_Label faceLabel = mainDocument.addComponent(
+        facesLabel, face, "Face " + std::to_string(nbFaces));
 
     TopExp_Explorer edgeExplorer;
     for (edgeExplorer.Init(face, TopAbs_EDGE); edgeExplorer.More();
@@ -64,7 +68,7 @@ int main(int argc, char **argv) {
       edgesBuilder.Add(edges, pipe);
     }
   }
-  mainDocument.addComponent(facesLabel, edges);
+  mainDocument.addComponent(facesLabel, edges, "Edges");
 
   // Triangulate
   Triangulation triangulation(mainDocument);

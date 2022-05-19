@@ -156,10 +156,13 @@ double Gmsh::getMax() const {
     double currentY = Current.Y();
     double currentZ = Current.Z();
 
-    Min.setCoordinates(std::min(minX, currentX), std::min(minY, currentY),
-                       std::min(minZ, currentZ));
-    Max.setCoordinates(std::max(maxX, currentX), std::max(maxY, currentY),
-                       std::max(maxZ, currentZ));
+    Min.setX(std::min(minX, currentX));
+    Min.setY(std::min(minY, currentY));
+    Min.setZ(std::min(minZ, currentZ));
+
+    Max.setX(std::max(maxX, currentX));
+    Max.setY(std::max(maxY, currentY));
+    Max.setZ(std::max(maxZ, currentZ));
   }
 
   return std::max(Max.X() - Min.X(),

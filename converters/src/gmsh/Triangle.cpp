@@ -29,6 +29,12 @@ void Triangle::setIndices(const uint index1, const uint index2,
   this->m_index3 = index3;
 }
 
+void Triangle::setI1(const uint index1) { this->m_index1 = index1; }
+
+void Triangle::setI2(const uint index2) { this->m_index2 = index2; }
+
+void Triangle::setI3(const uint index3) { this->m_index3 = index3; }
+
 /**
  * Set label
  * @param label Label
@@ -50,6 +56,12 @@ uint Triangle::getIndex(const uint i) const {
   else
     return 0;
 }
+
+uint Triangle::getI1() const { return this->m_index1; }
+
+uint Triangle::getI2() const { return this->m_index2; }
+
+uint Triangle::getI3() const { return this->m_index3; }
 
 /**
  * Get indices

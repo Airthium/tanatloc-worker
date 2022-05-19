@@ -1,8 +1,6 @@
 #ifndef _VERTEX_
 #define _VERTEX_
 
-#include <vector>
-
 using uint = unsigned int;
 
 /**
@@ -22,8 +20,14 @@ public:
   Vertex();
   Vertex(const double, const double, const double);
 
-  // Set coordinates
-  void setCoordinates(const double, const double, const double);
+  // Set x
+  void setX(const double);
+
+  // Set y
+  void setY(const double);
+
+  // Set z
+  void setZ(const double);
 
   // Get coordinate
   double getCoordinate(const uint) const;
@@ -36,9 +40,6 @@ public:
 
   // Z
   double Z() const;
-
-  // Get coordinates
-  std::vector<double> getCoordinates() const;
 };
 
 #endif

@@ -50,6 +50,8 @@ bool StepReader::read() {
 
   /// CLEAN DOCUMENT
   // Solids & faces loop
+  uint nbSolids = 0;
+  uint nbFaces = 0;
   TopExp_Explorer solidExplorer;
   for (solidExplorer.Init(originalCompound, TopAbs_SOLID); solidExplorer.More();
        solidExplorer.Next()) {
@@ -58,7 +60,9 @@ bool StepReader::read() {
     Quantity_Color solidColor = originalMainDocument.getShapeColor(solid);
 
     // New solid
-    TDF_Label solidLabel = this->m_mainDocument.addShape(solid, solidColor);
+    nbSolids++;
+    TDF_Label solidLabel = this->m_mainDocument.addShape(
+        solid, solidColor, "Solid " + std::to_string(nbSolids));
 
     TopExp_Explorer faceExplorer;
     for (faceExplorer.Init(solid, TopAbs_FACE); faceExplorer.More();
@@ -68,7 +72,9 @@ bool StepReader::read() {
       Quantity_Color faceColor = originalMainDocument.getShapeColor(face);
 
       // New face
-      this->m_mainDocument.addComponent(solidLabel, face, faceColor);
+      nbFaces++;
+      this->m_mainDocument.addComponent(solidLabel, face, faceColor,
+                                        "Face " + std::to_string(nbFaces));
     }
   }
 

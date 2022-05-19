@@ -25,13 +25,15 @@ public:
   MainDocument();
 
   // Add shape
-  TDF_Label addShape(const TopoDS_Shape &) const;
-  TDF_Label addShape(const TopoDS_Shape &, const Quantity_Color &) const;
+  TDF_Label addShape(const TopoDS_Shape &, const std::string &) const;
+  TDF_Label addShape(const TopoDS_Shape &, const Quantity_Color &,
+                     const std::string &) const;
 
   // Add component
-  TDF_Label addComponent(const TDF_Label &, const TopoDS_Shape &) const;
   TDF_Label addComponent(const TDF_Label &, const TopoDS_Shape &,
-                         const Quantity_Color &) const;
+                         const std::string &) const;
+  TDF_Label addComponent(const TDF_Label &, const TopoDS_Shape &,
+                         const Quantity_Color &, const std::string &) const;
 
   // Get labels
   TDF_LabelSequence getLabels() const;

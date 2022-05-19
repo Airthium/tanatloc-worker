@@ -33,6 +33,11 @@ void Tetrahedron::setIndices(const uint index1, const uint index2,
   this->m_index4 = index4;
 }
 
+void Tetrahedron::setI1(const uint index1) { this->m_index1 = index1; }
+void Tetrahedron::setI2(const uint index2) { this->m_index2 = index2; }
+void Tetrahedron::setI3(const uint index3) { this->m_index3 = index3; }
+void Tetrahedron::setI4(const uint index4) { this->m_index4 = index4; }
+
 /**
  * Set label
  * @param label Label
@@ -56,6 +61,14 @@ uint Tetrahedron::getIndex(const uint i) const {
   else
     return 0;
 }
+
+uint Tetrahedron::getI1() const { return this->m_index1; }
+
+uint Tetrahedron::getI2() const { return this->m_index2; }
+
+uint Tetrahedron::getI3() const { return this->m_index3; }
+
+uint Tetrahedron::getI4() const { return this->m_index4; }
 
 /**
  * Get indices

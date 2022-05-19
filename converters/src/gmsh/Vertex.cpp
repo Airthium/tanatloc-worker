@@ -15,47 +15,38 @@ Vertex::Vertex(const double x, const double y, const double z)
     : m_x(x), m_y(y), m_z(z) {}
 
 /**
- * Set coordinates
- * @param x Coordinate x
- * @param y Coordinate y
- * @param z Coordinate z
+ * Set x
+ * @param x X
  */
-void Vertex::setCoordinates(const double x, const double y, const double z) {
-  this->m_x = x;
-  this->m_y = y;
-  this->m_z = z;
-}
+void Vertex::setX(const double x) { this->m_x = x; }
 
 /**
- * Get coordinate
- * @param i Index
- * @returns Coordinate i
+ * Set y
+ * @param y Y
  */
-double Vertex::getCoordinate(const uint i) const {
-  if (i == 0)
-    return this->m_x;
-  else if (i == 1)
-    return this->m_y;
-  else if (i == 2)
-    return this->m_z;
-  else
-    return 0.;
-}
+void Vertex::setY(const double y) { this->m_y = y; }
 
+/**
+ * Set z
+ * @param z Z
+ */
+void Vertex::setZ(const double z) { this->m_y = z; }
+
+/**
+ * Get x
+ * @return double X
+ */
 double Vertex::X() const { return this->m_x; }
 
+/**
+ * Get y
+ * @return double Y
+ */
 double Vertex::Y() const { return this->m_y; }
 
-double Vertex::Z() const { return this->m_z; }
-
 /**
- * Get coordinates
- * @returns Coordinates
+ * Get z
+ *
+ * @return double Z
  */
-std::vector<double> Vertex::getCoordinates() const {
-  auto coordinates = std::vector<double>();
-  coordinates.push_back(this->m_x);
-  coordinates.push_back(this->m_y);
-  coordinates.push_back(this->m_z);
-  return coordinates;
-}
+double Vertex::Z() const { return this->m_z; }
