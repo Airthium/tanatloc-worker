@@ -94,7 +94,7 @@ bool Gmsh::load(const std::string &fileName) {
       uint index2;
       file >> index1 >> index2;
     } else {
-      Logger::ERROR("Unsupported type: " + type);
+      Logger::ERROR("Unsupported type: " + std::to_string(type));
       return false;
     }
   }

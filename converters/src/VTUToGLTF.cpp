@@ -1,13 +1,17 @@
+#include <algorithm>
+
 #include "logger/Logger.hpp"
 #include "occ/GLTFWriter.hpp"
 #include "occ/MainDocument.hpp"
 #include "occ/Triangulation.hpp"
-#include "occ/makeCylinder.hpp"
 #include "vtk/VTUReader.hpp"
 #include <BRepBuilderAPI_MakeEdge.hxx>
+#include <BRepBuilderAPI_MakeFace.hxx>
 #include <BRepBuilderAPI_MakeVertex.hxx>
+#include <BRepBuilderAPI_MakeWire.hxx>
 #include <TopoDS_Builder.hxx>
 #include <TopoDS_Compound.hxx>
+#include <TopoDS_Face.hxx>
 
 RData getMagnitude(const RData &);
 RData getComponent(const RData &, const int);
@@ -125,96 +129,6 @@ bool writeOne(const RData &result, const std::string &gltfFile,
               const double radius) {
   MainDocument mainDocument;
 
-  // Tetrahedra
-  TopoDS_Compound tethradedra;
-  TopoDS_Builder tethradedraBuilder;
-  tethradedraBuilder.MakeCompound(tethradedra);
-
-  TDF_Label tethradedraLabel = mainDocument.addShape(tethradedra, "Tetrahedra");
-
-  for (uint i = 0; i < result.tetrahedra.size(); i++) {
-    Tetrahedron tetrahedron = result.tetrahedra.at(i);
-
-    // Indices
-    uint index1 = tetrahedron.getI1();
-    uint index2 = tetrahedron.getI2();
-    uint index3 = tetrahedron.getI3();
-    uint index4 = tetrahedron.getI4();
-
-    // Data
-    double data1 = result.values.at(index1);
-    double data2 = result.values.at(index2);
-    double data3 = result.values.at(index3);
-    double data4 = result.values.at(index4);
-
-    // Vertices
-    Vertex v1 = result.vertices.at(index1);
-    Vertex v2 = result.vertices.at(index2);
-    Vertex v3 = result.vertices.at(index3);
-    Vertex v4 = result.vertices.at(index4);
-
-    // Points
-    gp_Pnt point1(v1.X(), v1.Y(), v1.Z());
-    gp_Pnt point2(v2.X(), v2.Y(), v2.Z());
-    gp_Pnt point3(v3.X(), v3.Y(), v3.Z());
-    gp_Pnt point4(v4.X(), v4.Y(), v4.Z());
-
-    // Vertices
-    BRepBuilderAPI_MakeVertex vertex1(point1);
-    BRepBuilderAPI_MakeVertex vertex2(point2);
-    BRepBuilderAPI_MakeVertex vertex3(point3);
-    BRepBuilderAPI_MakeVertex vertex4(point4);
-
-    // Edges
-    BRepBuilderAPI_MakeEdge edge1(vertex1.Vertex(), vertex2.Vertex());
-    BRepBuilderAPI_MakeEdge edge2(vertex1.Vertex(), vertex3.Vertex());
-    BRepBuilderAPI_MakeEdge edge3(vertex1.Vertex(), vertex4.Vertex());
-    BRepBuilderAPI_MakeEdge edge4(vertex2.Vertex(), vertex3.Vertex());
-    BRepBuilderAPI_MakeEdge edge5(vertex2.Vertex(), vertex4.Vertex());
-    BRepBuilderAPI_MakeEdge edge6(vertex3.Vertex(), vertex4.Vertex());
-
-    // Cylinder
-    TopoDS_Shape cylinder1 = makeCylinder(radius, edge1);
-    TopoDS_Shape cylinder2 = makeCylinder(radius, edge2);
-    TopoDS_Shape cylinder3 = makeCylinder(radius, edge3);
-    TopoDS_Shape cylinder4 = makeCylinder(radius, edge4);
-    TopoDS_Shape cylinder5 = makeCylinder(radius, edge5);
-    TopoDS_Shape cylinder6 = makeCylinder(radius, edge6);
-
-    tethradedraBuilder.Add(tethradedra, cylinder1);
-    tethradedraBuilder.Add(tethradedra, cylinder2);
-    tethradedraBuilder.Add(tethradedra, cylinder3);
-    tethradedraBuilder.Add(tethradedra, cylinder4);
-    tethradedraBuilder.Add(tethradedra, cylinder5);
-    tethradedraBuilder.Add(tethradedra, cylinder6);
-
-    std::string name1 = "Tetrahedron" + std::to_string(i) + ";1;{" +
-                        std::to_string(data1) + "," + std::to_string(data2) +
-                        "}";
-    std::string name2 = "Tetrahedron" + std::to_string(i) + ";2;{" +
-                        std::to_string(data1) + "," + std::to_string(data3) +
-                        "}";
-    std::string name3 = "Tetrahedron" + std::to_string(i) + ";3;{" +
-                        std::to_string(data1) + "," + std::to_string(data4) +
-                        "}";
-    std::string name4 = "Tetrahedron" + std::to_string(i) + ";4;{" +
-                        std::to_string(data2) + "," + std::to_string(data3) +
-                        "}";
-    std::string name5 = "Tetrahedron" + std::to_string(i) + ";5;{" +
-                        std::to_string(data2) + "," + std::to_string(data4) +
-                        "}";
-    std::string name6 = "Tetrahedron" + std::to_string(i) + ";6;{" +
-                        std::to_string(data3) + "," + std::to_string(data4) +
-                        "}";
-
-    mainDocument.addComponent(tethradedraLabel, cylinder1, name1);
-    mainDocument.addComponent(tethradedraLabel, cylinder2, name2);
-    mainDocument.addComponent(tethradedraLabel, cylinder3, name3);
-    mainDocument.addComponent(tethradedraLabel, cylinder4, name4);
-    mainDocument.addComponent(tethradedraLabel, cylinder5, name5);
-    mainDocument.addComponent(tethradedraLabel, cylinder6, name6);
-  }
-
   // Triangles
   TopoDS_Compound triangles;
   TopoDS_Builder trianglesBuilder;
@@ -246,37 +160,43 @@ bool writeOne(const RData &result, const std::string &gltfFile,
     gp_Pnt point3(v3.X(), v3.Y(), v3.Z());
 
     // Vertices
-    BRepBuilderAPI_MakeVertex vertex1(point1);
-    BRepBuilderAPI_MakeVertex vertex2(point2);
-    BRepBuilderAPI_MakeVertex vertex3(point3);
+    BRepBuilderAPI_MakeVertex vertex1Builder(point1);
+    BRepBuilderAPI_MakeVertex vertex2Builder(point2);
+    BRepBuilderAPI_MakeVertex vertex3Builder(point3);
+
+    TopoDS_Vertex vertex1 = vertex1Builder.Vertex();
+    TopoDS_Vertex vertex2 = vertex2Builder.Vertex();
+    TopoDS_Vertex vertex3 = vertex3Builder.Vertex();
 
     // Edges
-    BRepBuilderAPI_MakeEdge edge1(vertex1.Vertex(), vertex2.Vertex());
-    BRepBuilderAPI_MakeEdge edge2(vertex1.Vertex(), vertex3.Vertex());
-    BRepBuilderAPI_MakeEdge edge3(vertex2.Vertex(), vertex3.Vertex());
+    BRepBuilderAPI_MakeEdge edge1Builder(vertex1, vertex2);
+    BRepBuilderAPI_MakeEdge edge2Builder(vertex2, vertex3);
+    BRepBuilderAPI_MakeEdge edge3Builder(vertex3, vertex1);
 
-    // Cylinder
-    TopoDS_Shape cylinder1 = makeCylinder(radius, edge1);
-    TopoDS_Shape cylinder2 = makeCylinder(radius, edge2);
-    TopoDS_Shape cylinder3 = makeCylinder(radius, edge3);
+    TopoDS_Edge edge1 = edge1Builder.Edge();
+    TopoDS_Edge edge2 = edge2Builder.Edge();
+    TopoDS_Edge edge3 = edge3Builder.Edge();
 
-    trianglesBuilder.Add(triangles, cylinder1);
-    trianglesBuilder.Add(triangles, cylinder2);
-    trianglesBuilder.Add(triangles, cylinder3);
+    BRepBuilderAPI_MakeWire wireBuilder(edge1, edge2, edge3);
+    TopoDS_Wire wire = wireBuilder.Wire();
 
-    std::string name1 = "Triangle" + std::to_string(i) + ";1;{" +
-                        std::to_string(data1) + "," + std::to_string(data2) +
-                        "}";
-    std::string name2 = "Triangle" + std::to_string(i) + ";2;{" +
-                        std::to_string(data1) + "," + std::to_string(data3) +
-                        "}";
-    std::string name3 = "Triangle" + std::to_string(i) + ";3;{" +
-                        std::to_string(data2) + "," + std::to_string(data3) +
-                        "}";
+    BRepBuilderAPI_MakeFace faceBuilder(wire);
+    TopoDS_Face face = faceBuilder.Face();
 
-    mainDocument.addComponent(trianglesLabel, cylinder1, name1);
-    mainDocument.addComponent(trianglesLabel, cylinder2, name2);
-    mainDocument.addComponent(trianglesLabel, cylinder3, name3);
+    trianglesBuilder.Add(triangles, face);
+
+    std::string data1str = std::to_string(data1);
+    std::replace(data1str.begin(), data1str.end(), '.', ',');
+
+    std::string data2str = std::to_string(data2);
+    std::replace(data2str.begin(), data2str.end(), '.', ',');
+
+    std::string data3str = std::to_string(data3);
+    std::replace(data3str.begin(), data3str.end(), '.', ',');
+
+    std::string name = data1str + ";" + data2str + ";" + data3str;
+
+    mainDocument.addComponent(trianglesLabel, face, name);
   }
 
   // Triangulate
