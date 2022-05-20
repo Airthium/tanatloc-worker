@@ -52,7 +52,7 @@ void DXFConverter::processCodeValuePair(unsigned int code,
                                         const std::string &value) {
   if (value == "ENDSEC") {
     Logger::DEBUG("DXFConverter::ENDSEC");
-    this->buildFace();
+    // this->buildFace(); // TODO introduce bug, check if needed
   }
 
   else if (value == "EOF") {
@@ -67,15 +67,34 @@ void DXFConverter::addLine(const DL_LineData &data) {
   DL_VertexData v1 = {data.x1, data.y1, 0, 0};
   DL_VertexData v2 = {data.x2, data.y2, 0, 0};
 
+  if ((data.x1 == data.x2) && (data.y1 == data.y2))
+    return;
+
   this->m_vertices.push_back(v1);
   this->m_vertices.push_back(v2);
 
   this->buildWire();
 }
 
-void DXFConverter::addArc(const DL_ArcData &) {
+void DXFConverter::addArc(const DL_ArcData &data) {
   Logger::DEBUG("DXFConverter::ARC");
-  Logger::ERROR("TODO");
+
+  gp_Circ circle;
+  gp_Pnt center(data.cx, data.cy, 0);
+  circle.SetLocation(center);
+  circle.SetRadius(data.radius);
+
+  GC_MakeArcOfCircle arc(circle, 2. * M_PI * data.angle1 / 360.,
+                         2. * M_PI * data.angle2 / 360., true);
+  Handle(Geom_TrimmedCurve) curve = arc.Value();
+
+  auto edgeBuilder = BRepBuilderAPI_MakeEdge(curve);
+  TopoDS_Edge edge = edgeBuilder.Edge();
+
+  auto wireBuilder = BRepBuilderAPI_MakeWire(edge);
+  TopoDS_Wire wire = wireBuilder.Wire();
+
+  this->m_wires.push_back(wire);
 }
 
 void DXFConverter::addCircle(const DL_CircleData &data) {
@@ -180,7 +199,7 @@ void DXFConverter::buildFace() {
 
   // Build face
   BRepBuilderAPI_MakeFace faceBuilder =
-      BRepBuilderAPI_MakeFace(this->m_wires[0], true);
+      BRepBuilderAPI_MakeFace(this->m_wires.at(0), true);
   for (uint i = 1; i < size; ++i) {
     TopoDS_Wire wire = this->m_wires[i];
     faceBuilder.Add(wire);

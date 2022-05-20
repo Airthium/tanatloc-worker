@@ -174,6 +174,8 @@ if (COVERAGE)
     COMMAND ./DXFToGLTF || true
     COMMAND ./DXFToGLTF ../test/assets/not_existing.dxf pipe.glb|| true
     COMMAND ./DXFToGLTF ../test/assets/pipe.dxf pipe.glb || true
+    COMMAND ./DXFToGLTF ../test/assets/circle.dxf circle.glb || true
+    COMMAND ./DXFToGLTF ../test/assets/curved.dxf curved.glb || true
     COMMAND ./GmshToGLTF || true
     COMMAND ./GmshToGLTF ../test/assets/not_existing.msh not_existing.glb || true
     COMMAND ./GmshToGLTF ../test/assets/Cube.msh Cube.glb || true

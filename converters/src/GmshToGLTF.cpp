@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
       trianglesBuilder.Add(triangles, face);
 
       std::string name =
-          "label" + std::to_string(i) + ",number" + std::to_string(j);
+          "label" + std::to_string(i) + ";number" + std::to_string(j);
 
       mainDocument.addComponent(facesLabel, face, color, name);
     }

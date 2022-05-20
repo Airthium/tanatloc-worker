@@ -3,8 +3,9 @@
 #include "occ/GLTFWriter.hpp"
 #include "occ/MainDocument.hpp"
 #include "occ/Triangulation.hpp"
-#include "occ/makeCylinder.hpp"
+#include "occ/makePipe.hpp"
 #include <TopExp_Explorer.hxx>
+#include <TopoDS.hxx>
 #include <TopoDS_Builder.hxx>
 
 int main(int argc, char **argv) {
@@ -54,8 +55,8 @@ int main(int argc, char **argv) {
 
     // New face
     nbFaces++;
-    TDF_Label faceLabel = mainDocument.addComponent(
-        facesLabel, face, "Face " + std::to_string(nbFaces));
+    mainDocument.addComponent(facesLabel, face,
+                              "Face" + std::to_string(nbFaces));
 
     TopExp_Explorer edgeExplorer;
     for (edgeExplorer.Init(face, TopAbs_EDGE); edgeExplorer.More();
@@ -64,10 +65,12 @@ int main(int argc, char **argv) {
       TopoDS_Shape edge = edgeExplorer.Current();
 
       // Edge to pipe
-      TopoDS_Shape pipe = makeCylinder(shape, edge);
+      TopoDS_Shape pipe = makePipe(shape, TopoDS::Edge(edge));
+
       edgesBuilder.Add(edges, pipe);
     }
   }
+
   mainDocument.addComponent(facesLabel, edges, "Edges");
 
   // Triangulate

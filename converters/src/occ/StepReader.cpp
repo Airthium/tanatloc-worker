@@ -59,7 +59,7 @@ bool StepReader::read() {
     // New solid
     nbSolids++;
     TDF_Label solidLabel = this->m_mainDocument.addShape(
-        solid, solidColor, "Solid " + std::to_string(nbSolids));
+        solid, solidColor, "Solid" + std::to_string(nbSolids));
 
     TopExp_Explorer faceExplorer;
     for (faceExplorer.Init(solid, TopAbs_FACE); faceExplorer.More();
@@ -71,7 +71,7 @@ bool StepReader::read() {
       // New face
       nbFaces++;
       this->m_mainDocument.addComponent(solidLabel, face, faceColor,
-                                        "Face " + std::to_string(nbFaces));
+                                        "Face" + std::to_string(nbFaces));
     }
   }
 

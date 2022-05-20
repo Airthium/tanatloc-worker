@@ -3,7 +3,7 @@
 
 #include "MainDocument.hpp"
 
-constexpr double meshQuality = 1.;
+constexpr double meshQuality = 1.e-3;
 
 class Triangulation {
 private:
