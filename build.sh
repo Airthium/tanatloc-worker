@@ -4,7 +4,7 @@
 if [ -z "$GITHUB_TOKEN" ]
 then
   echo "GITHUB_TOKEN variable is empty"
-  exit 1
+  echo "Archives download skipped!"
 fi
 
 declare -A ARCHIVES
@@ -50,7 +50,12 @@ downloadArchive() {
   # Download target if not already present
   if [ ! -f "$archive" ]; then
     echo "File $archive not found. Downloading..."
-    curl -LJO -u "$GITHUB_TOKEN:x-oauth-basic" -H 'Accept: application/octet-stream' ${ARCHIVES[$archive]}
+    if [ -z "GITHUB_TOKEN" ]
+    then
+      echo "Download skipped (no GITHUB_TOKEN)"
+    else
+      curl -LJO -u "$GITHUB_TOKEN:x-oauth-basic" -H 'Accept: application/octet-stream' ${ARCHIVES[$archive]}
+    fi
   fi
 }
 
