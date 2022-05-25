@@ -27,6 +27,7 @@ RUN apt install -yq \
   libopenblas-dev libhdf5-dev \
   libgsl-dev libfftw3-dev \
   libnlopt-dev libumfpack5 \
+  mpich \
   python3-paraview
 
 RUN apt autoremove \
