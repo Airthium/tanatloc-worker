@@ -34,18 +34,19 @@ int main(int argc, char **argv) {
 
   // Create document
   MainDocument mainDocument;
+  mainDocument.setDimension(2);
+  std::string type = "geometry";
+  mainDocument.setType(type);
 
   TopoDS_Compound faces;
   TopoDS_Builder facesBuilder;
   facesBuilder.MakeCompound(faces);
-  TDF_Label facesLabel = mainDocument.addShape(faces, "Faces");
 
   TopoDS_Compound edges;
   TopoDS_Builder edgesBuilder;
   edgesBuilder.MakeCompound(edges);
+  TDF_Label edgesLabel = mainDocument.addShape(edges, "Edges");
 
-  uint nbFaces = 0;
-  uint nbEdges = 0;
   TopExp_Explorer faceExplorer;
   for (faceExplorer.Init(shape, TopAbs_FACE); faceExplorer.More();
        faceExplorer.Next()) {
@@ -54,9 +55,7 @@ int main(int argc, char **argv) {
     facesBuilder.Add(faces, face);
 
     // New face
-    nbFaces++;
-    mainDocument.addComponent(facesLabel, face,
-                              "Face" + std::to_string(nbFaces));
+    mainDocument.add2DFace(face);
 
     TopExp_Explorer edgeExplorer;
     for (edgeExplorer.Init(face, TopAbs_EDGE); edgeExplorer.More();
@@ -68,10 +67,11 @@ int main(int argc, char **argv) {
       TopoDS_Shape pipe = makePipe(shape, TopoDS::Edge(edge));
 
       edgesBuilder.Add(edges, pipe);
+
+      // New edge
+      mainDocument.add2DEdge(edgesLabel, pipe);
     }
   }
-
-  mainDocument.addComponent(facesLabel, edges, "Edges");
 
   // Triangulate
   Triangulation triangulation(mainDocument);
@@ -84,6 +84,14 @@ int main(int argc, char **argv) {
   res = writer.write();
   if (!res) {
     Logger::ERROR("Unable to write glft file " + gltfFile);
+    return EXIT_FAILURE;
+  }
+
+  // Write description file
+  std::string descFile = gltfFile + ".desc";
+  res = mainDocument.writeDescription(descFile);
+  if (!res) {
+    Logger::ERROR("Unable to write description file " + gltfFile + ".desc");
     return EXIT_FAILURE;
   }
 

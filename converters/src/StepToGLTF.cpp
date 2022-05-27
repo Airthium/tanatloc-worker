@@ -43,5 +43,13 @@ int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
+  // Write description file
+  std::string descFile = gltfFile + ".desc";
+  res = mainDocument.writeDescription(descFile);
+  if (!res) {
+    Logger::ERROR("Unable to write description file " + gltfFile + ".desc");
+    return EXIT_FAILURE;
+  }
+
   return EXIT_SUCCESS;
 }

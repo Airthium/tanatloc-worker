@@ -39,6 +39,11 @@ if (OpenCASCADE_FOUND)
   set(OCC_LIBS ${OpenCASCADE_LIBRARIES})
 endif (OpenCASCADE_FOUND)
 
+# UUID
+find_path(LIBUUID_INCLUDE_DIR uuid.h PATH_SUFFIXES uuid)
+find_library(LIBUUID_LIBRARY libuuid.a)
+include_directories(${LIBUUID_INCLUDE_DIR})
+
 # Logger library
 AUX_SOURCE_DIRECTORY(src/logger LOGGER_SOURCE)
 
@@ -95,19 +100,19 @@ set(VTUToGLTFSOURCE
 ## Executables
 # DXFToGLTF
 add_executable(DXFToGLTF ${DXFToGLTFSOURCE})
-target_link_libraries(DXFToGLTF ${OCC_LIBS})
+target_link_libraries(DXFToGLTF ${OCC_LIBS} ${LIBUUID_LIBRARY})
 
 # GmshToGLTF
 add_executable(GmshToGLTF ${GmshToGLTFSOURCE})
-target_link_libraries(GmshToGLTF ${OCC_LIBS})
+target_link_libraries(GmshToGLTF ${OCC_LIBS} ${LIBUUID_LIBRARY})
 
 # StepToGLTF
 add_executable(StepToGLTF ${StepToGLTFSOURCE})
-target_link_libraries(StepToGLTF ${OCC_LIBS})
+target_link_libraries(StepToGLTF ${OCC_LIBS} ${LIBUUID_LIBRARY})
 
 # VTUToGLTF
 add_executable(VTUToGLTF ${VTUToGLTFSOURCE})
-target_link_libraries(VTUToGLTF ${VTK_LIBS} ${OCC_LIBS})
+target_link_libraries(VTUToGLTF ${VTK_LIBS} ${OCC_LIBS} ${LIBUUID_LIBRARY})
 
 ## Install
 install(TARGETS DXFToGLTF StepToGLTF)
@@ -157,9 +162,7 @@ set(SOURCE_TESTS
 )
 
 add_executable(tests ${SOURCE_TESTS})
-target_link_libraries(tests ${OCC_LIBS})
-target_link_libraries(tests ${VTK_LIBS})
-target_link_libraries(tests Catch2::Catch2)
+target_link_libraries(tests Catch2::Catch2 ${VTK_LIBS} ${OCC_LIBS} ${LIBUUID_LIBRARY})
 catch_discover_tests(tests)
 
 ## Coverage
