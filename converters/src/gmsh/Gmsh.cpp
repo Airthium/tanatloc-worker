@@ -168,6 +168,10 @@ double Gmsh::getMax() const {
                   std::max(Max.Y() - Min.Y(), Max.Z() - Min.Z()));
 }
 
+std::vector<Vertex> Gmsh::getVertices() const { return this->m_vertices; }
+
+std::vector<Triangle> Gmsh::getTriangles() const { return this->m_triangles; }
+
 /**
  * Get number of triangle labels
  * @returns Number of triangle labels

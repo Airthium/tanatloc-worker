@@ -44,6 +44,9 @@ find_path(LIBUUID_INCLUDE_DIR uuid.h PATH_SUFFIXES uuid)
 find_library(LIBUUID_LIBRARY libuuid.a)
 include_directories(${LIBUUID_INCLUDE_DIR})
 
+# TinyGLTF
+find_package(TinyGLTF REQUIRED)
+
 # Logger library
 AUX_SOURCE_DIRECTORY(src/logger LOGGER_SOURCE)
 
@@ -102,20 +105,20 @@ set(VTUToGLTFSOURCE
 add_executable(DXFToGLTF ${DXFToGLTFSOURCE})
 target_link_libraries(DXFToGLTF ${OCC_LIBS} ${LIBUUID_LIBRARY})
 
-# GmshToGLTF
-add_executable(GmshToGLTF ${GmshToGLTFSOURCE})
-target_link_libraries(GmshToGLTF ${OCC_LIBS} ${LIBUUID_LIBRARY})
-
 # StepToGLTF
 add_executable(StepToGLTF ${StepToGLTFSOURCE})
 target_link_libraries(StepToGLTF ${OCC_LIBS} ${LIBUUID_LIBRARY})
+
+# GmshToGLTF
+add_executable(GmshToGLTF ${GmshToGLTFSOURCE})
+target_link_libraries(GmshToGLTF ${OCC_LIBS} ${LIBUUID_LIBRARY})
 
 # VTUToGLTF
 add_executable(VTUToGLTF ${VTUToGLTFSOURCE})
 target_link_libraries(VTUToGLTF ${VTK_LIBS} ${OCC_LIBS} ${LIBUUID_LIBRARY})
 
 ## Install
-install(TARGETS DXFToGLTF StepToGLTF)
+install(TARGETS DXFToGLTF StepToGLTF GmshToGLTF VTUToGLTF)
 
 ## Tests
 include(CTest)

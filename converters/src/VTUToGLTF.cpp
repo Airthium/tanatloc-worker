@@ -5,13 +5,10 @@
 #include "occ/MainDocument.hpp"
 #include "occ/Triangulation.hpp"
 #include "vtk/VTUReader.hpp"
-#include <BRepBuilderAPI_MakeEdge.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
-#include <BRepBuilderAPI_MakeVertex.hxx>
-#include <BRepBuilderAPI_MakeWire.hxx>
+#include <BRepBuilderAPI_MakePolygon.hxx>
 #include <TopoDS_Builder.hxx>
 #include <TopoDS_Compound.hxx>
-#include <TopoDS_Face.hxx>
 
 RData getMagnitude(const RData &);
 RData getComponent(const RData &, const int);
@@ -128,6 +125,8 @@ RData getComponent(const RData &result, const int index) {
 bool writeOne(const RData &result, const std::string &gltfFile,
               const double radius) {
   MainDocument mainDocument;
+  std::string type = "result";
+  mainDocument.setType(type);
 
   // Triangles
   TopoDS_Compound triangles;
@@ -159,29 +158,14 @@ bool writeOne(const RData &result, const std::string &gltfFile,
     gp_Pnt point2(v2.X(), v2.Y(), v2.Z());
     gp_Pnt point3(v3.X(), v3.Y(), v3.Z());
 
-    // Vertices
-    BRepBuilderAPI_MakeVertex vertex1Builder(point1);
-    BRepBuilderAPI_MakeVertex vertex2Builder(point2);
-    BRepBuilderAPI_MakeVertex vertex3Builder(point3);
+    // Polygon
+    BRepBuilderAPI_MakePolygon polygonBuilder(point1, point2, point3, true);
 
-    TopoDS_Vertex vertex1 = vertex1Builder.Vertex();
-    TopoDS_Vertex vertex2 = vertex2Builder.Vertex();
-    TopoDS_Vertex vertex3 = vertex3Builder.Vertex();
-
-    // Edges
-    BRepBuilderAPI_MakeEdge edge1Builder(vertex1, vertex2);
-    BRepBuilderAPI_MakeEdge edge2Builder(vertex2, vertex3);
-    BRepBuilderAPI_MakeEdge edge3Builder(vertex3, vertex1);
-
-    TopoDS_Edge edge1 = edge1Builder.Edge();
-    TopoDS_Edge edge2 = edge2Builder.Edge();
-    TopoDS_Edge edge3 = edge3Builder.Edge();
-
-    BRepBuilderAPI_MakeWire wireBuilder(edge1, edge2, edge3);
-    TopoDS_Wire wire = wireBuilder.Wire();
+    // Wire
+    TopoDS_Wire wire = polygonBuilder.Wire();
 
     BRepBuilderAPI_MakeFace faceBuilder(wire);
-    TopoDS_Face face = faceBuilder.Face();
+    TopoDS_Shape face = faceBuilder.Shape();
 
     trianglesBuilder.Add(triangles, face);
 
@@ -210,6 +194,14 @@ bool writeOne(const RData &result, const std::string &gltfFile,
   bool res = writer.write();
   if (!res) {
     Logger::ERROR("Unable to write glft file " + gltfFile);
+    return EXIT_FAILURE;
+  }
+
+  // Write description file
+  std::string descFile = gltfFile + ".desc";
+  res = mainDocument.writeDescription(descFile);
+  if (!res) {
+    Logger::ERROR("Unable to write description file " + gltfFile + ".desc");
     return EXIT_FAILURE;
   }
 

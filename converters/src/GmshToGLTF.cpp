@@ -6,16 +6,19 @@
 #include "occ/GLTFWriter.hpp"
 #include "occ/MainDocument.hpp"
 #include "occ/Triangulation.hpp"
-#include <BRepBuilderAPI_MakeEdge.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
-#include <BRepBuilderAPI_MakeVertex.hxx>
-#include <BRepBuilderAPI_MakeWire.hxx>
+#include <BRepBuilderAPI_MakePolygon.hxx>
 #include <Quantity_Color.hxx>
 #include <TopoDS_Builder.hxx>
-#include <TopoDS_Face.hxx>
 #include <gp_Pnt.hxx>
 
-Quantity_Color generateColor();
+#define TINYGLTF_IMPLEMENTATION
+#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+
+#include "tiny_gltf.h"
+
+std::vector<double> generateColor();
 
 /**
  * Main function
@@ -36,88 +39,117 @@ int main(int argc, char *argv[]) {
   gltfFile = argv[2];
 
   // Read & process mesh
-  auto mesh = std::make_unique<Gmsh>();
-  res = mesh->load(meshFile);
+  auto gmsh = std::make_unique<Gmsh>();
+  res = gmsh->load(meshFile);
   if (!res) {
     Logger::ERROR("Unable to load Gmsh file " + meshFile);
     return EXIT_FAILURE;
   }
 
-  mesh->computeLabels();
+  // Compute labels
+  gmsh->computeLabels();
 
-  std::vector<Vertex> *volumesVertices = mesh->getVolumesVertices();
-  std::vector<Vertex> *surfacesVertices = mesh->getSurfacesVertices();
+  {
+    // GLTF
+    tinygltf::Model model;
+    tinygltf::Scene scene;
+    tinygltf::Asset asset;
 
-  double radius = mesh->getMax() / 250.;
+    // std::vector<Vertex> *volumesVertices = gmsh->getVolumesVertices();
+    std::vector<Vertex> *surfacesVertices = gmsh->getSurfacesVertices();
 
-  // Create document
-  MainDocument mainDocument;
+    for (uint i = 0; i < gmsh->getNumberOfTriangleLabels(); ++i) {
+      tinygltf::Node node;
+      tinygltf::Mesh mesh;
+      tinygltf::Buffer buffer;
+      tinygltf::BufferView bufferView;
+      tinygltf::Accessor accessor;
+      tinygltf::Primitive primitive;
+      tinygltf::Material material;
 
-  // Triangles
-  TopoDS_Compound triangles;
-  TopoDS_Builder trianglesBuilder;
-  trianglesBuilder.MakeCompound(triangles);
+      auto trianglesVertices = surfacesVertices[i];
 
-  TDF_Label facesLabel = mainDocument.addShape(triangles, "Triangles");
+      // Vertices
+      std::vector<float> vertices;
+      for (size_t j = 0; j < trianglesVertices.size(); ++j) {
+        Vertex vertex = trianglesVertices.at(j);
+        vertices.push_back(vertex.X());
+        vertices.push_back(vertex.Y());
+        vertices.push_back(vertex.Z());
+      }
 
-  for (i = 0; i < mesh->getNumberOfTriangleLabels(); ++i) {
-    // Vertices
-    auto vertices = std::vector<Vertex>();
-    std::for_each(surfacesVertices[i].begin(), surfacesVertices[i].end(),
-                  [&vertices](const Vertex &v) { vertices.push_back(v); });
+      // Buffer
+      for (size_t j = 0; j < vertices.size(); ++j) {
+        float vertex = vertices.at(j);
+        unsigned char buf[__SIZEOF_FLOAT__];
+        std::memcpy(buf, &vertex, __SIZEOF_FLOAT__);
 
-    // Color
-    Quantity_Color color = generateColor();
+        for (size_t k = 0; k < __SIZEOF_FLOAT__; ++k) {
+          buffer.data.push_back(buf[k]);
+        }
+      }
+      model.buffers.push_back(buffer);
 
-    // Edges
-    for (uint j = 0; j < vertices.size(); j += 3) {
-      // Three points per triangle
-      gp_Pnt point1(vertices.at(j).X(), vertices.at(j).Y(), vertices.at(j).Z());
-      gp_Pnt point2(vertices.at((j + 1)).X(), vertices.at((j + 1)).Y(),
-                    vertices.at((j + 1)).Z());
-      gp_Pnt point3(vertices.at((j + 2)).X(), vertices.at((j + 2)).Y(),
-                    vertices.at((j + 2)).Z());
+      // Buffer view
+      bufferView.buffer = model.buffers.size() - 1;
+      bufferView.byteOffset = 0;
+      bufferView.byteLength = vertices.size() * __SIZEOF_FLOAT__;
+      bufferView.target = TINYGLTF_TARGET_ARRAY_BUFFER;
+      model.bufferViews.push_back(bufferView);
 
-      BRepBuilderAPI_MakeVertex vertex1Builder(point1);
-      BRepBuilderAPI_MakeVertex vertex2Builder(point2);
-      BRepBuilderAPI_MakeVertex vertex3Builder(point3);
+      // Accessor
+      accessor.bufferView = model.bufferViews.size() - 1;
+      accessor.byteOffset = 0;
+      accessor.componentType = TINYGLTF_COMPONENT_TYPE_FLOAT;
+      accessor.count = vertices.size() / 3;
+      accessor.type = TINYGLTF_TYPE_VEC3;
+      accessor.maxValues = {1.0, 1.0, 1.0};
+      accessor.minValues = {0.0, 0.0, 0.0}; // TODO min/max
+      model.accessors.push_back(accessor);
 
-      TopoDS_Vertex vertex1 = vertex1Builder.Vertex();
-      TopoDS_Vertex vertex2 = vertex2Builder.Vertex();
-      TopoDS_Vertex vertex3 = vertex3Builder.Vertex();
+      // Material
+      material.pbrMetallicRoughness.baseColorFactor = generateColor();
+      material.doubleSided = true;
+      model.materials.push_back(material);
 
-      BRepBuilderAPI_MakeEdge edge1(vertex1, vertex2);
-      BRepBuilderAPI_MakeEdge edge2(vertex2, vertex3);
-      BRepBuilderAPI_MakeEdge edge3(vertex3, vertex1);
+      // Primitive
+      primitive.attributes["POSITION"] = model.accessors.size() - 1;
+      primitive.material = model.materials.size() - 1;
+      primitive.mode = TINYGLTF_MODE_TRIANGLES;
 
-      BRepBuilderAPI_MakeWire wireBuilder(edge1.Edge(), edge2.Edge(),
-                                          edge3.Edge());
-      TopoDS_Wire wire = wireBuilder.Wire();
+      // Mesh
+      mesh.name = "Face " + std::to_string(i);
+      // mesh.extras = tinygltf::Value() // TODO set userData
+      mesh.primitives.push_back(primitive);
+      model.meshes.push_back(mesh);
 
-      BRepBuilderAPI_MakeFace faceBuilder(wire);
-      TopoDS_Face face = faceBuilder.Face();
+      // Node
+      node.mesh = model.meshes.size() - 1;
+      model.nodes.push_back(node);
 
-      trianglesBuilder.Add(triangles, face);
-
-      std::string name =
-          "label" + std::to_string(i) + ";number" + std::to_string(j);
-
-      mainDocument.addComponent(facesLabel, face, color, name);
+      // Scene
+      scene.nodes.push_back(model.nodes.size() - 1);
     }
-  }
 
-  // Triangulate
-  Triangulation triangulation(mainDocument);
-  triangulation.triangulate();
+    // Scenes
+    model.scenes.push_back(scene);
 
-  // Write GLTF
-  Handle(TDocStd_Document) document = mainDocument.document;
-  TDF_LabelSequence labels = mainDocument.getLabels();
-  auto writer = GLTFWriter(gltfFile, document, labels);
-  res = writer.write();
-  if (!res) {
-    Logger::ERROR("Unable to write glft file " + gltfFile);
-    return EXIT_FAILURE;
+    // Asset
+    asset.version = "2.0";
+    asset.generator = "tanatloc-converter";
+    model.asset = asset;
+
+    // Save
+    tinygltf::TinyGLTF gltf;
+    res = gltf.WriteGltfSceneToFile(&model, gltfFile,
+                                    true,  // embedImages
+                                    true,  // embedBuffers
+                                    true,  // pretty print
+                                    true); // write binary
+    if (!res) {
+      Logger::ERROR("Unable to write glft file " + gltfFile);
+      return EXIT_FAILURE;
+    }
   }
 
   return EXIT_SUCCESS;
@@ -136,7 +168,6 @@ double generateRandom() {
 /**
  * Generate random color
  */
-Quantity_Color generateColor() {
-  return Quantity_Color(generateRandom(), generateRandom(), generateRandom(),
-                        Quantity_TOC_RGB);
+std::vector<double> generateColor() {
+  return {generateRandom(), generateRandom(), generateRandom(), 1.0f};
 }

@@ -44,6 +44,12 @@ public:
   // Get max
   double getMax() const;
 
+  // Get vertices
+  std::vector<Vertex> getVertices() const;
+
+  // Get triangles
+  std::vector<Triangle> getTriangles() const;
+
   // Get number of triangle labels
   uint getNumberOfTriangleLabels() const;
 
