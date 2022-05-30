@@ -91,14 +91,14 @@ int main(int argc, char *argv[]) {
       model.buffers.push_back(buffer);
 
       // Buffer view
-      bufferView.buffer = model.buffers.size() - 1;
+      bufferView.buffer = i;
       bufferView.byteOffset = 0;
       bufferView.byteLength = vertices.size() * __SIZEOF_FLOAT__;
       bufferView.target = TINYGLTF_TARGET_ARRAY_BUFFER;
       model.bufferViews.push_back(bufferView);
 
       // Accessor
-      accessor.bufferView = model.bufferViews.size() - 1;
+      accessor.bufferView = i;
       accessor.byteOffset = 0;
       accessor.componentType = TINYGLTF_COMPONENT_TYPE_FLOAT;
       accessor.count = vertices.size() / 3;
@@ -113,22 +113,27 @@ int main(int argc, char *argv[]) {
       model.materials.push_back(material);
 
       // Primitive
-      primitive.attributes["POSITION"] = model.accessors.size() - 1;
-      primitive.material = model.materials.size() - 1;
+      primitive.attributes["POSITION"] = i;
+      primitive.material = i;
       primitive.mode = TINYGLTF_MODE_TRIANGLES;
 
       // Mesh
-      mesh.name = "Face " + std::to_string(i);
-      // mesh.extras = tinygltf::Value() // TODO set userData
+      mesh.name = "Face " + std::to_string(i + 1);
+      std::string key = "test";
+      tinygltf::Value value = tinygltf::Value(true);
+      std::map<std::string, tinygltf::Value> json{{key, value}};
+      // std::string json = "{\"test\": true}";
+      mesh.extras = tinygltf::Value(json);
       mesh.primitives.push_back(primitive);
       model.meshes.push_back(mesh);
 
       // Node
-      node.mesh = model.meshes.size() - 1;
+      node.mesh = i;
+      node.extras_json_string = "{\"test\": true}";
       model.nodes.push_back(node);
 
       // Scene
-      scene.nodes.push_back(model.nodes.size() - 1);
+      scene.nodes.push_back(i);
     }
 
     // Scenes
