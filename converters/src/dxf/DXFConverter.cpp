@@ -12,7 +12,6 @@
 #include <BRep_Builder.hxx>
 #include <GC_MakeArcOfCircle.hxx>
 #include <Geom_TrimmedCurve.hxx>
-#include <TopoDS_Compound.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Vertex.hxx>
 #include <gp_Circ.hxx>
@@ -42,7 +41,7 @@ bool DXFConverter::convert() {
   return true;
 }
 
-TopoDS_Shape DXFConverter::getShape() const { return this->m_shape; }
+TopoDS_Compound DXFConverter::getCompound() const { return this->m_compound; }
 
 // PRIVATE
 
@@ -57,7 +56,7 @@ void DXFConverter::processCodeValuePair(unsigned int code,
 
   else if (value == "EOF") {
     Logger::DEBUG("DXFConverter::EOF");
-    this->buildShape();
+    this->buildCompound();
   }
 }
 
@@ -213,8 +212,8 @@ void DXFConverter::buildFace() {
   this->m_wires.clear();
 }
 
-void DXFConverter::buildShape() {
-  Logger::DEBUG("DXFConverter::buildShape");
+void DXFConverter::buildCompound() {
+  Logger::DEBUG("DXFConverter::buildCompound");
 
   // Check if wire build needed
   this->buildWire();
@@ -226,15 +225,11 @@ void DXFConverter::buildShape() {
     return;
 
   // Build group of faces
-  TopoDS_Compound group;
   BRep_Builder builder;
-  builder.MakeCompound(group);
+  builder.MakeCompound(this->m_compound);
   for (uint i = 0; i < size; ++i) {
-    builder.Add(group, this->m_faces[i]);
+    builder.Add(this->m_compound, this->m_faces[i]);
   }
-
-  // Save
-  this->m_shape = group;
 
   // Clear faces
   this->m_faces.clear();

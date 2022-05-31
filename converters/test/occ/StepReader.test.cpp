@@ -41,9 +41,9 @@ TEST_CASE("StepReader") {
     CHECK(res);
   }
 
-  SECTION("getDocument") {
-    auto stepReader = StepReader();
+  // SECTION("getDocument") {
+  //   auto stepReader = StepReader();
 
-    stepReader.getMainDocument();
-  }
+  //   stepReader.getMainDocument();
+  // }
 }

@@ -44,19 +44,19 @@ void Triangle::setLabel(const uint label) { this->m_label = label; }
  * Get index 1
  * @returns Index 1
  */
-uint Triangle::getI1() const { return this->m_index1; }
+uint Triangle::I1() const { return this->m_index1; }
 
 /**
  * Get index 2
  * @returns Index 2
  */
-uint Triangle::getI2() const { return this->m_index2; }
+uint Triangle::I2() const { return this->m_index2; }
 
 /**
  * Get index 3
  * @returns Index 3
  */
-uint Triangle::getI3() const { return this->m_index3; }
+uint Triangle::I3() const { return this->m_index3; }
 
 /**
  * Get indices
@@ -74,4 +74,4 @@ std::vector<uint> Triangle::getIndices() const {
  * Get label
  * @returns Label
  */
-uint Triangle::getLabel() const { return this->m_label; }
+uint Triangle::Label() const { return this->m_label; }

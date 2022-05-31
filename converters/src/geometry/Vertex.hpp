@@ -29,7 +29,7 @@ public:
   // Set z
   void setZ(const double);
 
-    // X
+  // X
   double X() const;
 
   // Y
@@ -39,4 +39,4 @@ public:
   double Z() const;
 };
 
-#endif
+#endif //_VERTEX_

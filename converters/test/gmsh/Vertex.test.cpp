@@ -1,6 +1,6 @@
 #include <catch2/catch.hpp>
 
-#include "../../src/gmsh/Vertex.hpp"
+#include "../../src/geometry/Vertex.hpp"
 
 TEST_CASE("Vertex") {
   SECTION("Construtor 1") {

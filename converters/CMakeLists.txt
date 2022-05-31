@@ -17,7 +17,7 @@ endif()
 
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
-## LIBRARIES
+## External libraries
 # VTK
 find_package(VTK COMPONENTS
   IOXML
@@ -41,81 +41,93 @@ endif (OpenCASCADE_FOUND)
 
 # UUID
 find_path(LIBUUID_INCLUDE_DIR uuid.h PATH_SUFFIXES uuid)
-find_library(LIBUUID_LIBRARY libuuid.a)
+find_library(LIBUUID_LIBS libuuid.a)
 include_directories(${LIBUUID_INCLUDE_DIR})
+
+link_libraries(${VTK_LIBS} ${OCC_LIBS} ${LIBUUID_LIBS})
 
 # TinyGLTF
 find_package(TinyGLTF REQUIRED)
 
-# Logger library
-AUX_SOURCE_DIRECTORY(src/logger LOGGER_SOURCE)
-
-# DXFLib library
-AUX_SOURCE_DIRECTORY(src/dxflib DXFLib_SOURCE)
-
-# DXF library
+## Libraries
+# DXF
 AUX_SOURCE_DIRECTORY(src/dxf DXF_SOURCE)
 
-# Gmsh library
+# DXFLib
+AUX_SOURCE_DIRECTORY(src/dxflib DXFLib_SOURCE)
+
+# Geometry
+AUX_SOURCE_DIRECTORY(src/geometry GEOMETRY_SOURCE)
+
+# Gmsh
 AUX_SOURCE_DIRECTORY(src/gmsh GMSH_SOURCE)
 
-# OCC library
+# Logger
+AUX_SOURCE_DIRECTORY(src/logger LOGGER_SOURCE)
+
+# OCC
 AUX_SOURCE_DIRECTORY(src/occ OCC_SOURCE)
 
-# VTK library
+# Utils
+AUX_SOURCE_DIRECTORY(src/vtk UTILS_SOURCE)
+
+# VTK
 AUX_SOURCE_DIRECTORY(src/vtk VTK_SOURCE)
 
-
-## SOURCES
+## Sources
 # DXFToGLTF
 set(DXFToGLTFSOURCE
   src/DXFToGLTF.cpp
-  ${DXFLib_SOURCE}
   ${DXF_SOURCE}
-  ${OCC_SOURCE}
+  ${DXFLib_SOURCE}
+  ${GEOMETRY_SOURCE}
   ${LOGGER_SOURCE}
-)
-
-# GmshToGLTF
-set(GmshToGLTFSOURCE
-  src/GmshToGLTF.cpp
-  ${GMSH_SOURCE}
   ${OCC_SOURCE}
-  ${LOGGER_SOURCE}
 )
 
 # StepToGLTF
 set(StepToGLTFSOURCE
   src/StepToGLTF.cpp
+  ${GEOMETRY_SOURCE}
+  ${LOGGER_SOURCE}
   ${OCC_SOURCE}
+)
+
+# GmshToGLTF
+set(GmshToGLTFSOURCE
+  src/GmshToGLTF.cpp
+  ${GEOMETRY_SOURCE}
+  ${GMSH_SOURCE}
+  ${UTILS_SOURCE}
   ${LOGGER_SOURCE}
 )
 
 # VTUToGLTF
 set(VTUToGLTFSOURCE
   src/VTUToGLTF.cpp
+  ${GEOMETRY_SOURCE}
   ${GMSH_SOURCE}
-  ${VTK_SOURCE}
-  ${OCC_SOURCE}
   ${LOGGER_SOURCE}
+  ${OCC_SOURCE}
+  ${VTK_SOURCE}
 )
 
 ## Executables
 # DXFToGLTF
 add_executable(DXFToGLTF ${DXFToGLTFSOURCE})
-target_link_libraries(DXFToGLTF ${OCC_LIBS} ${LIBUUID_LIBRARY})
+target_link_libraries(DXFToGLTF)
 
 # StepToGLTF
 add_executable(StepToGLTF ${StepToGLTFSOURCE})
-target_link_libraries(StepToGLTF ${OCC_LIBS} ${LIBUUID_LIBRARY})
+target_link_libraries(StepToGLTF)
 
 # GmshToGLTF
 add_executable(GmshToGLTF ${GmshToGLTFSOURCE})
-target_link_libraries(GmshToGLTF ${OCC_LIBS} ${LIBUUID_LIBRARY})
+target_link_libraries(GmshToGLTF)
 
 # VTUToGLTF
 add_executable(VTUToGLTF ${VTUToGLTFSOURCE})
-target_link_libraries(VTUToGLTF ${VTK_LIBS} ${OCC_LIBS} ${LIBUUID_LIBRARY})
+target_link_libraries(VTUToGLTF)
 
 ## Install
 install(TARGETS DXFToGLTF StepToGLTF GmshToGLTF VTUToGLTF)
@@ -136,7 +148,6 @@ set(GMSH_TESTS
 )
 
 set(OCC_TESTS
-  test/occ/GLTFWriter.test.cpp
   test/occ/StepReader.test.cpp
   test/occ/Triangulation.test.cpp
 )
@@ -151,13 +162,14 @@ set(DXF_TESTS
 
 set(SOURCE_TESTS
   test/main.cpp
-  ${LOGGER_TESTS}
   ${GMSH_TESTS}
+  ${LOGGER_TESTS}
   ${OCC_TESTS}
   ${VTK_TESTS}
   ${DXF_TESTS}
   ${DXF_SOURCE}
   ${DXFLib_SOURCE}
+  ${GEOMETRY_SOURCE}
   ${GMSH_SOURCE}
   ${LOGGER_SOURCE}
   ${OCC_SOURCE}
@@ -165,7 +177,7 @@ set(SOURCE_TESTS
 )
 
 add_executable(tests ${SOURCE_TESTS})
-target_link_libraries(tests Catch2::Catch2 ${VTK_LIBS} ${OCC_LIBS} ${LIBUUID_LIBRARY})
+target_link_libraries(tests Catch2::Catch2)
 catch_discover_tests(tests)
 
 ## Coverage

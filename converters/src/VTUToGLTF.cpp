@@ -1,7 +1,7 @@
 #include <algorithm>
 
 #include "logger/Logger.hpp"
-#include "occ/GLTFWriter.hpp"
+// #include "occ/GLTFWriter.hpp"
 #include "occ/MainDocument.hpp"
 #include "occ/Triangulation.hpp"
 #include "vtk/VTUReader.hpp"
@@ -126,87 +126,88 @@ bool writeOne(const RData &result, const std::string &gltfFile,
               const double radius) {
   MainDocument mainDocument;
   std::string type = "result";
-  mainDocument.setType(type);
+  // mainDocument.setType(type);
 
   // Triangles
   TopoDS_Compound triangles;
   TopoDS_Builder trianglesBuilder;
   trianglesBuilder.MakeCompound(triangles);
 
-  TDF_Label trianglesLabel = mainDocument.addShape(triangles, "Triangles");
+  // TDF_Label trianglesLabel = mainDocument.addShape(triangles, "Triangles");
 
-  for (uint i = 0; i < result.triangles.size(); i++) {
-    Triangle triangle = result.triangles.at(i);
+  // for (uint i = 0; i < result.triangles.size(); i++) {
+  //   Triangle triangle = result.triangles.at(i);
 
-    // Indices
-    uint index1 = triangle.getI1();
-    uint index2 = triangle.getI2();
-    uint index3 = triangle.getI3();
+  //   // Indices
+  //   uint index1 = triangle.I1();
+  //   uint index2 = triangle.I2();
+  //   uint index3 = triangle.I3();
 
-    // Data
-    double data1 = result.values.at(index1);
-    double data2 = result.values.at(index2);
-    double data3 = result.values.at(index3);
+  //   // Data
+  //   double data1 = result.values.at(index1);
+  //   double data2 = result.values.at(index2);
+  //   double data3 = result.values.at(index3);
 
-    // Vertices
-    Vertex v1 = result.vertices.at(index1);
-    Vertex v2 = result.vertices.at(index2);
-    Vertex v3 = result.vertices.at(index3);
+  //   // Vertices
+  //   Vertex v1 = result.vertices.at(index1);
+  //   Vertex v2 = result.vertices.at(index2);
+  //   Vertex v3 = result.vertices.at(index3);
 
-    // Points
-    gp_Pnt point1(v1.X(), v1.Y(), v1.Z());
-    gp_Pnt point2(v2.X(), v2.Y(), v2.Z());
-    gp_Pnt point3(v3.X(), v3.Y(), v3.Z());
+  //   // Points
+  //   gp_Pnt point1(v1.X(), v1.Y(), v1.Z());
+  //   gp_Pnt point2(v2.X(), v2.Y(), v2.Z());
+  //   gp_Pnt point3(v3.X(), v3.Y(), v3.Z());
 
-    // Polygon
-    BRepBuilderAPI_MakePolygon polygonBuilder(point1, point2, point3, true);
+  //   // Polygon
+  //   BRepBuilderAPI_MakePolygon polygonBuilder(point1, point2, point3, true);
 
-    // Wire
-    TopoDS_Wire wire = polygonBuilder.Wire();
+  //   // Wire
+  //   TopoDS_Wire wire = polygonBuilder.Wire();
 
-    BRepBuilderAPI_MakeFace faceBuilder(wire);
-    TopoDS_Shape face = faceBuilder.Shape();
+  //   BRepBuilderAPI_MakeFace faceBuilder(wire);
+  //   TopoDS_Shape face = faceBuilder.Shape();
 
-    trianglesBuilder.Add(triangles, face);
+  //   trianglesBuilder.Add(triangles, face);
 
-    std::string data1str = std::to_string(data1);
-    std::replace(data1str.begin(), data1str.end(), '.', ',');
+  //   std::string data1str = std::to_string(data1);
+  //   std::replace(data1str.begin(), data1str.end(), '.', ',');
 
-    std::string data2str = std::to_string(data2);
-    std::replace(data2str.begin(), data2str.end(), '.', ',');
+  //   std::string data2str = std::to_string(data2);
+  //   std::replace(data2str.begin(), data2str.end(), '.', ',');
 
-    std::string data3str = std::to_string(data3);
-    std::replace(data3str.begin(), data3str.end(), '.', ',');
+  //   std::string data3str = std::to_string(data3);
+  //   std::replace(data3str.begin(), data3str.end(), '.', ',');
 
-    std::string name = data1str + ";" + data2str + ";" + data3str;
+  //   std::string name = data1str + ";" + data2str + ";" + data3str;
 
-    mainDocument.addComponent(trianglesLabel, face, name);
-  }
+  //   mainDocument.addComponent(trianglesLabel, face, name);
+  // }
 
-  // Triangulate
-  Triangulation triangulation(mainDocument);
-  triangulation.triangulate();
+  // // Triangulate
+  // Triangulation triangulation(mainDocument);
+  // triangulation.triangulate();
 
-  // Write GLTF
-  Handle(TDocStd_Document) document = mainDocument.document;
-  TDF_LabelSequence labels = mainDocument.getLabels();
-  auto writer = GLTFWriter(gltfFile, document, labels);
-  bool res = writer.write();
-  if (!res) {
-    Logger::ERROR("Unable to write glft file " + gltfFile);
-    return EXIT_FAILURE;
-  }
+  // // Write GLTF
+  // Handle(TDocStd_Document) document = mainDocument.document;
+  // TDF_LabelSequence labels = mainDocument.getLabels();
+  // auto writer = GLTFWriter(gltfFile, document, labels);
+  // bool res = writer.write();
+  // if (!res) {
+  //   Logger::ERROR("Unable to write glft file " + gltfFile);
+  //   return EXIT_FAILURE;
+  // }
 
-  // Write description file
-  std::string descFile = gltfFile + ".desc";
-  res = mainDocument.writeDescription(descFile);
-  if (!res) {
-    Logger::ERROR("Unable to write description file " + gltfFile + ".desc");
-    return EXIT_FAILURE;
-  }
+  // // Write description file
+  // std::string descFile = gltfFile + ".desc";
+  // res = mainDocument.writeDescription(descFile);
+  // if (!res) {
+  //   Logger::ERROR("Unable to write description file " + gltfFile + ".desc");
+  //   return EXIT_FAILURE;
+  // }
 
-  Logger::DISP("{ \"glb\": \"" + gltfFile + "\", \"name\": \"" + result.name +
-               "\"}");
+  // Logger::DISP("{ \"glb\": \"" + gltfFile + "\", \"name\": \"" + result.name
+  // +
+  //              "\"}");
 
   return true;
 }

@@ -1,12 +1,12 @@
-#ifndef _VTUREADER_HPP_
-#define _VTUREADER_HPP_
+#ifndef _VTU_READER_
+#define _VTU_READER_
 
 #include <string>
 #include <vector>
 
-#include "../gmsh/Tetrahedron.hpp"
-#include "../gmsh/Triangle.hpp"
-#include "../gmsh/Vertex.hpp"
+#include "../geometry/Tetrahedron.hpp"
+#include "../geometry/Triangle.hpp"
+#include "../geometry/Vertex.hpp"
 #include <vtkSmartPointer.h>
 #include <vtkXMLUnstructuredGridReader.h>
 
@@ -43,4 +43,4 @@ public:
   std::vector<RData> getArrays() const;
 };
 
-#endif
+#endif // VTU_READER_

@@ -1,33 +1,50 @@
 #ifndef _TRIANGULATION_
 #define _TRIANGULATION_
 
+#include <vector>
+
+#include "../geometry/Vertex.hpp"
 #include "MainDocument.hpp"
 
 constexpr double meshQuality = 1.e-3;
 
+struct FaceMesh {
+  uint minIndex;
+  uint maxIndex;
+  Vertex minVertex;
+  Vertex maxVertex;
+  std::vector<uint> indices;
+  std::vector<Vertex> vertices;
+  std::vector<Vertex> normals;
+};
+
+struct EdgeMesh {
+  std::vector<Vertex> vertices;
+};
+
 class Triangulation {
 private:
-  MainDocument m_mainDocument;
+  TopoDS_Compound m_compound;
   double m_minBb = 0;
   double m_maxBb = 0;
 
   // Compute max bounding box
   void computeBb();
 
-  // Triangulate face
-  void triangulateFace(const TopoDS_Shape &) const;
-
-  // Triangulate edge
-  void triangulateEdge(const TopoDS_Shape &) const;
+  // Is Valid
+  bool isValid(const gp_Pnt &, const gp_Pnt &, const gp_Pnt &) const;
 
 public:
   // Constructor
   Triangulation();
   // Constructor
-  explicit Triangulation(const MainDocument &);
+  explicit Triangulation(const TopoDS_Compound &);
 
-  // Triangulate
-  void triangulate();
+  // Triangulate face
+  FaceMesh triangulateFace(const TopoDS_Shape &) const;
+
+  // triangulate edge
+  EdgeMesh triangulateEdge(const TopoDS_Shape &) const;
 };
 
 #endif //_TRIANGULATION_

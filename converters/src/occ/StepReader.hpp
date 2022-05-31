@@ -1,5 +1,5 @@
-#ifndef _STEPREADER_
-#define _STEPREADER_
+#ifndef _STEP_READER_
+#define _STEP_READER_
 
 #include "MainDocument.hpp"
 
@@ -17,8 +17,8 @@ public:
   // Read
   bool read();
 
-  // Get main document
-  MainDocument getMainDocument() const;
+  TopoDS_Compound getCompound() const;
+  Quantity_Color getShapeColor(const TopoDS_Shape &shape) const;
 };
 
-#endif
+#endif //_STEP_READER_

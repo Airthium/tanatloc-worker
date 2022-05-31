@@ -1,12 +1,16 @@
 #include "dxf/DXFConverter.hpp"
 #include "logger/Logger.hpp"
-#include "occ/GLTFWriter.hpp"
 #include "occ/MainDocument.hpp"
 #include "occ/Triangulation.hpp"
 #include "occ/makePipe.hpp"
+#include "utils/utils.hpp"
 #include <TopExp_Explorer.hxx>
-#include <TopoDS.hxx>
-#include <TopoDS_Builder.hxx>
+
+#define TINYGLTF_IMPLEMENTATION
+#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+
+#include "tiny_gltf.h"
 
 int main(int argc, char **argv) {
   bool res;
@@ -30,70 +34,81 @@ int main(int argc, char **argv) {
     Logger::ERROR("Unable to convert " + dxfFile);
     return EXIT_FAILURE;
   }
-  TopoDS_Shape shape = converter->getShape();
+  TopoDS_Compound compound = converter->getCompound();
 
-  // Create document
-  MainDocument mainDocument;
-  mainDocument.setDimension(2);
-  std::string type = "geometry";
-  mainDocument.setType(type);
+  // Triangulate (prepare)
+  Triangulation triangulation(compound);
 
-  TopoDS_Compound faces;
-  TopoDS_Builder facesBuilder;
-  facesBuilder.MakeCompound(faces);
+  // GLTF
+  tinygltf::Model model;
+  tinygltf::Scene scene;
+  tinygltf::Asset asset;
 
-  TopoDS_Compound edges;
-  TopoDS_Builder edgesBuilder;
-  edgesBuilder.MakeCompound(edges);
-  TDF_Label edgesLabel = mainDocument.addShape(edges, "Edges");
+  uint nFaces = 0;
+  uint nEdges = 0;
 
-  TopExp_Explorer faceExplorer;
-  for (faceExplorer.Init(shape, TopAbs_FACE); faceExplorer.More();
-       faceExplorer.Next()) {
-    // Face
-    TopoDS_Shape face = faceExplorer.Current();
-    facesBuilder.Add(faces, face);
+  // // Create document
+  // MainDocument mainDocument;
+  // mainDocument.setDimension(2);
+  // std::string type = "geometry";
+  // mainDocument.setType(type);
 
-    // New face
-    mainDocument.add2DFace(face);
+  // TopoDS_Compound faces;
+  // TopoDS_Builder facesBuilder;
+  // facesBuilder.MakeCompound(faces);
 
-    TopExp_Explorer edgeExplorer;
-    for (edgeExplorer.Init(face, TopAbs_EDGE); edgeExplorer.More();
-         edgeExplorer.Next()) {
-      // Edge
-      TopoDS_Shape edge = edgeExplorer.Current();
+  // TopoDS_Compound edges;
+  // TopoDS_Builder edgesBuilder;
+  // edgesBuilder.MakeCompound(edges);
+  // TDF_Label edgesLabel = mainDocument.addShape(edges, "Edges");
 
-      // Edge to pipe
-      TopoDS_Shape pipe = makePipe(shape, TopoDS::Edge(edge));
+  // TopExp_Explorer faceExplorer;
+  // for (faceExplorer.Init(shape, TopAbs_FACE); faceExplorer.More();
+  //      faceExplorer.Next()) {
+  //   // Face
+  //   TopoDS_Shape face = faceExplorer.Current();
+  //   facesBuilder.Add(faces, face);
 
-      edgesBuilder.Add(edges, pipe);
+  //   // New face
+  //   mainDocument.add2DFace(face);
 
-      // New edge
-      mainDocument.add2DEdge(edgesLabel, pipe);
-    }
-  }
+  //   TopExp_Explorer edgeExplorer;
+  //   for (edgeExplorer.Init(face, TopAbs_EDGE); edgeExplorer.More();
+  //        edgeExplorer.Next()) {
+  //     // Edge
+  //     TopoDS_Shape edge = edgeExplorer.Current();
 
-  // Triangulate
-  Triangulation triangulation(mainDocument);
-  triangulation.triangulate();
+  //     // Edge to pipe
+  //     TopoDS_Shape pipe = makePipe(shape, TopoDS::Edge(edge));
 
-  // Write GLTF
-  Handle(TDocStd_Document) document = mainDocument.document;
-  TDF_LabelSequence labels = mainDocument.getLabels();
-  auto writer = GLTFWriter(gltfFile, document, labels);
-  res = writer.write();
-  if (!res) {
-    Logger::ERROR("Unable to write glft file " + gltfFile);
-    return EXIT_FAILURE;
-  }
+  //     edgesBuilder.Add(edges, pipe);
 
-  // Write description file
-  std::string descFile = gltfFile + ".desc";
-  res = mainDocument.writeDescription(descFile);
-  if (!res) {
-    Logger::ERROR("Unable to write description file " + gltfFile + ".desc");
-    return EXIT_FAILURE;
-  }
+  //     // New edge
+  //     mainDocument.add2DEdge(edgesLabel, pipe);
+  //   }
+  // }
+
+  // // Triangulate
+  // Triangulation triangulation(mainDocument);
+  // triangulation.triangulate();
+
+  // // Write GLTF
+  // Handle(TDocStd_Document) document = mainDocument.document;
+  // TDF_LabelSequence labels = mainDocument.getLabels();
+  // auto writer = GLTFWriter(gltfFile, document, labels);
+  // res = writer.write();
+  // if (!res) {
+  //   Logger::ERROR("Unable to write glft file " + gltfFile);
+  //   return EXIT_FAILURE;
+  // }
+
+  // // Write description file
+  // std::string descFile = gltfFile + ".desc";
+  // res = mainDocument.writeDescription(descFile);
+  // if (!res) {
+  //   Logger::ERROR("Unable to write description file " + gltfFile + ".desc");
+  //   return EXIT_FAILURE;
+  // }
 
   return EXIT_SUCCESS;
 }

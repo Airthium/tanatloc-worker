@@ -1,10 +1,10 @@
-#ifndef _DXFCONVERTER_HPP_
-#define _DXFCONVERTER_HPP_
+#ifndef _DXF_CONVERTER_
+#define _DXF_CONVERTER_
 
 #include <vector>
 
 #include "../dxflib/dl_creationadapter.h"
-
+#include <TopoDS_Compound.hxx>
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Wire.hxx>
 
@@ -17,7 +17,7 @@ private:
   std::vector<TopoDS_Wire> m_wires;
   std::vector<TopoDS_Shape> m_faces;
 
-  TopoDS_Shape m_shape;
+  TopoDS_Compound m_compound;
 
   void processCodeValuePair(unsigned int, const std::string &) override;
   void addLine(const DL_LineData &) override;
@@ -32,7 +32,7 @@ private:
 
   void buildWire();
   void buildFace();
-  void buildShape();
+  void buildCompound();
 
 public:
   // Contructor
@@ -45,7 +45,7 @@ public:
   bool convert();
 
   // Get shape
-  TopoDS_Shape getShape() const;
+  TopoDS_Compound getCompound() const;
 };
 
-#endif //_DXFCONVERTER_HPP_
+#endif //_DXF_CONVERTER_

@@ -52,25 +52,25 @@ void Tetrahedron::setLabel(const uint label) { this->m_label = label; }
  * Get index 1
  * @returns Index 1
  */
-uint Tetrahedron::getI1() const { return this->m_index1; }
+uint Tetrahedron::I1() const { return this->m_index1; }
 
 /**
  * Get index 2
  * @returns Index 2
  */
-uint Tetrahedron::getI2() const { return this->m_index2; }
+uint Tetrahedron::I2() const { return this->m_index2; }
 
 /**
  * Get index 3
  * @returns Index 3
  */
-uint Tetrahedron::getI3() const { return this->m_index3; }
+uint Tetrahedron::I3() const { return this->m_index3; }
 
 /**
  * Get index 4
  * @returns Index 4
  */
-uint Tetrahedron::getI4() const { return this->m_index4; }
+uint Tetrahedron::I4() const { return this->m_index4; }
 
 /**
  * Get indices
@@ -89,4 +89,4 @@ std::vector<uint> Tetrahedron::getIndices() const {
  * Get label
  * @returns Label
  */
-uint Tetrahedron::getLabel() const { return this->m_label; }
+uint Tetrahedron::Label() const { return this->m_label; }

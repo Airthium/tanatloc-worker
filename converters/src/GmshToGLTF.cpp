@@ -1,16 +1,8 @@
 #include <algorithm>
-#include <random>
 
 #include "gmsh/Gmsh.hpp"
 #include "logger/Logger.hpp"
-#include "occ/GLTFWriter.hpp"
-#include "occ/MainDocument.hpp"
-#include "occ/Triangulation.hpp"
-#include <BRepBuilderAPI_MakeFace.hxx>
-#include <BRepBuilderAPI_MakePolygon.hxx>
-#include <Quantity_Color.hxx>
-#include <TopoDS_Builder.hxx>
-#include <gp_Pnt.hxx>
+#include "utils/utils.hpp"
 
 #define TINYGLTF_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
@@ -46,133 +38,174 @@ int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
   }
 
-  // Compute labels
-  gmsh->computeLabels();
+  // GLTF
+  tinygltf::Model model;
+  tinygltf::Scene scene;
+  tinygltf::Asset asset;
 
-  {
-    // GLTF
-    tinygltf::Model model;
-    tinygltf::Scene scene;
-    tinygltf::Asset asset;
+  // Surface
+  std::vector<tinygltf::Value> facesExtras;
+  std::vector<uint> surfaceLabels = gmsh->getSurfaceLabels();
+  std::for_each(
+      surfaceLabels.begin(), surfaceLabels.end(),
+      [&gmsh, &model, &scene, &facesExtras](const uint label) {
+        Surface surface = gmsh->getSurface(label);
 
-    // std::vector<Vertex> *volumesVertices = gmsh->getVolumesVertices();
-    std::vector<Vertex> *surfacesVertices = gmsh->getSurfacesVertices();
+        tinygltf::Node node;
+        tinygltf::Mesh mesh;
+        tinygltf::Buffer buffer;
+        tinygltf::BufferView bufferViewIndices;
+        tinygltf::BufferView bufferViewVertices;
+        tinygltf::Accessor accessorIndices;
+        tinygltf::Accessor accessorVertices;
+        tinygltf::Primitive primitive;
+        tinygltf::Material material;
 
-    for (uint i = 0; i < gmsh->getNumberOfTriangleLabels(); ++i) {
-      tinygltf::Node node;
-      tinygltf::Mesh mesh;
-      tinygltf::Buffer buffer;
-      tinygltf::BufferView bufferView;
-      tinygltf::Accessor accessor;
-      tinygltf::Primitive primitive;
-      tinygltf::Material material;
+        // Indices
+        std::for_each(surface.triangles.begin(), surface.triangles.end(),
+                      [&buffer](const Triangle triangle) {
+                        uint index1 = triangle.I1();
+                        uint index2 = triangle.I2();
+                        uint index3 = triangle.I3();
 
-      auto trianglesVertices = surfacesVertices[i];
+                        // To buffer
+                        Utils::uintToBuffer(index1, buffer.data);
+                        Utils::uintToBuffer(index2, buffer.data);
+                        Utils::uintToBuffer(index3, buffer.data);
+                      });
 
-      // Vertices
-      std::vector<float> vertices;
-      for (size_t j = 0; j < trianglesVertices.size(); ++j) {
-        Vertex vertex = trianglesVertices.at(j);
-        vertices.push_back(vertex.X());
-        vertices.push_back(vertex.Y());
-        vertices.push_back(vertex.Z());
-      }
-
-      // Buffer
-      for (size_t j = 0; j < vertices.size(); ++j) {
-        float vertex = vertices.at(j);
-        unsigned char buf[__SIZEOF_FLOAT__];
-        std::memcpy(buf, &vertex, __SIZEOF_FLOAT__);
-
-        for (size_t k = 0; k < __SIZEOF_FLOAT__; ++k) {
-          buffer.data.push_back(buf[k]);
+        // Padding
+        size_t paddingLength = buffer.data.size() % 4;
+        for (size_t padding; padding < paddingLength; ++padding) {
+          buffer.data.push_back(0x00);
         }
-      }
-      model.buffers.push_back(buffer);
 
-      // Buffer view
-      bufferView.buffer = i;
-      bufferView.byteOffset = 0;
-      bufferView.byteLength = vertices.size() * __SIZEOF_FLOAT__;
-      bufferView.target = TINYGLTF_TARGET_ARRAY_BUFFER;
-      model.bufferViews.push_back(bufferView);
+        // Vertices
+        std::for_each(surface.vertices.begin(), surface.vertices.end(),
+                      [&buffer](const Vertex vertex) {
+                        double x = vertex.X();
+                        double y = vertex.Y();
+                        double z = vertex.Z();
 
-      // Accessor
-      accessor.bufferView = i;
-      accessor.byteOffset = 0;
-      accessor.componentType = TINYGLTF_COMPONENT_TYPE_FLOAT;
-      accessor.count = vertices.size() / 3;
-      accessor.type = TINYGLTF_TYPE_VEC3;
-      accessor.maxValues = {1.0, 1.0, 1.0};
-      accessor.minValues = {0.0, 0.0, 0.0}; // TODO min/max
-      model.accessors.push_back(accessor);
+                        // To buffer
+                        Utils::floatToBuffer(x, buffer.data);
+                        Utils::floatToBuffer(y, buffer.data);
+                        Utils::floatToBuffer(z, buffer.data);
+                      });
+        model.buffers.push_back(buffer);
 
-      // Material
-      material.pbrMetallicRoughness.baseColorFactor = generateColor();
-      material.doubleSided = true;
-      model.materials.push_back(material);
+        // Buffer views
+        bufferViewIndices.buffer = model.buffers.size() - 1;
+        bufferViewIndices.byteOffset = 0;
+        bufferViewIndices.byteLength =
+            surface.triangles.size() * 3 * __SIZEOF_INT__;
+        bufferViewIndices.target = TINYGLTF_TARGET_ELEMENT_ARRAY_BUFFER;
+        model.bufferViews.push_back(bufferViewIndices);
 
-      // Primitive
-      primitive.attributes["POSITION"] = i;
-      primitive.material = i;
-      primitive.mode = TINYGLTF_MODE_TRIANGLES;
+        bufferViewVertices.buffer = model.buffers.size() - 1;
+        bufferViewVertices.byteOffset =
+            surface.triangles.size() * 3 * __SIZEOF_INT__ + paddingLength;
+        bufferViewVertices.byteLength =
+            surface.vertices.size() * 3 * __SIZEOF_FLOAT__;
+        bufferViewVertices.target = TINYGLTF_TARGET_ARRAY_BUFFER;
+        model.bufferViews.push_back(bufferViewVertices);
 
-      // Mesh
-      mesh.name = "Face " + std::to_string(i + 1);
-      std::string key = "test";
-      tinygltf::Value value = tinygltf::Value(true);
-      std::map<std::string, tinygltf::Value> json{{key, value}};
-      // std::string json = "{\"test\": true}";
-      mesh.extras = tinygltf::Value(json);
-      mesh.primitives.push_back(primitive);
-      model.meshes.push_back(mesh);
+        // Accessors
+        accessorIndices.bufferView = model.bufferViews.size() - 2;
+        accessorIndices.byteOffset = 0;
+        accessorIndices.componentType = TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT;
+        accessorIndices.count = surface.triangles.size() * 3;
+        accessorIndices.type = TINYGLTF_TYPE_SCALAR;
+        accessorIndices.minValues.push_back(surface.minIndex);
+        accessorIndices.maxValues.push_back(surface.maxIndex);
+        model.accessors.push_back(accessorIndices);
 
-      // Node
-      node.mesh = i;
-      node.extras_json_string = "{\"test\": true}";
-      model.nodes.push_back(node);
+        accessorVertices.bufferView = model.bufferViews.size() - 1;
+        accessorVertices.byteOffset = 0;
+        accessorVertices.componentType = TINYGLTF_COMPONENT_TYPE_FLOAT;
+        accessorVertices.count = surface.vertices.size();
+        accessorVertices.type = TINYGLTF_TYPE_VEC3;
+        accessorVertices.minValues = {surface.minVertex.X(),
+                                      surface.minVertex.Y(),
+                                      surface.minVertex.Z()};
+        accessorVertices.maxValues = {surface.maxVertex.X(),
+                                      surface.maxVertex.Y(),
+                                      surface.maxVertex.Z()};
+        model.accessors.push_back(accessorVertices);
 
-      // Scene
-      scene.nodes.push_back(i);
-    }
+        // Material
+        std::vector<double> color = generateColor();
+        material.pbrMetallicRoughness.baseColorFactor = color;
+        material.doubleSided = true;
+        model.materials.push_back(material);
 
-    // Scenes
-    model.scenes.push_back(scene);
+        // Primitive
+        primitive.indices = model.accessors.size() - 2;
+        primitive.attributes["POSITION"] = model.accessors.size() - 1;
+        primitive.material = model.materials.size() - 1;
+        primitive.mode = TINYGLTF_MODE_TRIANGLES;
 
-    // Asset
-    asset.version = "2.0";
-    asset.generator = "tanatloc-converter";
-    model.asset = asset;
+        // Mesh
+        mesh.name = "Face " + std::to_string(model.meshes.size() + 1);
+        std::string uuid = Utils::uuid();
+        mesh.extras = tinygltf::Value({{"uuid", tinygltf::Value(uuid)},
+                                       {"label", tinygltf::Value((int)label)}});
+        mesh.primitives.push_back(primitive);
+        model.meshes.push_back(mesh);
 
-    // Save
-    tinygltf::TinyGLTF gltf;
-    res = gltf.WriteGltfSceneToFile(&model, gltfFile,
-                                    true,  // embedImages
-                                    true,  // embedBuffers
-                                    true,  // pretty print
-                                    true); // write binary
-    if (!res) {
-      Logger::ERROR("Unable to write glft file " + gltfFile);
-      return EXIT_FAILURE;
-    }
+        // Extras
+        facesExtras.push_back(tinygltf::Value(
+            {{"name", tinygltf::Value(mesh.name)},
+             {"uuid", tinygltf::Value(uuid)},
+             {"label", tinygltf::Value((int)label)},
+             {"color",
+              tinygltf::Value({{"r", tinygltf::Value(color.at(0))},
+                               {"g", tinygltf::Value(color.at(1))},
+                               {"b", tinygltf::Value(color.at(2))}})}}));
+
+        // Node
+        node.mesh = model.meshes.size() - 1;
+        model.nodes.push_back(node);
+
+        // Scene
+        scene.nodes.push_back(model.nodes.size() - 1);
+      });
+
+  // Scene
+  scene.name = "master";
+  scene.extras =
+      tinygltf::Value({{"type", tinygltf::Value(std::string("mesh"))},
+                       {"uuid", tinygltf::Value(Utils::uuid())},
+                       {"dimension", tinygltf::Value(3)},
+                       {"faces", tinygltf::Value(facesExtras)}});
+
+  // Scenes
+  model.scenes.push_back(scene);
+
+  // Asset
+  asset.version = "2.0";
+  asset.generator = "Tanatloc-GmshToGLTF";
+  model.asset = asset;
+
+  // Save
+  tinygltf::TinyGLTF gltf;
+  res = gltf.WriteGltfSceneToFile(&model, gltfFile,
+                                  true,  // embedImages
+                                  true,  // embedBuffers
+                                  true,  // pretty print
+                                  true); // write binary
+  if (!res) {
+    Logger::ERROR("Unable to write glft file " + gltfFile);
+    return EXIT_FAILURE;
   }
 
   return EXIT_SUCCESS;
 }
 
 /**
- * Generate random
- */
-double generateRandom() {
-  std::random_device rd;
-  std::mt19937 generator(rd());
-  std::uniform_real_distribution<> dist(0., 1.);
-  return dist(generator);
-}
-
-/**
  * Generate random color
  */
 std::vector<double> generateColor() {
-  return {generateRandom(), generateRandom(), generateRandom(), 1.0f};
+  return {Utils::generateRandom(), Utils::generateRandom(),
+          Utils::generateRandom(), 1.0f};
 }
