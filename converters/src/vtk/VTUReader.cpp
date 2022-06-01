@@ -153,7 +153,13 @@ std::vector<Surface> VTUReader::getSurfaces() const {
           if (find1 == newIndices.end()) {
             const uint newIndex1 = surfaceVertices.size();
             surfaceVertices.push_back(data.vertices.at(index1));
-            surfaceValues.push_back(data.values.at(index1));
+            if (data.size == 1) {
+              surfaceValues.push_back(data.values.at(index1));
+            } else if (data.size == 3) {
+              surfaceValues.push_back(data.values.at(3 * index1 + 0));
+              surfaceValues.push_back(data.values.at(3 * index1 + 1));
+              surfaceValues.push_back(data.values.at(3 * index1 + 2));
+            }
             newTriangle.setI1(newIndex1);
             newIndices.push_back({index1, newIndex1});
           } else {
@@ -168,7 +174,13 @@ std::vector<Surface> VTUReader::getSurfaces() const {
           if (find2 == newIndices.end()) {
             const uint newIndex2 = surfaceVertices.size();
             surfaceVertices.push_back(data.vertices.at(index2));
-            surfaceValues.push_back(data.values.at(index2));
+            if (data.size == 1) {
+              surfaceValues.push_back(data.values.at(index2));
+            } else if (data.size == 3) {
+              surfaceValues.push_back(data.values.at(3 * index2 + 0));
+              surfaceValues.push_back(data.values.at(3 * index2 + 1));
+              surfaceValues.push_back(data.values.at(3 * index2 + 2));
+            }
             newTriangle.setI2(newIndex2);
             newIndices.push_back({index2, newIndex2});
           } else {
@@ -183,7 +195,13 @@ std::vector<Surface> VTUReader::getSurfaces() const {
           if (find3 == newIndices.end()) {
             const uint newIndex3 = surfaceVertices.size();
             surfaceVertices.push_back(data.vertices.at(index3));
-            surfaceValues.push_back(data.values.at(index3));
+            if (data.size == 1) {
+              surfaceValues.push_back(data.values.at(index3));
+            } else if (data.size == 3) {
+              surfaceValues.push_back(data.values.at(3 * index3 + 0));
+              surfaceValues.push_back(data.values.at(3 * index3 + 1));
+              surfaceValues.push_back(data.values.at(3 * index3 + 2));
+            }
             newTriangle.setI3(newIndex3);
             newIndices.push_back({index3, newIndex3});
           } else {

@@ -8,7 +8,21 @@ WORKDIR $CATCH2SOURCE
 # Build
 RUN mkdir build \
   && cd build \
-  && cmake .. -DBUILD_TESTING=OFF -DCATCH_BUILD_TESTING=OFF -DCATCH_INSTALL_DOCS=OFF -DCATCH_ENABLE_WERROR=OFF \ 
+  && cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DCATCH_BUILD_TESTING=OFF -DCATCH_INSTALL_DOCS=OFF -DCATCH_ENABLE_WERROR=OFF \ 
+  && make -j "$(nproc)" \
+  && make install
+
+##TinyGLFT
+ENV TINYGLTFSOURCE /home/programs/tinygltf
+
+# Copy
+RUN git clone https://github.com/syoyo/tinygltf.git $TINYGLTFSOURCE
+WORKDIR $TINYGLTFSOURCE
+
+# Build
+RUN mkdir build \
+  && cd build \
+  && cmake .. -DCMAKE_BUILD_TYPE=Release -DTINYGLTF_BUILD_LOADER_EXEMPLE=OFF  \
   && make -j "$(nproc)" \
   && make install
 

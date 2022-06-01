@@ -3,3 +3,4 @@ build.sh
 local.sonarcloud.sh
 opencascade.Dockerfile
 gmsh.Dockerfile
+converters/build

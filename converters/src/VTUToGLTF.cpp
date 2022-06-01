@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
     } else if (surface.size == 3) { // Vector
       // Magnitude
       Surface magnitude = getMagnitude(surface);
-      if (!writeOne(surface,
+      if (!writeOne(magnitude,
                     genericGltfFile + "_" + surface.name + "_magnitude.glb"))
         return EXIT_FAILURE;
 
@@ -82,15 +82,13 @@ Surface getMagnitude(const Surface &result) {
   magnitude.size = 1;
   magnitude.name = result.name + " (magnitude)";
 
-  auto magnitudeValues = std::vector<double>();
-  for (uint i = 0; i < magnitude.values.size() / 3; ++i) {
-    auto v = sqrt(pow(magnitude.values[3 * i + 0], 2) +
-                  pow(magnitude.values[3 * i + 1], 2) +
-                  pow(magnitude.values[3 * i + 2], 2));
-    magnitudeValues.push_back(v);
+  magnitude.values.clear();
+  for (uint i = 0; i < result.values.size() / 3; ++i) {
+    auto v = sqrt(pow(result.values[3 * i + 0], 2) +
+                  pow(result.values[3 * i + 1], 2) +
+                  pow(result.values[3 * i + 2], 2));
+    magnitude.values.push_back(v);
   }
-
-  magnitude.values = magnitudeValues;
 
   double minValue = magnitude.values.at(0);
   double maxValue = magnitude.values.at(0);
@@ -118,13 +116,11 @@ Surface getComponent(const Surface &result, const int index) {
   component.name =
       result.name + " (component " + std::to_string(index + 1) + ")";
 
-  auto componentValues = std::vector<double>();
-  for (uint i = 0; i < component.values.size() / 3; ++i) {
-    double v = component.values[3 * i + index];
-    componentValues.push_back(v);
+  component.values.clear();
+  for (uint i = 0; i < result.values.size() / 3; ++i) {
+    double v = result.values[3 * i + index];
+    component.values.push_back(v);
   }
-
-  component.values = componentValues;
 
   double minValue = component.values.at(0);
   double maxValue = component.values.at(0);
@@ -290,7 +286,7 @@ bool writeOne(const Surface &result, const std::string &gltfFile) {
   // Scene
   scene.name = "master";
   scene.extras = tinygltf::Value(
-      {{"type", tinygltf::Value(std::string("mesh"))},
+      {{"type", tinygltf::Value(std::string("result"))},
        {"uuid", tinygltf::Value(Utils::uuid())},
        {"dimension", tinygltf::Value(3)},
        {"faces", tinygltf::Value({{"name", tinygltf::Value(mesh.name)},
@@ -302,7 +298,7 @@ bool writeOne(const Surface &result, const std::string &gltfFile) {
 
   // Asset
   asset.version = "2.0";
-  asset.generator = "Tanatloc-GmshToGLTF";
+  asset.generator = "Tanatloc-VTUToGLTF";
   model.asset = asset;
 
   tinygltf::TinyGLTF gltf;
