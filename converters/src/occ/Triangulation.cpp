@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "../logger/Logger.hpp"
+#include "makePipe.hpp"
 #include <BRepBndLib.hxx>
 #include <BRepMesh_IncrementalMesh.hxx>
 #include <BRep_Tool.hxx>
@@ -51,30 +52,11 @@ void Triangulation::computeBb() {
   this->m_maxBb = std::max(xDim, std::max(yDim, zDim));
 }
 
-// /**
-//  * Triangulate
-//  */
-// void Triangulation::triangulate() {
-//   TDF_LabelSequence labels = this->m_mainDocument.getLabels();
-
-//   // Shapes
-//   for (uint i = 1; i <= labels.Size(); ++i) {
-//     TDF_Label label = labels.Value(i);
-//     TopoDS_Shape shape = this->m_mainDocument.getShape(label);
-//     BRepMesh_IncrementalMesh mesh(shape, this->m_maxBb * meshQuality);
-
-//     // Sub Shapes
-//     TDF_LabelSequence subLabels;
-//     this->m_mainDocument.getComponents(label, subLabels);
-//     for (uint j = 1; j <= subLabels.Size(); ++j) {
-//       TDF_Label subLabel = subLabels.Value(j);
-//       TopoDS_Shape subShape = this->m_mainDocument.getShape(subLabel);
-//       BRepMesh_IncrementalMesh subMesh(subShape, this->m_maxBb *
-//       meshQuality);
-//     }
-//   }
-// }
-
+/**
+ * Triangulate face
+ * @param face Face
+ * @return FaceMesh
+ */
 FaceMesh Triangulation::triangulateFace(const TopoDS_Shape &face) const {
   BRepMesh_IncrementalMesh(face, this->m_maxBb * meshQuality);
 
@@ -167,6 +149,24 @@ FaceMesh Triangulation::triangulateFace(const TopoDS_Shape &face) const {
   return faceMesh;
 }
 
+/**
+ * Triangulate edge (convert to pipe)
+ * @param edge Edge
+ * @return FaceMesh
+ */
+FaceMesh Triangulation::triangulateEdge(const TopoDS_Shape &edge) const {
+  TopoDS_Shape pipe = makePipe(this->m_maxBb / 250., TopoDS::Edge(edge));
+
+  return triangulateFace(pipe);
+}
+
+/**
+ * Check valid
+ * @param p1 Point 1
+ * @param p2 Point 2
+ * @param p3 Point 3
+ * @return Valid
+ */
 bool Triangulation::isValid(const gp_Pnt &p1, const gp_Pnt &p2,
                             const gp_Pnt &p3) const {
   gp_Vec v1(p1, p2);

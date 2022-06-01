@@ -1,13 +1,11 @@
 #ifndef _MAKE_PIPE_
 #define _MAKE_PIPE_
 
-#include <BRepBndLib.hxx>
 #include <BRepBuilderAPI_MakeEdge.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
 #include <BRepBuilderAPI_MakeWire.hxx>
 #include <BRepOffsetAPI_MakePipe.hxx>
 #include <BRep_Tool.hxx>
-#include <Bnd_Box.hxx>
 #include <ShapeAnalysis_Edge.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS_Face.hxx>
@@ -18,25 +16,6 @@
 #include <gp_Dir.hxx>
 #include <gp_Pln.hxx>
 #include <gp_Pnt.hxx>
-
-double computeMax(const TopoDS_Shape shape) {
-  Bnd_Box boundingBox;
-  double xMin;
-  double yMin;
-  double zMin;
-  double xMax;
-  double yMax;
-  double zMax;
-
-  BRepBndLib::Add(shape, boundingBox);
-  boundingBox.Get(xMin, yMin, zMin, xMax, yMax, zMax);
-
-  double xDim = std::abs(xMax - xMin);
-  double yDim = std::abs(yMax - yMin);
-  double zDim = std::abs(zMax - zMin);
-
-  return std::max(xDim, std::max(yDim, zDim));
-}
 
 TopoDS_Shape makePipe(const double radius, const TopoDS_Edge edge) {
   // Analysis
@@ -80,11 +59,6 @@ TopoDS_Shape makePipe(const double radius, const TopoDS_Edge edge) {
   explorer.Next();
 
   return explorer.Current();
-}
-
-TopoDS_Shape makePipe(const TopoDS_Shape parent, const TopoDS_Edge edge) {
-  double maxBb = computeMax(parent);
-  return makePipe(maxBb / 250., edge);
 }
 
 #endif //_MAKE_PIPE_

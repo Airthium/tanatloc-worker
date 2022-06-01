@@ -1,19 +1,26 @@
 #include <algorithm>
 
 #include "logger/Logger.hpp"
-// #include "occ/GLTFWriter.hpp"
-#include "occ/MainDocument.hpp"
 #include "occ/Triangulation.hpp"
+#include "utils/utils.hpp"
 #include "vtk/VTUReader.hpp"
-#include <BRepBuilderAPI_MakeFace.hxx>
-#include <BRepBuilderAPI_MakePolygon.hxx>
-#include <TopoDS_Builder.hxx>
-#include <TopoDS_Compound.hxx>
 
-RData getMagnitude(const RData &);
-RData getComponent(const RData &, const int);
-bool writeOne(const RData &, const std::string &, const double);
+#define TINYGLTF_IMPLEMENTATION
+#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
 
+#include <tiny_gltf.h>
+
+Surface getMagnitude(const Surface &);
+Surface getComponent(const Surface &, const int);
+bool writeOne(const Surface &, const std::string &);
+
+/**
+ * VTUToGLTF
+ * @param argc
+ * @param argv
+ * @return int
+ */
 int main(int argc, char *argv[]) {
   bool res;
   std::string vtuFile;
@@ -34,33 +41,29 @@ int main(int argc, char *argv[]) {
     Logger::ERROR("Unable to read VTU file " + vtuFile);
     return EXIT_FAILURE;
   }
-  std::vector<RData> arrays = reader.getArrays();
-  double radius = reader.getMax() / 250.;
+  std::vector<Surface> surfaces = reader.getSurfaces();
 
   // Process arrays
-  const auto numberOfArrays = (int)arrays.size();
-  for (int i = 0; i < numberOfArrays; ++i) {
-    RData result = arrays[i];
+  const auto numberOfArrays = surfaces.size();
+  for (size_t i = 0; i < numberOfArrays; ++i) {
+    Surface surface = surfaces.at(i);
 
-    if (result.size == 1) { // Scalar
-      if (!writeOne(result, genericGltfFile + "_" + result.name + ".glb",
-                    radius))
+    if (surface.size == 1) { // Scalar
+      if (!writeOne(surface, genericGltfFile + "_" + surface.name + ".glb"))
         return EXIT_FAILURE;
-    } else if (result.size == 3) { // Vector
+    } else if (surface.size == 3) { // Vector
       // Magnitude
-      RData magnitude = getMagnitude(result);
-      if (!writeOne(magnitude,
-                    genericGltfFile + "_" + result.name + "_magnitude.glb",
-                    radius))
+      Surface magnitude = getMagnitude(surface);
+      if (!writeOne(surface,
+                    genericGltfFile + "_" + surface.name + "_magnitude.glb"))
         return EXIT_FAILURE;
 
       // Component 1, 2 & 3
       for (int j = 0; j < 3; ++j) {
-        RData component = getComponent(result, j);
-        if (!writeOne(component,
-                      genericGltfFile + "_" + result.name + "_component" +
-                          std::to_string(j + 1) + ".glb",
-                      radius))
+        Surface component = getComponent(surface, j);
+        if (!writeOne(component, genericGltfFile + "_" + surface.name +
+                                     "_component" + std::to_string(j + 1) +
+                                     ".glb"))
           return EXIT_FAILURE;
       }
     }
@@ -74,8 +77,8 @@ int main(int argc, char *argv[]) {
  * @param result Result
  * @return Magnitude
  */
-RData getMagnitude(const RData &result) {
-  RData magnitude = result;
+Surface getMagnitude(const Surface &result) {
+  Surface magnitude = result;
   magnitude.size = 1;
   magnitude.name = result.name + " (magnitude)";
 
@@ -89,6 +92,17 @@ RData getMagnitude(const RData &result) {
 
   magnitude.values = magnitudeValues;
 
+  double minValue = magnitude.values.at(0);
+  double maxValue = magnitude.values.at(0);
+  std::for_each(magnitude.values.begin(), magnitude.values.end(),
+                [&minValue, &maxValue](const double value) {
+                  minValue = std::min(minValue, value);
+                  maxValue = std::max(maxValue, value);
+                });
+
+  magnitude.minValue = minValue;
+  magnitude.maxValue = maxValue;
+
   return magnitude;
 }
 
@@ -98,8 +112,8 @@ RData getMagnitude(const RData &result) {
  * @param index Index
  * @return Component
  */
-RData getComponent(const RData &result, const int index) {
-  RData component = result;
+Surface getComponent(const Surface &result, const int index) {
+  Surface component = result;
   component.size = 1;
   component.name =
       result.name + " (component " + std::to_string(index + 1) + ")";
@@ -112,6 +126,17 @@ RData getComponent(const RData &result, const int index) {
 
   component.values = componentValues;
 
+  double minValue = component.values.at(0);
+  double maxValue = component.values.at(0);
+  std::for_each(component.values.begin(), component.values.end(),
+                [&minValue, &maxValue](const double value) {
+                  minValue = std::min(minValue, value);
+                  maxValue = std::max(maxValue, value);
+                });
+
+  component.minValue = minValue;
+  component.maxValue = maxValue;
+
   return component;
 }
 
@@ -119,95 +144,180 @@ RData getComponent(const RData &result, const int index) {
  * Write one
  * @param result Result
  * @param gltfFile GLTF file
- * @param radius Radius
  * @return Status
  */
-bool writeOne(const RData &result, const std::string &gltfFile,
-              const double radius) {
-  MainDocument mainDocument;
-  std::string type = "result";
-  // mainDocument.setType(type);
+bool writeOne(const Surface &result, const std::string &gltfFile) {
+  tinygltf::Model model;
+  tinygltf::Scene scene;
+  tinygltf::Asset asset;
 
-  // Triangles
-  TopoDS_Compound triangles;
-  TopoDS_Builder trianglesBuilder;
-  trianglesBuilder.MakeCompound(triangles);
+  tinygltf::Node node;
+  tinygltf::Mesh mesh;
+  tinygltf::Buffer buffer;
+  tinygltf::BufferView bufferViewIndices;
+  tinygltf::BufferView bufferViewVertices;
+  tinygltf::BufferView bufferViewColors;
+  tinygltf::Accessor accessorIndices;
+  tinygltf::Accessor accessorVertices;
+  tinygltf::Accessor accessorColors;
+  tinygltf::Primitive primitive;
+  tinygltf::Material material;
 
-  // TDF_Label trianglesLabel = mainDocument.addShape(triangles, "Triangles");
+  // Indices
+  std::for_each(result.triangles.begin(), result.triangles.end(),
+                [&buffer](const Triangle triangle) {
+                  uint index1 = triangle.I1();
+                  uint index2 = triangle.I2();
+                  uint index3 = triangle.I3();
 
-  // for (uint i = 0; i < result.triangles.size(); i++) {
-  //   Triangle triangle = result.triangles.at(i);
+                  // To buffer
+                  Utils::uintToBuffer(index1, buffer.data);
+                  Utils::uintToBuffer(index2, buffer.data);
+                  Utils::uintToBuffer(index3, buffer.data);
+                });
 
-  //   // Indices
-  //   uint index1 = triangle.I1();
-  //   uint index2 = triangle.I2();
-  //   uint index3 = triangle.I3();
+  // Padding
+  size_t paddingLength = buffer.data.size() % 4;
+  for (size_t padding; padding < paddingLength; ++padding) {
+    buffer.data.push_back(0x00);
+  }
 
-  //   // Data
-  //   double data1 = result.values.at(index1);
-  //   double data2 = result.values.at(index2);
-  //   double data3 = result.values.at(index3);
+  // Vertices
+  std::for_each(result.vertices.begin(), result.vertices.end(),
+                [&buffer](const Vertex vertex) {
+                  double x = vertex.X();
+                  double y = vertex.Y();
+                  double z = vertex.Z();
 
-  //   // Vertices
-  //   Vertex v1 = result.vertices.at(index1);
-  //   Vertex v2 = result.vertices.at(index2);
-  //   Vertex v3 = result.vertices.at(index3);
+                  // To buffer
+                  Utils::floatToBuffer(x, buffer.data);
+                  Utils::floatToBuffer(y, buffer.data);
+                  Utils::floatToBuffer(z, buffer.data);
+                });
 
-  //   // Points
-  //   gp_Pnt point1(v1.X(), v1.Y(), v1.Z());
-  //   gp_Pnt point2(v2.X(), v2.Y(), v2.Z());
-  //   gp_Pnt point3(v3.X(), v3.Y(), v3.Z());
+  // Padding
+  size_t paddingLength2 = buffer.data.size() % 4;
+  for (size_t padding; padding < paddingLength2; ++padding) {
+    buffer.data.push_back(0x00);
+  }
 
-  //   // Polygon
-  //   BRepBuilderAPI_MakePolygon polygonBuilder(point1, point2, point3, true);
+  // Colors
+  std::for_each(result.values.begin(), result.values.end(),
+                [&result, &buffer](const double value) {
+                  // To buffer
+                  Utils::floatToBuffer(value, buffer.data);
+                });
+  model.buffers.push_back(buffer);
 
-  //   // Wire
-  //   TopoDS_Wire wire = polygonBuilder.Wire();
+  // Buffer views
+  bufferViewIndices.buffer = model.buffers.size() - 1;
+  bufferViewIndices.byteOffset = 0;
+  bufferViewIndices.byteLength = result.triangles.size() * 3 * __SIZEOF_INT__;
+  bufferViewIndices.target = TINYGLTF_TARGET_ELEMENT_ARRAY_BUFFER;
+  model.bufferViews.push_back(bufferViewIndices);
 
-  //   BRepBuilderAPI_MakeFace faceBuilder(wire);
-  //   TopoDS_Shape face = faceBuilder.Shape();
+  bufferViewVertices.buffer = model.buffers.size() - 1;
+  bufferViewVertices.byteOffset =
+      result.triangles.size() * 3 * __SIZEOF_INT__ + paddingLength;
+  bufferViewVertices.byteLength = result.vertices.size() * 3 * __SIZEOF_FLOAT__;
+  bufferViewVertices.target = TINYGLTF_TARGET_ARRAY_BUFFER;
+  model.bufferViews.push_back(bufferViewVertices);
 
-  //   trianglesBuilder.Add(triangles, face);
+  bufferViewColors.buffer = model.buffers.size() - 1;
+  bufferViewColors.byteOffset =
+      result.triangles.size() * 3 * __SIZEOF_INT__ + paddingLength +
+      result.vertices.size() * 3 * __SIZEOF_FLOAT__ + paddingLength2;
+  bufferViewColors.byteLength = result.values.size() * __SIZEOF_FLOAT__;
+  bufferViewColors.target = TINYGLTF_TARGET_ARRAY_BUFFER;
+  model.bufferViews.push_back(bufferViewColors);
 
-  //   std::string data1str = std::to_string(data1);
-  //   std::replace(data1str.begin(), data1str.end(), '.', ',');
+  // Accessors
+  accessorIndices.bufferView = model.bufferViews.size() - 3;
+  accessorIndices.byteOffset = 0;
+  accessorIndices.componentType = TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT;
+  accessorIndices.count = result.triangles.size() * 3;
+  accessorIndices.type = TINYGLTF_TYPE_SCALAR;
+  accessorIndices.minValues.push_back(result.minIndex);
+  accessorIndices.maxValues.push_back(result.maxIndex);
+  model.accessors.push_back(accessorIndices);
 
-  //   std::string data2str = std::to_string(data2);
-  //   std::replace(data2str.begin(), data2str.end(), '.', ',');
+  accessorVertices.bufferView = model.bufferViews.size() - 2;
+  accessorVertices.byteOffset = 0;
+  accessorVertices.componentType = TINYGLTF_COMPONENT_TYPE_FLOAT;
+  accessorVertices.count = result.vertices.size();
+  accessorVertices.type = TINYGLTF_TYPE_VEC3;
+  accessorVertices.minValues = {result.minVertex.X(), result.minVertex.Y(),
+                                result.minVertex.Z()};
+  accessorVertices.maxValues = {result.maxVertex.X(), result.maxVertex.Y(),
+                                result.maxVertex.Z()};
+  model.accessors.push_back(accessorVertices);
 
-  //   std::string data3str = std::to_string(data3);
-  //   std::replace(data3str.begin(), data3str.end(), '.', ',');
+  accessorColors.bufferView = model.bufferViews.size() - 1;
+  accessorColors.byteOffset = 0;
+  accessorColors.componentType = TINYGLTF_COMPONENT_TYPE_FLOAT;
+  accessorColors.count = result.values.size();
+  accessorColors.type = TINYGLTF_TYPE_SCALAR;
+  accessorColors.minValues.push_back(result.minValue);
+  accessorColors.maxValues.push_back(result.maxValue);
+  model.accessors.push_back(accessorColors);
 
-  //   std::string name = data1str + ";" + data2str + ";" + data3str;
+  // Material
+  material.doubleSided = true;
+  model.materials.push_back(material);
 
-  //   mainDocument.addComponent(trianglesLabel, face, name);
-  // }
+  // Primitive
+  primitive.indices = model.accessors.size() - 3;
+  primitive.attributes["POSITION"] = model.accessors.size() - 2;
+  primitive.attributes["DATA"] = model.accessors.size() - 1;
+  primitive.material = model.materials.size() - 1;
+  primitive.mode = TINYGLTF_MODE_TRIANGLES;
 
-  // // Triangulate
-  // Triangulation triangulation(mainDocument);
-  // triangulation.triangulate();
+  // Mesh
+  mesh.name = "Face " + std::to_string(model.meshes.size() + 1);
+  std::string uuid = Utils::uuid();
+  mesh.extras = tinygltf::Value(
+      {{"uuid", tinygltf::Value(uuid)}, {"label", tinygltf::Value(1)}});
+  mesh.primitives.push_back(primitive);
+  model.meshes.push_back(mesh);
 
-  // // Write GLTF
-  // Handle(TDocStd_Document) document = mainDocument.document;
-  // TDF_LabelSequence labels = mainDocument.getLabels();
-  // auto writer = GLTFWriter(gltfFile, document, labels);
-  // bool res = writer.write();
-  // if (!res) {
-  //   Logger::ERROR("Unable to write glft file " + gltfFile);
-  //   return EXIT_FAILURE;
-  // }
+  // Node
+  node.mesh = model.meshes.size() - 1;
+  model.nodes.push_back(node);
 
-  // // Write description file
-  // std::string descFile = gltfFile + ".desc";
-  // res = mainDocument.writeDescription(descFile);
-  // if (!res) {
-  //   Logger::ERROR("Unable to write description file " + gltfFile + ".desc");
-  //   return EXIT_FAILURE;
-  // }
+  // Scene
+  scene.nodes.push_back(model.nodes.size() - 1);
 
-  // Logger::DISP("{ \"glb\": \"" + gltfFile + "\", \"name\": \"" + result.name
-  // +
-  //              "\"}");
+  // Scene
+  scene.name = "master";
+  scene.extras = tinygltf::Value(
+      {{"type", tinygltf::Value(std::string("mesh"))},
+       {"uuid", tinygltf::Value(Utils::uuid())},
+       {"dimension", tinygltf::Value(3)},
+       {"faces", tinygltf::Value({{"name", tinygltf::Value(mesh.name)},
+                                  {"uuid", tinygltf::Value(uuid)},
+                                  {"label", tinygltf::Value(1)}})}});
+
+  // Scenes
+  model.scenes.push_back(scene);
+
+  // Asset
+  asset.version = "2.0";
+  asset.generator = "Tanatloc-GmshToGLTF";
+  model.asset = asset;
+
+  tinygltf::TinyGLTF gltf;
+  bool res = gltf.WriteGltfSceneToFile(&model, gltfFile,
+                                       true,  // embedImages
+                                       true,  // embedBuffers
+                                       true,  // pretty print
+                                       true); // write binary
+  if (!res) {
+    Logger::ERROR("Unable to write glft file " + gltfFile);
+    return false;
+  }
+
+  Logger::DISP("{ \"glb\": \"" + gltfFile + "\", \"name\": \"" + result.name +
+               "\"}");
 
   return true;
 }

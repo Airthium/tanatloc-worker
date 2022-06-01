@@ -8,12 +8,15 @@
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 
-#include "tiny_gltf.h"
+#include <tiny_gltf.h>
 
 std::vector<double> generateColor();
 
 /**
- * Main function
+ * GmshToGLTF
+ * @param argc
+ * @param argv
+ * @return int
  */
 int main(int argc, char *argv[]) {
   bool res;

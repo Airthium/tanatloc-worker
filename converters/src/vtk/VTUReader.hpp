@@ -10,12 +10,26 @@
 #include <vtkSmartPointer.h>
 #include <vtkXMLUnstructuredGridReader.h>
 
-struct RData {
+struct VTUData {
   int size;
   std::string name;
   std::vector<Vertex> vertices;
   std::vector<Triangle> triangles;
   std::vector<Tetrahedron> tetrahedra;
+  std::vector<double> values;
+};
+
+struct Surface {
+  uint size;
+  std::string name;
+  uint minIndex;
+  uint maxIndex;
+  Vertex minVertex;
+  Vertex maxVertex;
+  double minValue;
+  double maxValue;
+  std::vector<Triangle> triangles;
+  std::vector<Vertex> vertices;
   std::vector<double> values;
 };
 
@@ -25,7 +39,7 @@ private:
   vtkSmartPointer<vtkXMLUnstructuredGridReader> m_reader =
       vtkSmartPointer<vtkXMLUnstructuredGridReader>::New();
 
-  std::vector<RData> m_arrays = std::vector<RData>();
+  std::vector<VTUData> m_arrays = std::vector<VTUData>();
 
 public:
   // Constructor
@@ -36,11 +50,11 @@ public:
   // Read
   bool read();
 
-  // Get max
-  double getMax() const;
-
   // Get arrays
-  std::vector<RData> getArrays() const;
+  std::vector<VTUData> getArrays() const;
+
+  // Get surfaces
+  std::vector<Surface> getSurfaces() const;
 };
 
 #endif // VTU_READER_

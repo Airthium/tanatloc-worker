@@ -112,41 +112,6 @@ bool Gmsh::load(const std::string &fileName) {
 }
 
 /**
- * Get max dimension
- * @return Max
- */
-double Gmsh::getMax() const {
-  Vertex Min(this->m_vertices.at(0));
-  Vertex Max(this->m_vertices.at(0));
-
-  for (uint i = 1; i < this->m_vertices.size(); ++i) {
-    double minX = Min.X();
-    double minY = Min.Y();
-    double minZ = Min.Z();
-
-    double maxX = Max.X();
-    double maxY = Max.Y();
-    double maxZ = Max.Z();
-
-    Vertex Current = this->m_vertices.at(i);
-    double currentX = Current.X();
-    double currentY = Current.Y();
-    double currentZ = Current.Z();
-
-    Min.setX(std::min(minX, currentX));
-    Min.setY(std::min(minY, currentY));
-    Min.setZ(std::min(minZ, currentZ));
-
-    Max.setX(std::max(maxX, currentX));
-    Max.setY(std::max(maxY, currentY));
-    Max.setZ(std::max(maxZ, currentZ));
-  }
-
-  return std::max(Max.X() - Min.X(),
-                  std::max(Max.Y() - Min.Y(), Max.Z() - Min.Z()));
-}
-
-/**
  * Get volume labels
  */
 std::vector<uint> Gmsh::getVolumeLabels() const {

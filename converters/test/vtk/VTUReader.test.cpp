@@ -10,7 +10,7 @@ TEST_CASE("VTUReader") {
   SECTION("getArrays") {
     VTUReader reader = VTUReader();
 
-    std::vector<RData> arrays = reader.getArrays();
+    std::vector<VTUData> arrays = reader.getArrays();
     CHECK(arrays.size() == 0);
   }
 
@@ -18,7 +18,7 @@ TEST_CASE("VTUReader") {
     VTUReader reader = VTUReader("../test/assets/Result.vtu");
     reader.read();
 
-    std::vector<RData> arrays = reader.getArrays();
+    std::vector<VTUData> arrays = reader.getArrays();
     CHECK(arrays.size() == 2);
   }
 
@@ -26,7 +26,7 @@ TEST_CASE("VTUReader") {
     VTUReader reader = VTUReader("../test/assets/Result2Pieces.vtu");
     reader.read();
 
-    std::vector<RData> arrays = reader.getArrays();
+    std::vector<VTUData> arrays = reader.getArrays();
     CHECK(arrays.size() == 1);
   }
 }

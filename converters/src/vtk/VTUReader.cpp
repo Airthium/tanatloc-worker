@@ -38,7 +38,7 @@ bool VTUReader::read() {
   }
 
   // Geometry
-  RData baseData;
+  VTUData baseData;
   baseData.name = "base";
   baseData.size = 0;
 
@@ -95,7 +95,7 @@ bool VTUReader::read() {
   const int numberOfPointData = pointData->GetNumberOfArrays();
 
   for (int i = 0; i < numberOfPointData; ++i) {
-    RData data = baseData;
+    VTUData data = baseData;
     data.name = pointData->GetArrayName(i);
 
     vtkSmartPointer<vtkDataArray> array = pointData->GetArray(i);
@@ -117,44 +117,135 @@ bool VTUReader::read() {
 }
 
 /**
- * Get max dimension
- * @return Max
- */
-double VTUReader::getMax() const {
-  RData array = this->m_arrays.at(0);
-
-  Vertex Min(array.vertices.at(0));
-  Vertex Max(array.vertices.at(0));
-
-  for (uint i = 1; i < array.vertices.size(); ++i) {
-    double minX = Min.X();
-    double minY = Min.Y();
-    double minZ = Min.Z();
-
-    double maxX = Max.X();
-    double maxY = Max.Y();
-    double maxZ = Max.Z();
-
-    Vertex Current = array.vertices.at(i);
-    double currentX = Current.X();
-    double currentY = Current.Y();
-    double currentZ = Current.Z();
-
-    Min.setX(std::min(minX, currentX));
-    Min.setY(std::min(minY, currentY));
-    Min.setZ(std::min(minZ, currentZ));
-
-    Max.setX(std::max(maxX, currentX));
-    Max.setY(std::max(maxY, currentY));
-    Max.setZ(std::max(maxZ, currentZ));
-  }
-
-  return std::max(Max.X() - Min.X(),
-                  std::max(Max.Y() - Min.Y(), Max.Z() - Min.Z()));
-}
-
-/**
  * Get arrays
  * @return Arrays
  */
-std::vector<RData> VTUReader::getArrays() const { return this->m_arrays; }
+std::vector<VTUData> VTUReader::getArrays() const { return this->m_arrays; }
+
+std::vector<Surface> VTUReader::getSurfaces() const {
+  std::vector<VTUData> arrays = this->m_arrays;
+  std::vector<Surface> surfaces;
+
+  std::for_each(arrays.begin(), arrays.end(), [&surfaces](VTUData &data) {
+    // Surface triangles & vertices
+    std::vector<Triangle> tempSurfaceTriangles = data.triangles;
+    std::vector<Triangle> surfaceTriangles;
+    std::vector<Vertex> surfaceVertices;
+    std::vector<double> surfaceValues;
+
+    // Surface vertices
+    std::vector<std::pair<uint, uint>> newIndices;
+    std::for_each(
+        tempSurfaceTriangles.begin(), tempSurfaceTriangles.end(),
+        [data, &surfaceVertices, &newIndices, &surfaceTriangles,
+         &surfaceValues](const Triangle triangle) {
+          const uint index1 = triangle.I1();
+          const uint index2 = triangle.I2();
+          const uint index3 = triangle.I3();
+
+          Triangle newTriangle;
+
+          auto find1 =
+              std::find_if(newIndices.begin(), newIndices.end(),
+                           [index1](const std::pair<uint, uint> newIndex) {
+                             return newIndex.first == index1;
+                           });
+          if (find1 == newIndices.end()) {
+            const uint newIndex1 = surfaceVertices.size();
+            surfaceVertices.push_back(data.vertices.at(index1));
+            surfaceValues.push_back(data.values.at(index1));
+            newTriangle.setI1(newIndex1);
+            newIndices.push_back({index1, newIndex1});
+          } else {
+            newTriangle.setI1((*find1).second);
+          }
+
+          auto find2 =
+              std::find_if(newIndices.begin(), newIndices.end(),
+                           [index2](const std::pair<uint, uint> oldIndex) {
+                             return oldIndex.first == index2;
+                           });
+          if (find2 == newIndices.end()) {
+            const uint newIndex2 = surfaceVertices.size();
+            surfaceVertices.push_back(data.vertices.at(index2));
+            surfaceValues.push_back(data.values.at(index2));
+            newTriangle.setI2(newIndex2);
+            newIndices.push_back({index2, newIndex2});
+          } else {
+            newTriangle.setI2((*find2).second);
+          }
+
+          auto find3 =
+              std::find_if(newIndices.begin(), newIndices.end(),
+                           [index3](const std::pair<uint, uint> oldIndex) {
+                             return oldIndex.first == index3;
+                           });
+          if (find3 == newIndices.end()) {
+            const uint newIndex3 = surfaceVertices.size();
+            surfaceVertices.push_back(data.vertices.at(index3));
+            surfaceValues.push_back(data.values.at(index3));
+            newTriangle.setI3(newIndex3);
+            newIndices.push_back({index3, newIndex3});
+          } else {
+            newTriangle.setI3((*find3).second);
+          }
+
+          surfaceTriangles.push_back(newTriangle);
+        });
+
+    // min / max
+    uint minIndex = 0; // Min is always 0
+    uint maxIndex = 0;
+    std::for_each(surfaceTriangles.begin(), surfaceTriangles.end(),
+                  [&maxIndex](const Triangle triangle) {
+                    const uint index1 = triangle.I1();
+                    const uint index2 = triangle.I2();
+                    const uint index3 = triangle.I3();
+
+                    maxIndex = std::max(
+                        maxIndex, std::max(index1, std::max(index2, index3)));
+                  });
+
+    Vertex minVertex(surfaceVertices.at(0));
+    Vertex maxVertex(surfaceVertices.at(0));
+    std::for_each(surfaceVertices.begin(), surfaceVertices.end(),
+                  [&minVertex, &maxVertex](const Vertex vertex) {
+                    const double x = vertex.X();
+                    const double y = vertex.Y();
+                    const double z = vertex.Z();
+
+                    minVertex.setX(std::min(minVertex.X(), x));
+                    minVertex.setY(std::min(minVertex.Y(), y));
+                    minVertex.setZ(std::min(minVertex.Z(), z));
+
+                    maxVertex.setX(std::max(maxVertex.X(), x));
+                    maxVertex.setY(std::max(maxVertex.Y(), y));
+                    maxVertex.setZ(std::max(maxVertex.Z(), z));
+                  });
+
+    double minValue = data.values.at(0);
+    double maxValue = data.values.at(0);
+    std::for_each(data.values.begin(), data.values.end(),
+                  [&minValue, &maxValue](const double value) {
+                    minValue = std::min(minValue, value);
+                    maxValue = std::max(maxValue, value);
+                  });
+
+    Surface surface;
+    surface.size = data.size;
+    surface.name = data.name;
+    surface.minIndex = minIndex;
+    surface.maxIndex = maxIndex;
+    surface.minVertex = minVertex;
+    surface.maxVertex = maxVertex;
+    surface.minValue = minValue;
+    surface.maxValue = maxValue;
+    surface.triangles = surfaceTriangles;
+    surface.vertices = surfaceVertices;
+    surface.values = surfaceValues;
+
+    surfaces.push_back(surface);
+  });
+
+  return surfaces;
+}

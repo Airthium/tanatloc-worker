@@ -53,9 +53,6 @@ public:
   // Loader
   bool load(const std::string &);
 
-  // Get max
-  double getMax() const;
-
   // Get volume labels
   std::vector<uint> getVolumeLabels() const;
 

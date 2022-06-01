@@ -9,6 +9,7 @@
 constexpr double meshQuality = 1.e-3;
 
 struct FaceMesh {
+  uint label;
   uint minIndex;
   uint maxIndex;
   Vertex minVertex;
@@ -16,10 +17,6 @@ struct FaceMesh {
   std::vector<uint> indices;
   std::vector<Vertex> vertices;
   std::vector<Vertex> normals;
-};
-
-struct EdgeMesh {
-  std::vector<Vertex> vertices;
 };
 
 class Triangulation {
@@ -44,7 +41,7 @@ public:
   FaceMesh triangulateFace(const TopoDS_Shape &) const;
 
   // triangulate edge
-  EdgeMesh triangulateEdge(const TopoDS_Shape &) const;
+  FaceMesh triangulateEdge(const TopoDS_Shape &) const;
 };
 
 #endif //_TRIANGULATION_
