@@ -258,6 +258,7 @@ bool writeOne(const Surface &result, const std::string &gltfFile) {
   model.accessors.push_back(accessorColors);
 
   // Material
+  material.pbrMetallicRoughness.metallicFactor = 0.25;
   material.doubleSided = true;
   model.materials.push_back(material);
 

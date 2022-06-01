@@ -13,6 +13,8 @@
 
 #include <tiny_gltf.h>
 
+// TODO export BRep, Gmsh can not read DXF
+
 /**
  * DXFToGLTF
  * @param argc

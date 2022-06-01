@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
     solidsExtras.push_back(tinygltf::Value(
         {{"name", tinygltf::Value(solidNode.name)},
          {"uuid", tinygltf::Value(uuid)},
-         {"label", tinygltf::Value((int)nFaces)},
+         {"label", tinygltf::Value((int)nSolids)},
          {"color",
           tinygltf::Value({{"r", tinygltf::Value(solidColor.Red())},
                            {"g", tinygltf::Value(solidColor.Green())},
@@ -117,9 +117,9 @@ int main(int argc, char *argv[]) {
       // Vertices
       std::for_each(faceMesh.vertices.begin(), faceMesh.vertices.end(),
                     [&buffer](const Vertex vertex) {
-                      double x = vertex.X();
-                      double y = vertex.Y();
-                      double z = vertex.Z();
+                      double x = vertex.X() * 1.e-3; // mm to m
+                      double y = vertex.Y() * 1.e-3; // mm to m
+                      double z = vertex.Z() * 1.e-3; // mm to m
 
                       // To buffer
                       Utils::floatToBuffer(x, buffer.data);
@@ -158,12 +158,12 @@ int main(int argc, char *argv[]) {
       accessorVertices.componentType = TINYGLTF_COMPONENT_TYPE_FLOAT;
       accessorVertices.count = faceMesh.vertices.size();
       accessorVertices.type = TINYGLTF_TYPE_VEC3;
-      accessorVertices.minValues = {faceMesh.minVertex.X(),
-                                    faceMesh.minVertex.Y(),
-                                    faceMesh.minVertex.Z()};
-      accessorVertices.maxValues = {faceMesh.maxVertex.X(),
-                                    faceMesh.maxVertex.Y(),
-                                    faceMesh.maxVertex.Z()};
+      accessorVertices.minValues = {faceMesh.minVertex.X() * 1.e-3,  // mm to m
+                                    faceMesh.minVertex.Y() * 1.e-3,  // mm to m
+                                    faceMesh.minVertex.Z() * 1.e-3}; // mm to m
+      accessorVertices.maxValues = {faceMesh.maxVertex.X() * 1.e-3,  // mm to m
+                                    faceMesh.maxVertex.Y() * 1.e-3,  // mm to m
+                                    faceMesh.maxVertex.Z() * 1.e-3}; // mm to m
       model.accessors.push_back(accessorVertices);
 
       // Material
