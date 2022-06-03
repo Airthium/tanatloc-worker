@@ -57,9 +57,6 @@ bool VTUReader::read() {
   for (int i = 0; i < numberOfCells; ++i) {
     auto cellSize = connectivity->GetCellSize(i);
 
-    if (cellSize != 3 && cellSize != 4) // Only triangles & tetrahedra
-      continue;
-
     vtkSmartPointer<vtkIdList> indices = vtkSmartPointer<vtkIdList>::New();
     connectivity->GetCellAtId(i, indices);
 
@@ -87,6 +84,14 @@ bool VTUReader::read() {
       tetrahedron.setI4(index4);
 
       baseData.tetrahedra.push_back(tetrahedron);
+    } else {
+      Polygon polygon;
+
+      for (int j = 0; j < cellSize; ++j) {
+        polygon.addIndex((int)indices->GetId(j));
+      }
+
+      baseData.polygons.push_back(polygon);
     }
   }
 
@@ -266,4 +271,107 @@ std::vector<Surface> VTUReader::getSurfaces() const {
   });
 
   return surfaces;
+}
+
+std::vector<Line> VTUReader::getLines() const {
+  std::vector<VTUData> arrays = this->m_arrays;
+  std::vector<Line> lines;
+
+  std::for_each(arrays.begin(), arrays.end(), [&lines](VTUData &data) {
+    // Lines polygons & vertices
+    std::vector<Polygon> tempLinePolygons = data.polygons;
+    std::vector<Polygon> linePolygons;
+    std::vector<Vertex> lineVertices;
+    std::vector<double> lineValues;
+
+    // Line vertices
+    std::vector<std::pair<uint, uint>> newIndices;
+    std::for_each(tempLinePolygons.begin(), tempLinePolygons.end(),
+                  [data, &lineVertices, &newIndices, &linePolygons,
+                   &lineValues](const Polygon polygon) {
+                    std::vector<uint> indices = polygon.getIndices();
+
+                    Polygon newPolygon;
+
+                    for (size_t i = 0; i < indices.size(); ++i) {
+                      uint index = indices.at(i);
+                      auto find = std::find_if(
+                          newIndices.begin(), newIndices.end(),
+                          [index](const std::pair<uint, uint> newIndex) {
+                            return newIndex.first == index;
+                          });
+                      if (find == newIndices.end()) {
+                        const uint newIndex = lineVertices.size();
+                        lineVertices.push_back(data.vertices.at(index));
+                        if (data.size == 1) {
+                          lineValues.push_back(data.values.at(index));
+                        } else if (data.size == 3) {
+                          lineValues.push_back(data.values.at(3 * index + 0));
+                          lineValues.push_back(data.values.at(3 * index + 1));
+                          lineValues.push_back(data.values.at(3 * index + 2));
+                        }
+                        newPolygon.addIndex(newIndex);
+                        newIndices.push_back({index, newIndex});
+                      } else {
+                        newPolygon.addIndex((*find).second);
+                      }
+                    }
+
+                    linePolygons.push_back(newPolygon);
+                  });
+
+    // min / max
+    uint minIndex = 0; // Min is always 0
+    uint maxIndex = 0;
+    std::for_each(linePolygons.begin(), linePolygons.end(),
+                  [&maxIndex](const Polygon Polygon) {
+                    std::vector<uint> indices = Polygon.getIndices();
+
+                    std::vector<uint>::iterator result =
+                        std::max_element(indices.begin(), indices.end());
+                    maxIndex = *result;
+                  });
+
+    Vertex minVertex(lineVertices.at(0));
+    Vertex maxVertex(lineVertices.at(0));
+    std::for_each(lineVertices.begin(), lineVertices.end(),
+                  [&minVertex, &maxVertex](const Vertex vertex) {
+                    const double x = vertex.X();
+                    const double y = vertex.Y();
+                    const double z = vertex.Z();
+
+                    minVertex.setX(std::min(minVertex.X(), x));
+                    minVertex.setY(std::min(minVertex.Y(), y));
+                    minVertex.setZ(std::min(minVertex.Z(), z));
+
+                    maxVertex.setX(std::max(maxVertex.X(), x));
+                    maxVertex.setY(std::max(maxVertex.Y(), y));
+                    maxVertex.setZ(std::max(maxVertex.Z(), z));
+                  });
+
+    double minValue = data.values.at(0);
+    double maxValue = data.values.at(0);
+    std::for_each(data.values.begin(), data.values.end(),
+                  [&minValue, &maxValue](const double value) {
+                    minValue = std::min(minValue, value);
+                    maxValue = std::max(maxValue, value);
+                  });
+
+    Line line;
+    line.size = data.size;
+    line.name = data.name;
+    line.minIndex = minIndex;
+    line.maxIndex = maxIndex;
+    line.minVertex = minVertex;
+    line.maxVertex = maxVertex;
+    line.minValue = minValue;
+    line.maxValue = maxValue;
+    line.polygons = linePolygons;
+    line.vertices = lineVertices;
+    line.values = lineValues;
+
+    lines.push_back(line);
+  });
+
+  return lines;
 }

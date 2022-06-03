@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+#include "../geometry/Polygon.hpp"
 #include "../geometry/Tetrahedron.hpp"
 #include "../geometry/Triangle.hpp"
 #include "../geometry/Vertex.hpp"
@@ -14,6 +15,7 @@ struct VTUData {
   int size;
   std::string name;
   std::vector<Vertex> vertices;
+  std::vector<Polygon> polygons;
   std::vector<Triangle> triangles;
   std::vector<Tetrahedron> tetrahedra;
   std::vector<double> values;
@@ -29,6 +31,20 @@ struct Surface {
   double minValue;
   double maxValue;
   std::vector<Triangle> triangles;
+  std::vector<Vertex> vertices;
+  std::vector<double> values;
+};
+
+struct Line {
+  uint size;
+  std::string name;
+  uint minIndex;
+  uint maxIndex;
+  Vertex minVertex;
+  Vertex maxVertex;
+  double minValue;
+  double maxValue;
+  std::vector<Polygon> polygons;
   std::vector<Vertex> vertices;
   std::vector<double> values;
 };
@@ -55,6 +71,9 @@ public:
 
   // Get surfaces
   std::vector<Surface> getSurfaces() const;
+
+  // Get lines
+  std::vector<Line> getLines() const;
 };
 
 #endif // VTU_READER_

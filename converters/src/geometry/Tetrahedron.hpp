@@ -37,7 +37,6 @@ public:
   void setLabel(const uint);
 
   // Get index
-
   uint I1() const;
   uint I2() const;
   uint I3() const;
