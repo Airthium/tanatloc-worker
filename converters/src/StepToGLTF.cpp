@@ -4,6 +4,7 @@
 #include "occ/StepReader.hpp"
 #include "occ/Triangulation.hpp"
 #include "utils/utils.hpp"
+#include <BRepTools.hxx>
 #include <TopExp_Explorer.hxx>
 
 #define TINYGLTF_IMPLEMENTATION
@@ -22,15 +23,17 @@ int main(int argc, char *argv[]) {
   bool res;
   std::string stepFile;
   std::string gltfFile;
+  std::string brepFile;
 
   // Arguments
-  if (argc < 3) {
+  if (argc < 4) {
     Logger::ERROR("USAGE:");
-    Logger::ERROR("StepToGLTF stepFile gltfFile");
+    Logger::ERROR("StepToGLTF stepFile gltfFile brepFile");
     return EXIT_FAILURE;
   }
   stepFile = argv[1];
   gltfFile = argv[2];
+  brepFile = argv[3];
 
   // Read step file
   auto reader = StepReader(stepFile);
@@ -246,6 +249,9 @@ int main(int argc, char *argv[]) {
     Logger::ERROR("Unable to write glft file " + gltfFile);
     return EXIT_FAILURE;
   }
+
+  // BRep
+  BRepTools::Write(compound, brepFile.c_str());
 
   return EXIT_SUCCESS;
 }

@@ -5,6 +5,7 @@
 #include "occ/MainDocument.hpp"
 #include "occ/Triangulation.hpp"
 #include "utils/utils.hpp"
+#include <BRepTools.hxx>
 #include <TopExp_Explorer.hxx>
 
 #define TINYGLTF_IMPLEMENTATION
@@ -12,8 +13,6 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 
 #include <tiny_gltf.h>
-
-// TODO export BRep, Gmsh can not read DXF
 
 /**
  * DXFToGLTF
@@ -25,15 +24,17 @@ int main(int argc, char **argv) {
   bool res;
   std::string dxfFile;
   std::string gltfFile;
+  std::string brepFile;
 
   // Input arguments
-  if (argc < 3) {
+  if (argc < 4) {
     Logger::ERROR("USAGE:");
-    Logger::ERROR("DXFToGLTF dxfFile glftFile");
+    Logger::ERROR("DXFToGLTF dxfFile glftFile brepFile");
     return EXIT_FAILURE;
   }
   dxfFile = argv[1];
   gltfFile = argv[2];
+  brepFile = argv[3];
 
   // Converter
   auto converter = std::make_unique<DXFConverter>();
@@ -281,7 +282,7 @@ int main(int argc, char **argv) {
       edgesExtras.push_back(
           tinygltf::Value({{"name", tinygltf::Value(mesh.name)},
                            {"uuid", tinygltf::Value(uuid)},
-                           {"label", tinygltf::Value((int)nFaces)}}));
+                           {"label", tinygltf::Value((int)nEdges)}}));
 
       // Node
       node.mesh = model.meshes.size() - 1;
@@ -331,6 +332,9 @@ int main(int argc, char **argv) {
     Logger::ERROR("Unable to write glft file " + gltfFile);
     return EXIT_FAILURE;
   }
+
+  // BRep
+  BRepTools::Write(compound, brepFile.c_str());
 
   return EXIT_SUCCESS;
 }
