@@ -214,8 +214,10 @@ Surface Gmsh::getSurface(const uint label) const {
                       maxIndex, std::max(index1, std::max(index2, index3)));
                 });
 
-  Vertex minVertex(surfaceVertices.at(0));
-  Vertex maxVertex(surfaceVertices.at(0));
+  Vertex minVertex(surfaceVertices.size() ? surfaceVertices.at(0)
+                                          : Vertex(0, 0, 0));
+  Vertex maxVertex(surfaceVertices.size() ? surfaceVertices.at(0)
+                                          : Vertex(0, 0, 0));
   std::for_each(surfaceVertices.begin(), surfaceVertices.end(),
                 [&minVertex, &maxVertex](const Vertex vertex) {
                   const double x = vertex.X();
@@ -350,8 +352,10 @@ Volume Gmsh::getVolume(const uint label) const {
             std::max(index1, std::max(index2, std::max(index3, index4))));
       });
 
-  Vertex minVertex(volumeVertices.at(0));
-  Vertex maxVertex(volumeVertices.at(0));
+  Vertex minVertex(volumeVertices.size() ? volumeVertices.at(0)
+                                         : Vertex(0, 0, 0));
+  Vertex maxVertex(volumeVertices.size() ? volumeVertices.at(0)
+                                         : Vertex(0, 0, 0));
   std::for_each(volumeVertices.begin(), volumeVertices.end(),
                 [&minVertex, &maxVertex](const Vertex vertex) {
                   const double x = vertex.X();

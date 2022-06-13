@@ -122,8 +122,8 @@ Surface getMagnitude(const Surface &result) {
     magnitude.values.push_back(v);
   }
 
-  double minValue = magnitude.values.at(0);
-  double maxValue = magnitude.values.at(0);
+  double minValue = magnitude.values.size() ? magnitude.values.at(0) : 0;
+  double maxValue = magnitude.values.size() ? magnitude.values.at(0) : 0;
   std::for_each(magnitude.values.begin(), magnitude.values.end(),
                 [&minValue, &maxValue](const double value) {
                   minValue = std::min(minValue, value);
@@ -154,8 +154,8 @@ Line getMagnitude(const Line &result) {
     magnitude.values.push_back(v);
   }
 
-  double minValue = magnitude.values.at(0);
-  double maxValue = magnitude.values.at(0);
+  double minValue = magnitude.values.size() ? magnitude.values.at(0) : 0;
+  double maxValue = magnitude.values.size() ? magnitude.values.at(0) : 0;
   std::for_each(magnitude.values.begin(), magnitude.values.end(),
                 [&minValue, &maxValue](const double value) {
                   minValue = std::min(minValue, value);
@@ -186,8 +186,8 @@ Surface getComponent(const Surface &result, const int index) {
     component.values.push_back(v);
   }
 
-  double minValue = component.values.at(0);
-  double maxValue = component.values.at(0);
+  double minValue = component.values.size() ? component.values.at(0) : 0;
+  double maxValue = component.values.size() ? component.values.at(0) : 0;
   std::for_each(component.values.begin(), component.values.end(),
                 [&minValue, &maxValue](const double value) {
                   minValue = std::min(minValue, value);
@@ -218,8 +218,8 @@ Line getComponent(const Line &result, const int index) {
     component.values.push_back(v);
   }
 
-  double minValue = component.values.at(0);
-  double maxValue = component.values.at(0);
+  double minValue = component.values.size() ? component.values.at(0) : 0;
+  double maxValue = component.values.size() ? component.values.at(0) : 0;
   std::for_each(component.values.begin(), component.values.end(),
                 [&minValue, &maxValue](const double value) {
                   minValue = std::min(minValue, value);

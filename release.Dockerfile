@@ -19,18 +19,16 @@ ENV CONVERTERSPATH /home/programs/converters
 
 # Install packages
 RUN apt update \
-  && apt upgrade -yq
-
-RUN apt install -yq \
+  && apt upgrade -yq \
+  && apt install -yq \
   libfontconfig1 libgl1-mesa-dev \
   libarpack2-dev \
   libopenblas-dev libhdf5-dev \
   libgsl-dev libfftw3-dev \
   libnlopt-dev libumfpack5 \
   mpich \
-  python3-paraview
-
-RUN apt autoremove \
+  python3-paraview \
+  && apt autoremove \
   && apt clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 

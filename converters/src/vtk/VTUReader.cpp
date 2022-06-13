@@ -229,8 +229,10 @@ std::vector<Surface> VTUReader::getSurfaces() const {
                         maxIndex, std::max(index1, std::max(index2, index3)));
                   });
 
-    Vertex minVertex(surfaceVertices.at(0));
-    Vertex maxVertex(surfaceVertices.at(0));
+    Vertex minVertex(surfaceVertices.size() ? surfaceVertices.at(0)
+                                            : Vertex(0, 0, 0));
+    Vertex maxVertex(surfaceVertices.size() ? surfaceVertices.at(0)
+                                            : Vertex(0, 0, 0));
     std::for_each(surfaceVertices.begin(), surfaceVertices.end(),
                   [&minVertex, &maxVertex](const Vertex vertex) {
                     const double x = vertex.X();
@@ -246,8 +248,8 @@ std::vector<Surface> VTUReader::getSurfaces() const {
                     maxVertex.setZ(std::max(maxVertex.Z(), z));
                   });
 
-    double minValue = data.values.at(0);
-    double maxValue = data.values.at(0);
+    double minValue = data.values.size() ? data.values.at(0) : 0;
+    double maxValue = data.values.size() ? data.values.at(0) : 0;
     std::for_each(data.values.begin(), data.values.end(),
                   [&minValue, &maxValue](const double value) {
                     minValue = std::min(minValue, value);
@@ -320,6 +322,9 @@ std::vector<Line> VTUReader::getLines() const {
                     linePolygons.push_back(newPolygon);
                   });
 
+    if (!linePolygons.size())
+      return;
+
     // min / max
     uint minIndex = 0; // Min is always 0
     uint maxIndex = 0;
@@ -332,8 +337,10 @@ std::vector<Line> VTUReader::getLines() const {
                     maxIndex = *result;
                   });
 
-    Vertex minVertex(lineVertices.at(0));
-    Vertex maxVertex(lineVertices.at(0));
+    Vertex minVertex(lineVertices.size() ? lineVertices.at(0)
+                                         : Vertex(0, 0, 0));
+    Vertex maxVertex(lineVertices.size() ? lineVertices.at(0)
+                                         : Vertex(0, 0, 0));
     std::for_each(lineVertices.begin(), lineVertices.end(),
                   [&minVertex, &maxVertex](const Vertex vertex) {
                     const double x = vertex.X();
@@ -349,8 +356,8 @@ std::vector<Line> VTUReader::getLines() const {
                     maxVertex.setZ(std::max(maxVertex.Z(), z));
                   });
 
-    double minValue = data.values.at(0);
-    double maxValue = data.values.at(0);
+    double minValue = data.values.size() ? data.values.at(0) : 0;
+    double maxValue = data.values.size() ? data.values.at(0) : 0;
     std::for_each(data.values.begin(), data.values.end(),
                   [&minValue, &maxValue](const double value) {
                     minValue = std::min(minValue, value);

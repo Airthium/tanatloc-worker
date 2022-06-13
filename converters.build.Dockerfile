@@ -22,7 +22,7 @@ WORKDIR $TINYGLTFSOURCE
 # Build
 RUN mkdir build \
   && cd build \
-  && cmake .. -DCMAKE_BUILD_TYPE=Release -DTINYGLTF_BUILD_LOADER_EXEMPLE=OFF  \
+  && cmake .. -DCMAKE_BUILD_TYPE=Release -DTINYGLTF_BUILD_LOADER_EXAMPLE=OFF  \
   && make -j "$(nproc)" \
   && make install
 

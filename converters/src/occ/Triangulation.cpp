@@ -127,8 +127,10 @@ FaceMesh Triangulation::triangulateFace(const TopoDS_Shape &face) const {
   faceMesh.minIndex = minIndex;
   faceMesh.maxIndex = maxIndex;
 
-  Vertex minVertex(faceMesh.vertices.at(0));
-  Vertex maxVertex(faceMesh.vertices.at(0));
+  Vertex minVertex(faceMesh.vertices.size() ? faceMesh.vertices.at(0)
+                                            : Vertex(0, 0, 0));
+  Vertex maxVertex(faceMesh.vertices.size() ? faceMesh.vertices.at(0)
+                                            : Vertex(0, 0, 0));
   std::for_each(faceMesh.vertices.begin(), faceMesh.vertices.end(),
                 [&minVertex, &maxVertex](const Vertex vertex) {
                   const double x = vertex.X();
