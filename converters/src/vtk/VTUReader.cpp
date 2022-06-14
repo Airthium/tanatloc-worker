@@ -108,7 +108,9 @@ bool VTUReader::read() {
     const int numberOfComponents = array->GetNumberOfComponents();
     data.size = numberOfComponents;
 
-    for (int j = 0; j < numberOfValues; ++j) {
+    const int numberOfTuples = numberOfValues / numberOfComponents;
+
+    for (int j = 0; j < numberOfTuples; ++j) {
       const double *values = array->GetTuple(j);
 
       for (int k = 0; k < numberOfComponents; ++k)

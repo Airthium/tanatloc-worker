@@ -44,6 +44,7 @@ int main(int argc, char *argv[]) {
     Logger::ERROR("Unable to read VTU file " + vtuFile);
     return EXIT_FAILURE;
   }
+
   std::vector<Surface> surfaces = reader.getSurfaces();
   std::vector<Line> lines = reader.getLines();
 
