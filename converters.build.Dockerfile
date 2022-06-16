@@ -18,7 +18,7 @@ ENV CONVERTERSSOURCES /home/programs/converterssources
 
 # Copy
 WORKDIR $CONVERTERSSOURCES
-COPY ./converters .
+COPY ./tanatloc-converters .
 
 # Build converters
 RUN mkdir build \

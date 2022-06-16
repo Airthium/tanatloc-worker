@@ -1,0 +1,3 @@
+[submodule "tanatloc-converters"]
+	path = tanatloc-converters
+	url = git@github.com:Airthium/tanatloc-converters.git

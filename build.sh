@@ -94,4 +94,3 @@ echo "ARGS=\"$ARGS\""
 
 checkArchives
 buildDockerfile "$target"
-# build "$target"

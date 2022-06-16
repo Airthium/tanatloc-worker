@@ -1,21 +1,6 @@
-# Misc
-.vscode
-
 # Archives
 **/*.tar.gz
 **/*.tgz
-
-# CMake
-converters
-!converters/src/**/*
-!converters/test/**/*
-!converters/CMakeFile
-
-# Tests
-converters/test/assets/Cube
-
-# Coverage
-coverage
 
 # Dockerfile
 Dockerfile
