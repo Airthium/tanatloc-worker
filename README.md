@@ -1,6 +1,6 @@
-# tanatloc-dockers
+# tanatloc-worker
 
-Dockers for the Tanatloc project.
+Docker for the Tanatloc project.
 
 ## Requirements
 
@@ -17,13 +17,5 @@ export GITHUB_TOKEN=xxx
 ## Usage
 
 ```shell
-./build.sh opencascade
-./build.sh gmsh
-./build.sh converters
-```
-
-## Test
-
-```shell
-./build.sh gmsh:test
+./build.sh worker
 ```
