@@ -2,7 +2,22 @@ cmake_minimum_required(VERSION 3.0)
 
 project(Tanatloc)
 
-## LIBRARIES
+## Debug
+option(DEBUG "Print debug informations" OFF)
+if (DEBUG)
+  add_definitions(-DDEBUG_MODE)
+else()
+  remove_definitions(-DDEBUG_MODE)
+endif()
+
+## Build type
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+
+## External libraries
 # VTK
 find_package(VTK COMPONENTS
   IOXML
@@ -24,98 +39,98 @@ if (OpenCASCADE_FOUND)
   set(OCC_LIBS ${OpenCASCADE_LIBRARIES})
 endif (OpenCASCADE_FOUND)
 
-# Logger library
-AUX_SOURCE_DIRECTORY(src/logger LOGGER_SOURCE)
+# UUID
+find_path(LIBUUID_INCLUDE_DIR uuid.h PATH_SUFFIXES uuid)
+find_library(LIBUUID_LIBS libuuid.a)
+include_directories(${LIBUUID_INCLUDE_DIR})
 
-# DXF library
-AUX_SOURCE_DIRECTORY(src/dxflib DXF_SOURCE)
+link_libraries(${VTK_LIBS} ${OCC_LIBS} ${LIBUUID_LIBS})
 
-# Gmsh library
+# TinyGLTF
+find_package(TinyGLTF REQUIRED)
+
+## Libraries
+# DXF
+AUX_SOURCE_DIRECTORY(src/dxf DXF_SOURCE)
+
+# DXFLib
+AUX_SOURCE_DIRECTORY(src/dxflib DXFLib_SOURCE)
+
+# Geometry
+AUX_SOURCE_DIRECTORY(src/geometry GEOMETRY_SOURCE)
+
+# Gmsh
 AUX_SOURCE_DIRECTORY(src/gmsh GMSH_SOURCE)
 
-# OCC library
+# Logger
+AUX_SOURCE_DIRECTORY(src/logger LOGGER_SOURCE)
+
+# OCC
 AUX_SOURCE_DIRECTORY(src/occ OCC_SOURCE)
 
-# VTK library
+# Utils
+AUX_SOURCE_DIRECTORY(src/vtk UTILS_SOURCE)
+
+# VTK
 AUX_SOURCE_DIRECTORY(src/vtk VTK_SOURCE)
 
-# ThreeJS library
-AUX_SOURCE_DIRECTORY(src/threeJS THREEJS_SOURCE)
-
-## SOURCES
-# DXFToBRep
-set(DXFToBRepSOURCE
-  src/DXFToBRep.cpp
-  src/DXFConverter.cpp
+## Sources
+# DXFToGLTF
+set(DXFToGLTFSOURCE
+  src/DXFToGLTF.cpp
   ${DXF_SOURCE}
+  ${DXFLib_SOURCE}
+  ${GEOMETRY_SOURCE}
   ${LOGGER_SOURCE}
-)
-
-# BRepToThreeJS
-set(BRepToThreeJSSOURCE
-  src/BRepToThreeJS.cpp
   ${OCC_SOURCE}
-  ${THREEJS_SOURCE}
-  ${LOGGER_SOURCE}
 )
 
-# GmshToThreeJS
-set(GmshToThreeJSSOURCE
-  src/GmshToThreeJS.cpp
+# StepToGLTF
+set(StepToGLTFSOURCE
+  src/StepToGLTF.cpp
+  ${GEOMETRY_SOURCE}
+  ${LOGGER_SOURCE}
+  ${OCC_SOURCE}
+)
+
+# GmshToGLTF
+set(GmshToGLTFSOURCE
+  src/GmshToGLTF.cpp
+  ${GEOMETRY_SOURCE}
   ${GMSH_SOURCE}
-  ${THREEJS_SOURCE}
+  ${UTILS_SOURCE}
   ${LOGGER_SOURCE}
 )
 
-# StepToThreeJS (TODO to remove)
-set(StepToThreeJSSOURCE
-  src/StepToThreeJS.cpp
+# VTUToGLTF
+set(VTUToGLTFSOURCE
+  src/VTUToGLTF.cpp
+  ${GEOMETRY_SOURCE}
+  ${GMSH_SOURCE}
+  ${LOGGER_SOURCE}
   ${OCC_SOURCE}
-  ${THREEJS_SOURCE}
-  ${LOGGER_SOURCE}
-)
-
-# StepUnion (TODO to replace by BRepUnion)
-set(StepUnionSOURCE
-  src/StepUnion.cpp
-  ${OCC_SOURCE}
-  ${LOGGER_SOURCE}
-)
-
-# VTUToThreeJS
-set(VTUToThreeJSSOURCE
-  src/VTUToThreeJS.cpp
   ${VTK_SOURCE}
-  ${THREEJS_SOURCE}
-  ${LOGGER_SOURCE}
 )
 
 ## Executables
-# DXFToBRep
-add_executable(DXFToBRep ${DXFToBRepSOURCE})
-target_link_libraries(DXFToBRep ${OCC_LIBS})
+# DXFToGLTF
+add_executable(DXFToGLTF ${DXFToGLTFSOURCE})
+target_link_libraries(DXFToGLTF)
 
-# BRepToThreeJS
-add_executable(BRepToThreeJS ${BRepToThreeJSSOURCE})
-target_link_libraries(BRepToThreeJS ${OCC_LIBS})
+# StepToGLTF
+add_executable(StepToGLTF ${StepToGLTFSOURCE})
+target_link_libraries(StepToGLTF)
 
-# GmshToThreeJS
-add_executable(GmshToThreeJS ${GmshToThreeJSSOURCE})
+# GmshToGLTF
+add_executable(GmshToGLTF ${GmshToGLTFSOURCE})
+target_link_libraries(GmshToGLTF)
 
-# StepToThreeJS
-add_executable(StepToThreeJS ${StepToThreeJSSOURCE})
-target_link_libraries(StepToThreeJS ${OCC_LIBS})
-
-# StepUnion
-add_executable(StepUnion ${StepUnionSOURCE})
-target_link_libraries(StepUnion ${OCC_LIBS})
-
-# VTUToThreeJS
-add_executable(VTUToThreeJS ${VTUToThreeJSSOURCE})
-target_link_libraries(VTUToThreeJS ${VTK_LIBS})
+# VTUToGLTF
+add_executable(VTUToGLTF ${VTUToGLTFSOURCE})
+target_link_libraries(VTUToGLTF)
 
 ## Install
-install(TARGETS DXFToBRep BRepToThreeJS GmshToThreeJS StepToThreeJS StepUnion VTUToThreeJS)
+install(TARGETS DXFToGLTF StepToGLTF GmshToGLTF VTUToGLTF)
 
 ## Tests
 include(CTest)
@@ -133,45 +148,35 @@ set(GMSH_TESTS
 )
 
 set(OCC_TESTS
-  test/occ/getElements.test.cpp
   test/occ/StepReader.test.cpp
-  test/occ/StepWriter.test.cpp
   test/occ/Triangulation.test.cpp
-  test/occ/Union.test.cpp
-)
-
-set(THREEJS_TESTS
-  test/threeJS/ThreeJS.test.cpp
 )
 
 set(VTK_TESTS
   test/vtk/VTUReader.test.cpp
 )
 
-set(MAIN_TESTS
-  test/DXFConverter.test.cpp
-  src/DXFConverter.cpp
+set(DXF_TESTS
+  test/dxf/DXFConverter.test.cpp
 )
 
 set(SOURCE_TESTS
   test/main.cpp
-  ${LOGGER_TESTS}
-  ${LOGGER_SOURCE}
   ${GMSH_TESTS}
-  ${GMSH_SOURCE}
+  ${LOGGER_TESTS}
   ${OCC_TESTS}
-  ${OCC_SOURCE}
-  ${THREEJS_TESTS}
-  ${THREEJS_SOURCE}
   ${VTK_TESTS}
-  ${VTK_SOURCE}
-  ${MAIN_TESTS}
+  ${DXF_TESTS}
   ${DXF_SOURCE}
+  ${DXFLib_SOURCE}
+  ${GEOMETRY_SOURCE}
+  ${GMSH_SOURCE}
+  ${LOGGER_SOURCE}
+  ${OCC_SOURCE}
+  ${VTK_SOURCE}
 )
 
 add_executable(tests ${SOURCE_TESTS})
-target_link_libraries(tests ${OCC_LIBS})
-target_link_libraries(tests ${VTK_LIBS})
 target_link_libraries(tests Catch2::Catch2)
 catch_discover_tests(tests)
 
@@ -179,37 +184,29 @@ catch_discover_tests(tests)
 option(COVERAGE "Enable coverage flags" OFF)
 if (COVERAGE)
   SET(CMAKE_CXX_FLAGS "-O0 --coverage -W")
+  
+  add_custom_target(coverage
+    COMMAND make clean
+    COMMAND make -j"$(nproc)"
+    COMMAND make test
+    COMMAND ./DXFToGLTF || true
+    COMMAND ./DXFToGLTF ../test/assets/not_existing.dxf pipe.glb|| true
+    COMMAND ./DXFToGLTF ../test/assets/pipe.dxf pipe.glb || true
+    COMMAND ./DXFToGLTF ../test/assets/circle.dxf circle.glb || true
+    COMMAND ./DXFToGLTF ../test/assets/curved.dxf curved.glb || true
+    COMMAND ./GmshToGLTF || true
+    COMMAND ./GmshToGLTF ../test/assets/not_existing.msh not_existing.glb || true
+    COMMAND ./GmshToGLTF ../test/assets/Cube.msh Cube.glb || true
+    COMMAND ./StepToGLTF || true
+    COMMAND ./StepToGLTF ../test/assets/not_existing.step not_existing.glb || true
+    COMMAND ./StepToGLTF ../test/assets/cube.step cube.glb || true
+    COMMAND ./VTUToGLTF || true
+    COMMAND ./VTUToGLTF ../test/assets/not_existing.vtu not_existing || true
+    COMMAND ./VTUToGLTF ../test/assets/Result.vtu Result || true
+    COMMAND ./VTUToGLTF ../test/assets/Result2Pieces.vtu Result || true
+    COMMAND lcov --directory . -c -o report0.info
+    COMMAND lcov --remove report0.info '/usr/include/*' '/usr/local/include/*' '*/dxflib/*' -o report.info
+    COMMAND genhtml -o ../coverage -t "Converters coverage" report.info
+  )
 endif()
 
-add_custom_target(coverage
-  COMMAND make clean
-  COMMAND make
-  COMMAND make test
-  COMMAND ./DXFToBRep || true
-  COMMAND ./DXFToBRep ./test/assets/not_existing.dxf pipe.brep|| true
-  COMMAND ./DXFToBRep ./test/assets/pipe.dxf pipe.brep || true
-  COMMAND ./BRepToThreeJS || true
-  COMMAND ./BRepToThreeJS ./test/assets/not_existing.brep || true
-  COMMAND ./BRepToThreeJS ./test/assets/pipe.brep || true
-  COMMAND ./BRepToThreeJS ./test/assets/cube.brep || true
-  COMMAND ./BRepToThreeJS ./test/assets/pipe.brep pipe || true
-  COMMAND ./GmshToThreeJS || true
-  COMMAND ./GmshToThreeJS ./test/assets/not_existing.msh || true
-  COMMAND ./GmshToThreeJS ./test/assets/Cube.msh || true
-  COMMAND ./GmshToThreeJS ./test/assets/Cube.msh ./cube || true
-  COMMAND ./StepToThreeJS || true
-  COMMAND ./StepToThreeJS ./test/assets/not_existing.step || true
-  COMMAND ./StepToThreeJS ./test/assets/cube.step || true
-  COMMAND ./StepToThreeJS ./test/assets/cube.step ./cube || true
-  COMMAND ./StepUnion || true
-  COMMAND ./StepUnion ./test/assets/not_existing.step ./cube.step || true
-  COMMAND ./StepUnion ./test/assets/not_existing.step ./not_existing/cube.step || true
-  COMMAND ./StepUnion ./test/assets/cube.step ./cube.step || true
-  COMMAND ./VTUToThreeJS || true
-  COMMAND ./VTUToThreeJS ./test/assets/not_existing.vtu || true
-  COMMAND ./VTUToThreeJS ./test/assets/Result.vtu || true
-  COMMAND ./VTUToThreeJS ./test/assets/Result.vtu Result || true
-  COMMAND ./VTUToThreeJS ./test/assets/Result_multi.vtu Result || true
-  COMMAND lcov --directory . -c -o report.info
-  COMMAND genhtml -o ../coverage -t "Converters coverage" report.info
-)

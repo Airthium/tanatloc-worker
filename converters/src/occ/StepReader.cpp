@@ -1,18 +1,8 @@
 #include "StepReader.hpp"
 
-#include <fstream>
-
+#include "../logger/Logger.hpp"
 #include <IFSelect_ReturnStatus.hxx>
 #include <STEPCAFControl_Reader.hxx>
-#include <STEPControl_Reader.hxx>
-#include <StepData_Protocol.hxx>
-#include <StepData_StepModel.hxx>
-#include <XCAFApp_Application.hxx>
-#include <XCAFDoc_ColorTool.hxx>
-#include <XCAFDoc_DocumentTool.hxx>
-#include <XCAFDoc_ShapeTool.hxx>
-
-#include "../logger/Logger.hpp"
 
 /**
  * Constructor
@@ -21,7 +11,7 @@ StepReader::StepReader() = default;
 
 /**
  * Constructor
- * @parem fileName File name
+ * @param fileName File name
  */
 StepReader::StepReader(const std::string &fileName) : m_fileName(fileName) {}
 
@@ -30,19 +20,8 @@ StepReader::StepReader(const std::string &fileName) : m_fileName(fileName) {}
  * @returns Status
  */
 bool StepReader::read() {
+  // Read
   IFSelect_ReturnStatus status;
-
-  // Document
-  Handle(XCAFApp_Application) app = XCAFApp_Application::GetApplication();
-
-  if (app->NbDocuments() > 0) {
-    app->GetDocument(1, this->m_document);
-    app->Close(this->m_document);
-  }
-
-  app->NewDocument("STEP-XCAF", this->m_document);
-
-  // STEP CAF reader
   STEPCAFControl_Reader caf_reader = STEPCAFControl_Reader();
   status = caf_reader.ReadFile(this->m_fileName.c_str());
   if (status != IFSelect_RetDone) {
@@ -50,36 +29,19 @@ bool StepReader::read() {
     return false;
   }
 
-  if (!caf_reader.Transfer(this->m_document)) {
+  // Transfer
+  if (!caf_reader.Transfer(this->m_mainDocument.document)) {
     Logger::ERROR("Unable to transfert root");
     return false;
-  }
-
-  Handle(XCAFDoc_ShapeTool) shapeContent =
-      XCAFDoc_DocumentTool::ShapeTool(this->m_document->Main());
-  TDF_LabelSequence shapes;
-  shapeContent->GetShapes(shapes);
-
-  for (int i = 1; i <= shapes.Size(); ++i) {
-    if (XCAFDoc_ShapeTool::IsFree(shapes.Value(i)))
-      this->m_shapes.push_back(XCAFDoc_ShapeTool::GetShape(shapes.Value(i)));
   }
 
   return true;
 }
 
-/**
- * Get shape
- * @returns Shape
- */
-std::vector<TopoDS_Shape> StepReader::getShapes() const {
-  return this->m_shapes;
+TopoDS_Compound StepReader::getCompound() const {
+  return this->m_mainDocument.getCompound();
 }
 
-/**
- * Get document
- * @returns Document
- */
-Handle(TDocStd_Document) StepReader::getDocument() const {
-  return this->m_document;
+Quantity_Color StepReader::getShapeColor(const TopoDS_Shape &shape) const {
+  return this->m_mainDocument.getShapeColor(shape);
 }

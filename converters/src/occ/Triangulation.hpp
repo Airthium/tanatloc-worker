@@ -3,50 +3,45 @@
 
 #include <vector>
 
-#include <TopoDS_Face.hxx>
-#include <TopoDS_Shape.hxx>
+#include "../geometry/Vertex.hpp"
+#include "MainDocument.hpp"
 
-constexpr double meshQuality = 0.01;
+constexpr double meshQuality = 1.e-3;
+
+struct FaceMesh {
+  uint label;
+  uint minIndex;
+  uint maxIndex;
+  Vertex minVertex;
+  Vertex maxVertex;
+  std::vector<uint> indices;
+  std::vector<Vertex> vertices;
+  std::vector<Vertex> normals;
+};
 
 class Triangulation {
 private:
-  TopoDS_Shape m_shape;
+  TopoDS_Compound m_compound;
   double m_minBb = 0;
   double m_maxBb = 0;
-  std::vector<float> m_vertices;
-  std::vector<float> m_normals;
-  std::vector<uint> m_indices;
 
   // Compute max bounding box
   void computeBb();
-  // Triangulate solid
-  void triangulateSolid(const TopoDS_Shape &shape);
-  // Triangulate face
-  void triangulateFace(const TopoDS_Shape &shape);
-  // Triangulate edge
-  void triangulateEdge(const TopoDS_Shape &shape);
-  // Triangulate loop (solid & face)
-  void triangulateLoop(const TopoDS_Face &face, const uint iDelta = 0);
-  // Is valid
+
+  // Is Valid
   bool isValid(const gp_Pnt &, const gp_Pnt &, const gp_Pnt &) const;
 
 public:
   // Constructor
   Triangulation();
   // Constructor
-  explicit Triangulation(TopoDS_Shape shape);
+  explicit Triangulation(const TopoDS_Compound &);
 
-  // Triangulate
-  void triangulate();
+  // Triangulate face
+  FaceMesh triangulateFace(const TopoDS_Shape &) const;
 
-  // Get Bb
-  void getBb(double *, double *) const;
-  // Get vertices
-  std::vector<float> getVertices() const;
-  // Get normals
-  std::vector<float> getNormals() const;
-  // Get indices
-  std::vector<uint> getIndices() const;
+  // triangulate edge
+  FaceMesh triangulateEdge(const TopoDS_Shape &) const;
 };
 
 #endif //_TRIANGULATION_

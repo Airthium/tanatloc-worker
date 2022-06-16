@@ -1,21 +1,13 @@
 #include <catch2/catch.hpp>
 
-#include "../../src/gmsh/Vertex.hpp"
+#include "../../src/geometry/Vertex.hpp"
 
 TEST_CASE("Vertex") {
   SECTION("Construtor 1") {
     Vertex vertex = Vertex();
-    CHECK(vertex.getCoordinate(0) == 0);
-    CHECK(vertex.getCoordinate(1) == 0);
-    CHECK(vertex.getCoordinate(2) == 0);
-
-    // Out of range
-    CHECK(vertex.getCoordinate(3) == 0);
-
-    std::vector<double> coordinates = vertex.getCoordinates();
-    CHECK(coordinates[0] == 0);
-    CHECK(coordinates[1] == 0);
-    CHECK(coordinates[2] == 0);
+    CHECK(vertex.X() == 0);
+    CHECK(vertex.Y() == 0);
+    CHECK(vertex.Z() == 0);
   }
 
   SECTION("Construtor 2") {
@@ -23,14 +15,9 @@ TEST_CASE("Vertex") {
     double y = 2.;
     double z = 3;
     Vertex vertex = Vertex(x, y, z);
-    CHECK(vertex.getCoordinate(0) == x);
-    CHECK(vertex.getCoordinate(1) == y);
-    CHECK(vertex.getCoordinate(2) == z);
-
-    std::vector<double> coordinates = vertex.getCoordinates();
-    CHECK(coordinates[0] == x);
-    CHECK(coordinates[1] == y);
-    CHECK(coordinates[2] == z);
+    CHECK(vertex.X() == x);
+    CHECK(vertex.Y() == y);
+    CHECK(vertex.Z() == z);
   }
 
   SECTION("Vertex setCoordinates") {
@@ -38,14 +25,11 @@ TEST_CASE("Vertex") {
     double y = 2.;
     double z = 3.;
     Vertex vertex = Vertex();
-    vertex.setCoordinates(x, y, z);
-    CHECK(vertex.getCoordinate(0) == 1.);
-    CHECK(vertex.getCoordinate(1) == 2.);
-    CHECK(vertex.getCoordinate(2) == 3.);
-
-    std::vector<double> coordinates = vertex.getCoordinates();
-    CHECK(coordinates[0] == 1.);
-    CHECK(coordinates[1] == 2.);
-    CHECK(coordinates[2] == 3.);
+    vertex.setX(x);
+    vertex.setY(y);
+    vertex.setZ(z);
+    CHECK(vertex.X() == x);
+    CHECK(vertex.Y() == y);
+    CHECK(vertex.Z() == z);
   }
 }

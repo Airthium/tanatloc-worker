@@ -1,17 +1,18 @@
 #include "Triangulation.hpp"
 
+#include <algorithm>
+
+#include "../logger/Logger.hpp"
+#include "makePipe.hpp"
 #include <BRepBndLib.hxx>
 #include <BRepMesh_IncrementalMesh.hxx>
 #include <BRep_Tool.hxx>
 #include <Bnd_Box.hxx>
 #include <Poly_Connect.hxx>
-#include <ShapeAnalysis_Edge.hxx>
+#include <Poly_Triangulation.hxx>
 #include <StdPrs_ToolTriangulatedShape.hxx>
-#include <TopAbs_ShapeEnum.hxx>
-#include <TopExp_Explorer.hxx>
+#include <TColgp_Array1OfDir.hxx>
 #include <TopoDS.hxx>
-
-#include "../logger/Logger.hpp"
 
 /**
  * Constructor
@@ -22,15 +23,16 @@ Triangulation::Triangulation() = default;
  * Constructor
  * @param shape Shape
  */
-Triangulation::Triangulation(TopoDS_Shape shape) : m_shape(shape) {
+Triangulation::Triangulation(const TopoDS_Compound &compound)
+    : m_compound(compound) {
   this->computeBb();
 }
 
 /**
- * Compute max bounding box dimension
- * @returns Max bounding box dimension
+ * Compute bounding box and max dimensions
  */
 void Triangulation::computeBb() {
+
   Bnd_Box boundingBox;
   double xMin;
   double yMin;
@@ -39,7 +41,7 @@ void Triangulation::computeBb() {
   double yMax;
   double zMax;
 
-  BRepBndLib::Add(this->m_shape, boundingBox);
+  BRepBndLib::Add(this->m_compound, boundingBox);
   boundingBox.Get(xMin, yMin, zMin, xMax, yMax, zMax);
 
   double xDim = std::abs(xMax - xMin);
@@ -51,83 +53,30 @@ void Triangulation::computeBb() {
 }
 
 /**
- * Triangulate
- */
-void Triangulation::triangulate() {
-  TopAbs_ShapeEnum type = this->m_shape.ShapeType();
-  if (type == TopAbs_SOLID)
-    this->triangulateSolid(this->m_shape);
-  else if (type == TopAbs_FACE)
-    this->triangulateFace(this->m_shape);
-  else if (type == TopAbs_EDGE)
-    this->triangulateEdge(this->m_shape);
-}
-
-/**
- * Triangulate solid [private]
- * @param shape Shape
- */
-void Triangulation::triangulateSolid(const TopoDS_Shape &shape) {
-  TopExp_Explorer explorer;
-  BRepMesh_IncrementalMesh mesh(shape, this->m_maxBb * meshQuality);
-  for (explorer.Init(shape, TopAbs_FACE); explorer.More(); explorer.Next()) {
-    TopoDS_Face face = TopoDS::Face(explorer.Current());
-    this->triangulateLoop(face, (uint)this->m_vertices.size() / 3);
-  }
-}
-
-/**
- * Triangulate face [private]
- * @param shape Shape
- */
-void Triangulation::triangulateFace(const TopoDS_Shape &shape) {
-  BRepMesh_IncrementalMesh mesh(shape, this->m_maxBb * meshQuality);
-  this->triangulateLoop(TopoDS::Face(shape));
-}
-
-/**
- * Triangulate edge [private]
- * @param shape Shape
- */
-void Triangulation::triangulateEdge(const TopoDS_Shape &shape) {
-  gp_Pnt p;
-
-  BRepMesh_IncrementalMesh mesh(shape, this->m_maxBb * 2.e-2 * meshQuality,
-                                false, 0.5 * meshQuality, false);
-  TopLoc_Location location;
-  Handle(Poly_Polygon3D) polygon =
-      BRep_Tool::Polygon3D(TopoDS::Edge(shape), location);
-
-  const TColgp_Array1OfPnt &nodes = polygon->Nodes();
-  for (uint i = nodes.Lower(); i <= (uint)nodes.Upper(); ++i) {
-    p = nodes(i).Transformed(location.Transformation());
-    this->m_vertices.push_back(static_cast<float>(p.X()));
-    this->m_vertices.push_back(static_cast<float>(p.Y()));
-    this->m_vertices.push_back(static_cast<float>(p.Z()));
-  }
-}
-
-/**
- * Triangulate loop [private]
+ * Triangulate face
  * @param face Face
+ * @return FaceMesh
  */
-void Triangulation::triangulateLoop(const TopoDS_Face &face,
-                                    const uint iDelta) {
+FaceMesh Triangulation::triangulateFace(const TopoDS_Shape &face) const {
+  BRepMesh_IncrementalMesh(face, this->m_maxBb * meshQuality);
+
+  FaceMesh faceMesh;
+
   uint i;
   gp_Pnt p;
   gp_Dir d;
 
   TopLoc_Location location;
   Handle(Poly_Triangulation) triangulation =
-      BRep_Tool::Triangulation(face, location);
+      BRep_Tool::Triangulation(TopoDS::Face(face), location);
 
   if (triangulation.IsNull()) {
     Logger::ERROR("Null triangulation");
-    return;
+    return faceMesh;
   }
   Poly_Connect pc(triangulation);
 
-  // vertices
+  // Vertices
   const uint nbNodes = triangulation->NbNodes();
   TColgp_Array1OfPnt nodes(1, nbNodes);
   for (i = 1; i <= nbNodes; ++i) {
@@ -138,22 +87,18 @@ void Triangulation::triangulateLoop(const TopoDS_Face &face,
   for (i = 1; i <= nbNodes; ++i) {
     const gp_Pnt node = nodes.Value(i);
     p = node.Transformed(location.Transformation());
-    this->m_vertices.push_back(static_cast<float>(p.X()));
-    this->m_vertices.push_back(static_cast<float>(p.Y()));
-    this->m_vertices.push_back(static_cast<float>(p.Z()));
+    faceMesh.vertices.push_back(Vertex(p.X(), p.Y(), p.Z()));
   }
 
-  // normal
+  // Normals
   TColgp_Array1OfDir normals(1, triangulation->NbNodes());
-  StdPrs_ToolTriangulatedShape::Normal(face, pc, normals);
+  StdPrs_ToolTriangulatedShape::Normal(TopoDS::Face(face), pc, normals);
   for (i = 1; i <= nbNodes; ++i) {
     d = normals(i).Transformed(location.Transformation());
-    this->m_normals.push_back(static_cast<float>(d.X()));
-    this->m_normals.push_back(static_cast<float>(d.Y()));
-    this->m_normals.push_back(static_cast<float>(d.Z()));
+    faceMesh.normals.push_back(Vertex(d.X(), d.Y(), d.Z()));
   }
 
-  // indices
+  // Indices
   int n1;
   int n2;
   int n3;
@@ -167,47 +112,62 @@ void Triangulation::triangulateLoop(const TopoDS_Face &face,
       n2 = tmp;
     }
     if (this->isValid(nodes.Value(n1), nodes.Value(n2), nodes.Value(n3))) {
-      this->m_indices.push_back(--n1 + iDelta);
-      this->m_indices.push_back(--n2 + iDelta);
-      this->m_indices.push_back(--n3 + iDelta);
+      faceMesh.indices.push_back(--n1);
+      faceMesh.indices.push_back(--n2);
+      faceMesh.indices.push_back(--n3);
     }
   }
+
+  // Min / max
+  uint minIndex = 0; // Min is always 0
+  uint maxIndex = 0;
+  std::for_each(
+      faceMesh.indices.begin(), faceMesh.indices.end(),
+      [&maxIndex](const uint index) { maxIndex = std::max(maxIndex, index); });
+  faceMesh.minIndex = minIndex;
+  faceMesh.maxIndex = maxIndex;
+
+  Vertex minVertex(faceMesh.vertices.size() ? faceMesh.vertices.at(0)
+                                            : Vertex(0, 0, 0));
+  Vertex maxVertex(faceMesh.vertices.size() ? faceMesh.vertices.at(0)
+                                            : Vertex(0, 0, 0));
+  std::for_each(faceMesh.vertices.begin(), faceMesh.vertices.end(),
+                [&minVertex, &maxVertex](const Vertex vertex) {
+                  const double x = vertex.X();
+                  const double y = vertex.Y();
+                  const double z = vertex.Z();
+
+                  minVertex.setX(std::min(minVertex.X(), x));
+                  minVertex.setY(std::min(minVertex.Y(), y));
+                  minVertex.setZ(std::min(minVertex.Z(), z));
+
+                  maxVertex.setX(std::max(maxVertex.X(), x));
+                  maxVertex.setY(std::max(maxVertex.Y(), y));
+                  maxVertex.setZ(std::max(maxVertex.Z(), z));
+                });
+  faceMesh.minVertex = minVertex;
+  faceMesh.maxVertex = maxVertex;
+
+  return faceMesh;
 }
 
 /**
- * Get Bb
+ * Triangulate edge (convert to pipe)
+ * @param edge Edge
+ * @return FaceMesh
  */
-void Triangulation::getBb(double *min, double *max) const {
-  *min = this->m_minBb;
-  *max = this->m_maxBb;
+FaceMesh Triangulation::triangulateEdge(const TopoDS_Shape &edge) const {
+  TopoDS_Shape pipe = makePipe(this->m_maxBb / 250., TopoDS::Edge(edge));
+
+  return triangulateFace(pipe);
 }
 
 /**
- * Get vertices
- * @returns Vertices
- */
-std::vector<float> Triangulation::getVertices() const {
-  return this->m_vertices;
-}
-
-/**
- * Get normals
- * @returns normals
- */
-std::vector<float> Triangulation::getNormals() const { return this->m_normals; }
-
-/**
- * Get indices
- * @returns indices
- */
-std::vector<uint> Triangulation::getIndices() const { return this->m_indices; }
-
-/**
- * Is valid
+ * Check valid
  * @param p1 Point 1
  * @param p2 Point 2
  * @param p3 Point 3
- * @returns Is valid
+ * @return Valid
  */
 bool Triangulation::isValid(const gp_Pnt &p1, const gp_Pnt &p2,
                             const gp_Pnt &p3) const {

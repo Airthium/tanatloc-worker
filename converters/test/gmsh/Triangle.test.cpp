@@ -1,23 +1,20 @@
 #include <catch2/catch.hpp>
 
-#include "../../src/gmsh/Triangle.hpp"
+#include "../../src/geometry/Triangle.hpp"
 
 TEST_CASE("Triangle") {
   SECTION("Constructor 1") {
     Triangle triangle = Triangle();
-    CHECK(triangle.getIndex(0) == 0);
-    CHECK(triangle.getIndex(1) == 0);
-    CHECK(triangle.getIndex(2) == 0);
-
-    // Out of range
-    CHECK(triangle.getIndex(3) == 0);
+    CHECK(triangle.I1() == 0);
+    CHECK(triangle.I2() == 0);
+    CHECK(triangle.I3() == 0);
 
     std::vector<uint> indices = triangle.getIndices();
     CHECK(indices[0] == 0);
     CHECK(indices[1] == 0);
     CHECK(indices[2] == 0);
 
-    CHECK(triangle.getLabel() == 0);
+    CHECK(triangle.Label() == 0);
   }
 
   SECTION("Constructor 2") {
@@ -26,16 +23,16 @@ TEST_CASE("Triangle") {
     uint index3 = 3;
     uint label = 4;
     Triangle triangle = Triangle(index1, index2, index3, label);
-    CHECK(triangle.getIndex(0) == 1);
-    CHECK(triangle.getIndex(1) == 2);
-    CHECK(triangle.getIndex(2) == 3);
+    CHECK(triangle.I1() == index1);
+    CHECK(triangle.I2() == index2);
+    CHECK(triangle.I3() == index3);
 
     std::vector<uint> indices = triangle.getIndices();
-    CHECK(indices[0] == 1);
-    CHECK(indices[1] == 2);
-    CHECK(indices[2] == 3);
+    CHECK(indices[0] == index1);
+    CHECK(indices[1] == index2);
+    CHECK(indices[2] == index3);
 
-    CHECK(triangle.getLabel() == 4);
+    CHECK(triangle.Label() == label);
   }
 
   SECTION("setIndices") {
@@ -43,32 +40,34 @@ TEST_CASE("Triangle") {
     uint index2 = 2;
     uint index3 = 3;
     Triangle triangle = Triangle();
-    triangle.setIndices(index1, index2, index3);
-    CHECK(triangle.getIndex(0) == 1);
-    CHECK(triangle.getIndex(1) == 2);
-    CHECK(triangle.getIndex(2) == 3);
+    triangle.setI1(index1);
+    triangle.setI2(index2);
+    triangle.setI3(index3);
+    CHECK(triangle.I1() == index1);
+    CHECK(triangle.I2() == index2);
+    CHECK(triangle.I3() == index3);
 
     std::vector<uint> indices = triangle.getIndices();
-    CHECK(indices[0] == 1);
-    CHECK(indices[1] == 2);
-    CHECK(indices[2] == 3);
+    CHECK(indices[0] == index1);
+    CHECK(indices[1] == index2);
+    CHECK(indices[2] == index3);
 
-    CHECK(triangle.getLabel() == 0);
+    CHECK(triangle.Label() == 0);
   }
 
   SECTION("Triangle setLabel") {
     uint label = 4;
     Triangle triangle = Triangle();
     triangle.setLabel(label);
-    CHECK(triangle.getIndex(0) == 0);
-    CHECK(triangle.getIndex(1) == 0);
-    CHECK(triangle.getIndex(2) == 0);
+    CHECK(triangle.I1() == 0);
+    CHECK(triangle.I2() == 0);
+    CHECK(triangle.I3() == 0);
 
     std::vector<uint> indices = triangle.getIndices();
     CHECK(indices[0] == 0);
     CHECK(indices[1] == 0);
     CHECK(indices[2] == 0);
 
-    CHECK(triangle.getLabel() == 4);
+    CHECK(triangle.Label() == label);
   }
 }

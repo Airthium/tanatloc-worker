@@ -3,6 +3,7 @@
 #include <iostream>
 
 void Logger::DEBUG(const std::string &message) {
+#ifdef DEBUG_MODE
   try {
     std::cout << "\033[1;34m";
     std::cout << "DEBUG: ";
@@ -12,6 +13,7 @@ void Logger::DEBUG(const std::string &message) {
   } catch (const std::exception &e) {
     std::cerr << e.what() << std::endl;
   }
+#endif
 }
 
 void Logger::LOG(const std::string &message) {

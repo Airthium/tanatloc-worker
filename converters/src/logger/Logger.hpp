@@ -12,4 +12,4 @@ public:
   static void ERROR(const std::string &);
 };
 
-#endif
+#endif //_LOGGER_

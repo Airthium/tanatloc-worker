@@ -1,16 +1,12 @@
-#ifndef _STEPREADER_
-#define _STEPREADER_
+#ifndef _STEP_READER_
+#define _STEP_READER_
 
-#include <vector>
-
-#include <TDocStd_Document.hxx>
-#include <TopoDS_Shape.hxx>
+#include "MainDocument.hpp"
 
 class StepReader {
 private:
   std::string m_fileName = "";
-  std::vector<TopoDS_Shape> m_shapes;
-  Handle(TDocStd_Document) m_document;
+  MainDocument m_mainDocument;
 
 public:
   // Constructor
@@ -21,11 +17,8 @@ public:
   // Read
   bool read();
 
-  // Get shape
-  std::vector<TopoDS_Shape> getShapes() const;
-
-  // Get document
-  Handle(TDocStd_Document) getDocument() const;
+  TopoDS_Compound getCompound() const;
+  Quantity_Color getShapeColor(const TopoDS_Shape &shape) const;
 };
 
-#endif
+#endif //_STEP_READER_

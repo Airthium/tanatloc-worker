@@ -1,2 +1,2 @@
-*:converters/dxflib/*
-*:converters/CMakeFiles/*
+*:src/dxflib/*
+*:build/*

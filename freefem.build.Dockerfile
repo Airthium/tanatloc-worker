@@ -12,13 +12,12 @@ WORKDIR $FREEFEMSOURCES
 
 # Configure and build FreeFEM
 RUN autoreconf -i \
-    && ./configure --enable-download --enable-optim --enable-generic --prefix=$FREEFEMPATH \
-    && ./3rdparty/getall -o PETSc -a
-
-RUN cd 3rdparty/ff-petsc \
-    && sed -i'.bak' 's#download-mpich#download-mpich=http://www.mpich.org/static/downloads/3.4rc1/mpich-3.4rc1.tar.gz#' Makefile \
-    && make petsc-slepc
-
-RUN ./reconfigure \
-    && make -j "$(nproc)" \
-    && make install
+	&& ./configure --enable-download --enable-optim --enable-generic --prefix=$FREEFEMPATH \
+	&& ./3rdparty/getall -o PETSc -a \
+	&& cd 3rdparty/ff-petsc \
+	&& sed -i'.bak' 's#download-mpich#download-mpich=http://www.mpich.org/static/downloads/3.4rc1/mpich-3.4rc1.tar.gz#' Makefile \
+	&& make petsc-slepc \
+	&& cd - \
+	&& ./reconfigure \
+	&& make -j "$(nproc)" \
+	&& make install

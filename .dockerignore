@@ -1,5 +1,5 @@
 format.sh
 build.sh
 local.sonarcloud.sh
-opencascade.Dockerfile
-gmsh.Dockerfile
+*.build.Dockerfile
+build

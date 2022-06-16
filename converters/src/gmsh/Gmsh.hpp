@@ -4,11 +4,31 @@
 #include <string>
 #include <vector>
 
-#include "Tetrahedron.hpp"
-#include "Triangle.hpp"
-#include "Vertex.hpp"
+#include "../geometry/Tetrahedron.hpp"
+#include "../geometry/Triangle.hpp"
+#include "../geometry/Vertex.hpp"
 
 using uint = unsigned int;
+
+struct Surface {
+  uint label;
+  uint minIndex;
+  uint maxIndex;
+  Vertex minVertex;
+  Vertex maxVertex;
+  std::vector<Triangle> triangles;
+  std::vector<Vertex> vertices;
+};
+
+struct Volume {
+  uint label;
+  uint minIndex;
+  uint maxIndex;
+  Vertex minVertex;
+  Vertex maxVertex;
+  std::vector<Tetrahedron> tetrahedra;
+  std::vector<Vertex> vertices;
+};
 
 /**
  * Gmsh class
@@ -26,11 +46,6 @@ private:
   // Tetrahedron labels
   std::vector<uint> m_tetrahedronLabels = std::vector<uint>();
 
-  // Copy vertices
-  void copyVertices(const Tetrahedron &, std::vector<double> *) const;
-  void copyVertices(const Triangle &, std::vector<double> *) const;
-  void copy(const std::vector<uint>, std::vector<double> *) const;
-
 public:
   // Constructor
   Gmsh();
@@ -38,29 +53,17 @@ public:
   // Loader
   bool load(const std::string &);
 
-  // Compute number of different labels
-  void computeLabels();
+  // Get volume labels
+  std::vector<uint> getVolumeLabels() const;
 
-  // Get number of vertices
-  uint getNumberOfVertices() const;
-  // Get number of triangles
-  uint getNumberOfTriangles() const;
-  // Get number of triangle labels
-  uint getNumberOfTriangleLabels() const;
-  // Get number of tetrahedra
-  uint getNumberOfTetrahedra() const;
-  // Get number of tetrahedron labels
-  uint getNumberOfTetrahedronLabels() const;
+  // Get surface labels
+  std::vector<uint> getSurfaceLabels() const;
 
-  // Get tetrahedron label
-  uint getTetrahedronLabel(const uint) const;
-  // Get triangle label
-  uint getTriangleLabel(const uint) const;
+  // Get volume
+  Volume getVolume(const uint) const;
 
-  // Get volume vertices
-  std::vector<double> *getVolumesVertices() const;
-  // Get surface vertices
-  std::vector<double> *getSurfacesVertices() const;
+  // Get surface
+  Surface getSurface(const uint) const;
 };
 
-#endif
+#endif //_GMSH_
