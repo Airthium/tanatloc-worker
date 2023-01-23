@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
 # Check GITHUB_TOKEN
-if [ -z "$GITHUB_TOKEN" ]
-then
+if [ -z "$GITHUB_TOKEN" ]; then
   echo "GITHUB_TOKEN variable is empty"
   echo "Archives download skipped!"
 fi
@@ -26,21 +25,21 @@ TARGETS["vtk"]="pre vtk.build"
 TARGETS["converters"]="pre freefem.build vtk.build opencascade.build gmsh.build converters.build"
 TARGETS["worker"]="pre freefem.build vtk.build opencascade.build gmsh.build converters.build release"
 
-DOCKERFILE_PATH="./Dockerfile";
+DOCKERFILE_PATH="./Dockerfile"
 
 # Read Github Token from 2 different env variables for CI:
 GITHUB_TOKEN=${BUILD_TOKEN:-${GITHUB_TOKEN}}
 
 usage() {
-  echo "Usage: ./build.sh [target]";
+  echo "Usage: ./build.sh [target]"
   echo "target=[opencascade, gmsh, freefem, vtk, converters or worker]"
 }
 
 checkArchives() {
   echo -e "Checking archives..."
   for archive in "${!ARCHIVES[@]}"; do
-    echo -e "> $archive";
-    downloadArchive "$archive";
+    echo -e "> $archive"
+    downloadArchive "$archive"
   done
 }
 
@@ -50,8 +49,7 @@ downloadArchive() {
   # Download target if not already present
   if [ ! -f "$archive" ]; then
     echo "File $archive not found. Downloading..."
-    if [ -z "GITHUB_TOKEN" ]
-    then
+    if [ -z "$GITHUB_TOKEN" ]; then
       echo "Download skipped (no GITHUB_TOKEN)"
     else
       curl -LJO -u "$GITHUB_TOKEN:x-oauth-basic" -H 'Accept: application/octet-stream' ${ARCHIVES[$archive]}
@@ -66,12 +64,12 @@ buildDockerfile() {
 
   fragments="${TARGETS[$target]}"
 
-  rm -f $DOCKERFILE_PATH;
+  rm -f $DOCKERFILE_PATH
   for fragment in $fragments; do
     if [ ! -f $DOCKERFILE_PATH ]; then
-      cat "./${fragment}.Dockerfile" > $DOCKERFILE_PATH
+      cat "./${fragment}.Dockerfile" >$DOCKERFILE_PATH
     else
-      cat "./${fragment}.Dockerfile" >> $DOCKERFILE_PATH
+      cat "./${fragment}.Dockerfile" >>$DOCKERFILE_PATH
     fi
   done
 }
@@ -87,12 +85,12 @@ target=$1
 shift
 
 if [ "${TARGETS[$target]}" == "" ]; then
-  echo "Invalid target";
+  echo "Invalid target"
   usage
-  exit 1;
+  exit 1
 fi
 
-ARGS="$*";
+ARGS="$*"
 echo "Building started..."
 echo "TARGET=\"$target\""
 echo "ARGS=\"$ARGS\""
