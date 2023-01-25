@@ -37,6 +37,6 @@ COPY ./tanatloc-converters .
 # Build converters
 RUN mkdir build \
   && cd build \
-  && cmake .. -DBUILD_TESTING=OFF -DOpenCASCADE_DIR=$OCCPATH/lib/cmake/opencascade -DVTK_DIR=$VTKPATH/lib/cmake/vtk-9.1 -DCMAKE_INSTALL_PREFIX=$CONVERTERSPATH \
+  && cmake .. -DBUILD_TESTING=OFF -DCMAKE_PREFIX_PATH=/usr/local/lib/cmake -DOpenCASCADE_DIR=$OCCPATH/lib/cmake/opencascade -DVTK_DIR=$VTKPATH/lib/cmake/vtk-9.1 -DCMAKE_INSTALL_PREFIX=$CONVERTERSPATH \
   && make -j "$(nproc)" \
   && make install

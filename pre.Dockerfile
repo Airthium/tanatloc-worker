@@ -4,7 +4,8 @@ FROM ubuntu:20.04 as builder
 ENV DEBIAN_FRONTEND noninteractive
 
 # Install packages
-RUN apt update \
+RUN apt clean \
+  && apt update \
   && apt upgrade -yq \
   && apt install -yq \
   automake \
