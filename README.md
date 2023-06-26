@@ -2,20 +2,22 @@
 
 Docker for the Tanatloc project.
 
-## Requirements
-
-You need a valid `GITHUB_TOKEN` defined in your environment
-variables to retrieve the archives OpenCascade and Gmsh from
-this repository.
-
-```shell
-export GITHUB_TOKEN=xxx
-```
-
-> https://github.com/settings/tokens
+Converters are defined in the [tanatloc/converters](https://github.com/Airthium/tanatloc-converters) repository.
 
 ## Usage
 
+If you want to build the entire worker:
+
 ```shell
 ./build.sh worker
+```
+
+You can also build only some parts of the project:
+
+```shell
+./build.sh opencascade
+./build.sh gmsh
+./build.sh freefem
+./build.sh vtk
+./build.sh converters
 ```

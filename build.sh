@@ -1,15 +1,9 @@
 #!/usr/bin/env bash
 
-# Check GITHUB_TOKEN
-if [ -z "$GITHUB_TOKEN" ]; then
-  echo "GITHUB_TOKEN variable is empty"
-  echo "Archives download skipped!"
-fi
-
 declare -A ARCHIVES
 
 # Get the list of releases and associated assets:
-#> curl -u $GITHUB_TOKEN:x-oauth-basic "https://api.github.com/repos/Airthium/tanatloc-dockers/releases"
+#> curl -u "https://api.github.com/repos/Airthium/tanatloc-dockers/releases"
 ARCHIVES["opencascade-7.6.0.tgz"]="https://api.github.com/repos/Airthium/tanatloc-dockers/releases/assets/65069748"
 ARCHIVES["gmsh-4.10.1-source.tgz"]="https://api.github.com/repos/Airthium/tanatloc-dockers/releases/assets/65069747"
 ARCHIVES["FreeFem-sources-4.11.tar.gz"]="https://api.github.com/repos/Airthium/tanatloc-dockers/releases/assets/65069742"
@@ -26,9 +20,6 @@ TARGETS["converters"]="pre freefem.build vtk.build opencascade.build gmsh.build 
 TARGETS["worker"]="pre freefem.build vtk.build opencascade.build gmsh.build converters.build release"
 
 DOCKERFILE_PATH="./Dockerfile"
-
-# Read Github Token from 2 different env variables for CI:
-GITHUB_TOKEN=${BUILD_TOKEN:-${GITHUB_TOKEN}}
 
 usage() {
   echo "Usage: ./build.sh [target]"
@@ -49,11 +40,7 @@ downloadArchive() {
   # Download target if not already present
   if [ ! -f "$archive" ]; then
     echo "File $archive not found. Downloading..."
-    if [ -z "$GITHUB_TOKEN" ]; then
-      echo "Download skipped (no GITHUB_TOKEN)"
-    else
-      curl -LJO -u "$GITHUB_TOKEN:x-oauth-basic" -H 'Accept: application/octet-stream' ${ARCHIVES[$archive]}
-    fi
+    curl -LJO -H 'Accept: application/octet-stream' ${ARCHIVES[$archive]}
   fi
 }
 
