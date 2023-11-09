@@ -1,14 +1,5 @@
 #!/usr/bin/env bash
 
-declare -A ARCHIVES
-
-# Get the list of releases and associated assets:
-#> curl -u "https://api.github.com/repos/Airthium/tanatloc-dockers/releases"
-ARCHIVES["opencascade-7.6.0.tgz"]="https://api.github.com/repos/Airthium/tanatloc-dockers/releases/assets/65069748"
-ARCHIVES["gmsh-4.10.1-source.tgz"]="https://api.github.com/repos/Airthium/tanatloc-dockers/releases/assets/65069747"
-ARCHIVES["FreeFem-sources-4.11.tar.gz"]="https://api.github.com/repos/Airthium/tanatloc-dockers/releases/assets/65069742"
-ARCHIVES["VTK-9.1.0.tar.gz"]="https://api.github.com/repos/Airthium/tanatloc-dockers/releases/assets/65069731"
-
 declare -A TARGETS
 
 TARGETS["opencascade"]="pre opencascade.build"
@@ -24,14 +15,6 @@ DOCKERFILE_PATH="./Dockerfile"
 usage() {
   echo "Usage: ./build.sh [target]"
   echo "target=[opencascade, gmsh, freefem, vtk, converters or worker]"
-}
-
-checkArchives() {
-  echo -e "Checking archives..."
-  for archive in "${!ARCHIVES[@]}"; do
-    echo -e "> $archive"
-    downloadArchive "$archive"
-  done
 }
 
 downloadArchive() {
@@ -55,8 +38,10 @@ buildDockerfile() {
   for fragment in $fragments; do
     if [ ! -f $DOCKERFILE_PATH ]; then
       cat "./${fragment}.Dockerfile" >$DOCKERFILE_PATH
+      echo "" >>$DOCKERFILE_PATH
     else
       cat "./${fragment}.Dockerfile" >>$DOCKERFILE_PATH
+      echo "" >>$DOCKERFILE_PATH
     fi
   done
 }
@@ -82,5 +67,4 @@ echo "Building started..."
 echo "TARGET=\"$target\""
 echo "ARGS=\"$ARGS\""
 
-checkArchives
 buildDockerfile "$target"
