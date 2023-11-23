@@ -11,8 +11,8 @@ WORKDIR $OCCSOURCES
 
 # Configure and build OCC
 RUN mkdir build \
-  && cd build \
-  && cmake .. -DCMAKE_BUILD_TYPE=Release -DUSE_RAPIDJSON=ON -DINSTALL_DIR=${OCCPATH} \
-  && make -j "$(nproc)" \
-  && make install \
-  && make clean
+	&& cd build \
+	&& cmake .. -DCMAKE_BUILD_TYPE=Release -DUSE_RAPIDJSON=ON -DINSTALL_DIR=${OCCPATH} \
+	&& make -j "$(nproc)" \
+	&& make install \
+	&& make clean

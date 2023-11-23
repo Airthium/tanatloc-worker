@@ -4,4 +4,4 @@ WORKDIR $GMSHSOURCES
 
 # Test gmsh
 RUN cd gmsh/build \
-  && make test
+	&& make test

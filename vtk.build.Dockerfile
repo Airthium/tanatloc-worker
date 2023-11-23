@@ -11,8 +11,8 @@ WORKDIR $VTKSOURCES
 
 # Configure and build VTK
 RUN mkdir build \
-  && cd build \
-  && cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${VTKPATH} \
-  && make -j "$(nproc)" \
-  && make install \
-  && make clean
+	&& cd build \
+	&& cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${VTKPATH} \
+	&& make -j "$(nproc)" \
+	&& make install \
+	&& make clean

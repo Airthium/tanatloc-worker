@@ -11,8 +11,8 @@ WORKDIR $GMSHSOURCES
 
 # Configure and build Gmsh
 RUN mkdir build \
-  && cd build \
-  && cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_FLTK=OFF -DCMAKE_PREFIX_PATH=${OCCPATH} -DCMAKE_INSTALL_PREFIX=${GMSHPATH} \
-  && make -j 4 \
-  && make install \
-  && make clean
+	&& cd build \
+	&& cmake .. -DCMAKE_BUILD_TYPE=Release -DENABLE_FLTK=OFF -DCMAKE_PREFIX_PATH=${OCCPATH} -DCMAKE_INSTALL_PREFIX=${GMSHPATH} \
+	&& make -j 4 \
+	&& make install \
+	&& make clean
