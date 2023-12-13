@@ -1,5 +1,5 @@
 ## PRE ##
-FROM ubuntu:20.04 AS builder
+FROM ubuntu:22.04 AS builder
 
 ENV DEBIAN_FRONTEND noninteractive
 
